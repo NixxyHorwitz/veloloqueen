@@ -78,6 +78,8 @@ i[class^="ph-"] {
 .topbar {
   position: sticky; top: 0; z-index: 1000;
   width: 100%;
+  height: auto !important; /* FIX OVERFLOW: Prevent fixed height */
+  min-height: 54px;
   background: linear-gradient(135deg, #ea580c 0%, #f97316 60%, #fb923c 100%);
   border-bottom: 4px solid #c2410c;
   box-shadow: 0 4px 0 #9a3412;
@@ -162,28 +164,28 @@ i[class^="ph-"] {
 
 .bal-pill {
   display: flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.18);
-  border: 2px solid rgba(255,255,255,0.32);
+  background: #fff;
+  border: 2px solid #0f172a;
   border-radius: 20px;
   padding: 5px 10px 5px 6px;
-  cursor: pointer; transition: background 0.15s;
+  cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
   width: 100%;          /* fill the flex container */
-  box-shadow: 0 3px 0 rgba(0,0,0,0.10);
+  box-shadow: 0 4px 0 #0f172a;
 }
-.bal-pill:active { background: rgba(255,255,255,0.28); }
+.bal-pill:active { transform: translateY(3px); box-shadow: 0 1px 0 #0f172a; }
 .bal-pill__icon {
-  width: 22px; height: 22px; border-radius: 50%;
+  width: 24px; height: 24px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; flex-shrink: 0;
-  background: rgba(255,255,255,0.22);
+  font-size: 13px; flex-shrink: 0;
+  border: 1.5px solid rgba(0,0,0,0.1);
 }
 .bal-pill__texts { display: flex; flex-direction: column; gap: 0; min-width: 0; }
 .bal-pill__label {
-  font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.8); line-height: 1;
+  font-size: 9px; font-weight: 800; color: #64748b; line-height: 1;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .bal-pill__val {
-  font-size: 11px; font-weight: 900; color: #fff; line-height: 1.2;
+  font-size: 12px; font-weight: 900; color: #0f172a; line-height: 1.2;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
@@ -250,7 +252,7 @@ i[class^="ph-"] {
     <div class="topbar__row2">
       <div class="bal-dropdown" id="bal-dropdown-wd">
         <button type="button" class="bal-pill" onclick="toggleBal('wd', event)" aria-label="Saldo pencairan">
-          <div class="bal-pill__icon"><i class="ph-bold ph-arrow-circle-up" style="color:#34d399;font-size:13px"></i></div>
+          <div class="bal-pill__icon" style="background:#d1fae5"><i class="ph-bold ph-arrow-circle-up" style="color:#059669;font-size:13px"></i></div>
           <div class="bal-pill__texts">
             <span class="bal-pill__label">💰 Dompet</span>
             <span class="bal-pill__val"><?= fmt_short((float)$user['balance_wd']) ?></span>
@@ -266,7 +268,7 @@ i[class^="ph-"] {
 
       <div class="bal-dropdown" id="bal-dropdown-dep">
         <button type="button" class="bal-pill" onclick="toggleBal('dep', event)" aria-label="Saldo beli">
-          <div class="bal-pill__icon"><i class="ph-bold ph-bank" style="color:#93c5fd;font-size:13px"></i></div>
+          <div class="bal-pill__icon" style="background:#dbeafe"><i class="ph-bold ph-bank" style="color:#2563eb;font-size:13px"></i></div>
           <div class="bal-pill__texts">
             <span class="bal-pill__label">🛒 Top Up</span>
             <span class="bal-pill__val"><?= fmt_short((float)$user['balance_dep']) ?></span>
