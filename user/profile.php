@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/auth/guard.php';
 $flash = $flashType = '';
@@ -337,7 +337,7 @@ require dirname(__DIR__) . '/partials/header.php';
   <!-- CONTACTS -->
   <div class="p-contacts">
     <?php foreach ($_contact_btns as $cb):
-      $t = strtolower($cb['type']);
+      $t = strtolower(\$cb['icon_value']);
       $c = match($t) {
         'wa' => 'background:linear-gradient(135deg, #4ade80, #16a34a);',
         'tele' => 'background:linear-gradient(135deg, #60a5fa, #2563eb);',
