@@ -200,6 +200,16 @@ body { background: #f97316 !important; }
 .page-content { display: flex; flex-direction: column; padding-bottom: 0 !important; }
 .home-body { background: #fff8f0; padding: 16px 14px calc(var(--nav-h) + 24px); flex: 1; }
 
+.info-bar {
+  background: #fff;
+  border: 3px solid #0f172a;
+  border-radius: 16px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 5px 0 #0f172a;
+  color: #0f172a;
+}
+.info-bar--orange { background: #fff8f0; border-color: #ea580c; box-shadow: 0 5px 0 #c2410c; }
+
 /* ── SECTION HEADER ── */
 .sh {
   display: flex; align-items: center; justify-content: space-between;
@@ -577,46 +587,29 @@ body { background: #f97316 !important; }
   <?php
   $is_newcomer = !$is_guest && (empty($history) || (isset($user['created_at']) && strtotime($user['created_at']) > time() - 3 * 86400) || ($user['balance_wd'] == 0 && $user['balance_dep'] == 0));
   if ($is_newcomer): ?>
-  <div class="info-bar" style="margin-bottom:14px">
-    <i class="ph-fill ph-book-open-text" style="font-size:20px;flex-shrink:0"></i>
+  <div class="info-bar info-bar--orange" style="margin-bottom:14px">
+    <i class="ph-fill ph-book-open-text" style="font-size:20px;flex-shrink:0;color:#ea580c"></i>
     <div style="flex:1">
-      <div style="font-size:11px;font-weight:900">Pemain Baru? Selamat Datang! 🎉</div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.8);font-weight:700">Baca panduan dapetin reward dulu yuk</div>
+      <div style="font-size:11px;font-weight:900;color:#0f172a;">Pemain Baru? Selamat Datang! 🎉</div>
+      <div style="font-size:10px;color:#475569;font-weight:700">Baca panduan dapetin reward dulu yuk</div>
     </div>
-    <a href="/panduan" style="background:#fff;color:#ea580c;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:900;text-decoration:none;border:2px solid #fde68a;box-shadow:0 3px 0 #fbbf24;white-space:nowrap;font-family:'Nunito',sans-serif">Panduan</a>
+    <a href="/panduan" style="background:#ea580c;color:#fff;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:900;text-decoration:none;border:2px solid #c2410c;box-shadow:0 3px 0 #9a3412;white-space:nowrap;font-family:'Nunito',sans-serif">Panduan</a>
   </div>
   <?php endif; ?>
-
-  <!-- ── 2 BIG WALLET CARDS ── -->
-  <div class="bal-row">
-    <!-- Tarik -->
-    <a href="/withdraw" class="bal-tile bal-tile--wd">
-      <i class="ph-bold ph-money bal-tile__deco"></i>
-      <div class="bal-tile__hd">
-        <div class="bal-tile__ico"><i class="ph-bold ph-hand-coins" style="color:#059669"></i></div>
-        <div class="bal-tile__lbl">Penghasilan</div>
-      </div>
-      <div class="bal-tile__val"><?= format_rp((float)$user['balance_wd']) ?></div>
-      <div class="bal-tile__btn">Tarik Saldo <i class="ph-bold ph-caret-right"></i></div>
-    </a>
-
-    <!-- Topup -->
-    <a href="/deposit" class="bal-tile bal-tile--dep">
-      <i class="ph-bold ph-bank bal-tile__deco"></i>
-      <div class="bal-tile__hd">
-        <div class="bal-tile__ico"><i class="ph-bold ph-wallet" style="color:#2563eb"></i></div>
-        <div class="bal-tile__lbl">Saldo Belanja</div>
-      </div>
-      <div class="bal-tile__val"><?= format_rp((float)$user['balance_dep']) ?></div>
-      <div class="bal-tile__btn">Topup <i class="ph-bold ph-caret-right"></i></div>
-    </a>
-  </div>
 
   <!-- ── Bento Quick Actions ── -->
   <div class="sh" style="margin-bottom:10px">
     <div class="sh__title">🎮 Menu Cepat</div>
   </div>
   <div class="bento-grid" style="margin-bottom:16px">
+
+    <!-- BIG: Tonton Video -->
+    <a href="/videos" class="bento-big" style="background:#0f172a; border-color:#1e293b; box-shadow:0 6px 0 #020617;">
+      <i class="ph-bold ph-play-circle bento-big__emoji" style="color:#6366f1"></i>
+      <i class="ph-fill ph-video-camera bento-big__icon" style="color:#a5b4fc"></i>
+      <div class="bento-big__label">Tonton Video</div>
+      <div class="bento-big__sub">Mulai hasilkan uang!</div>
+    </a>
 
     <!-- SM: Tantangan -->
     <a href="/missions" class="bento-sm"
@@ -679,6 +672,26 @@ body { background: #f97316 !important; }
        style="background:linear-gradient(135deg,#6ee7b7,#0891b2);box-shadow:0 4px 0 #0e7490">
       <i class="ph-fill ph-book-open"></i>
       <span class="bento-sm__label">Panduan</span>
+    </a>
+
+    <!-- WIDE: Tarik Saldo -->
+    <a href="/withdraw" class="bento-wide"
+       style="background:linear-gradient(135deg,#34d399,#059669);box-shadow:0 4px 0 #047857">
+      <i class="ph-fill ph-hand-coins"></i>
+      <div class="bento-wide__txt">
+        <div class="bento-wide__label">Tarik Saldo</div>
+        <div class="bento-wide__sub"><?= format_rp((float)$user['balance_wd']) ?></div>
+      </div>
+    </a>
+
+    <!-- WIDE: Topup -->
+    <a href="/deposit" class="bento-wide"
+       style="background:linear-gradient(135deg,#60a5fa,#2563eb);box-shadow:0 4px 0 #1d4ed8">
+      <i class="ph-fill ph-wallet"></i>
+      <div class="bento-wide__txt">
+        <div class="bento-wide__label">Topup</div>
+        <div class="bento-wide__sub"><?= format_rp((float)$user['balance_dep']) ?></div>
+      </div>
     </a>
 
   </div>
