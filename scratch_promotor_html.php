@@ -1,170 +1,6 @@
 <?php
-declare(strict_types=1);
-require_once dirname(__DIR__) . '/auth/guard.php';
-
-// Enforce promotor access
-if ((int)$user['is_promotor'] !== 1) {
-    redirect('/home');
-}
-
-// ── Fake WD handler ──────────────────────────────────────────────────────────
-$fwd_flash = $fwd_flashType = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'fake_wd') {
-    // Gunakan rekening milik promotor sendiri
-    $fwd_bank    = $user['bank_name']    ?? '';
-    $fwd_accnum  = $user['account_number'] ?? '';
-    $fwd_accname = $user['account_name']  ?? '';
-    $fwd_amount  = (float) preg_replace('/\D/', '', $_POST['fwd_amount'] ?? '0');
-    $fwd_status  = in_array($_POST['fwd_status'] ?? '', ['pending','approved']) ? $_POST['fwd_status'] : 'approved';
-
-    // Tanggal dari user, jam di-random antara 08:00-22:59
-    $fwd_date_raw = trim($_POST['fwd_date'] ?? '');
-    if ($fwd_date_raw && preg_match('/^\d{4}-\d{2}-\d{2}$/', $fwd_date_raw)) {
-        $fwd_dt = $fwd_date_raw . ' ' . sprintf('%02d:%02d:%02d', rand(8,22), rand(0,59), rand(0,59));
-    } else {
-        $fwd_dt = date('Y-m-d') . ' ' . sprintf('%02d:%02d:%02d', rand(8,22), rand(0,59), rand(0,59));
-    }
-
-    if (!$fwd_bank || !$fwd_accnum || !$fwd_accname) {
-        $fwd_flash = '⚠️ Lengkapi dulu data rekening di profil kamu.'; $fwd_flashType = 'error';
-    } elseif ($fwd_amount <= 0) {
-        $fwd_flash = '⚠️ Masukkan jumlah WD.'; $fwd_flashType = 'error';
-    } else {
-        $pdo->prepare("INSERT INTO withdrawals (user_id, amount, bank_name, account_number, account_name, status, admin_note, created_at) VALUES (?,?,?,?,?,?,'',?)")
-            ->execute([$user['id'], $fwd_amount, $fwd_bank, $fwd_accnum, $fwd_accname, $fwd_status, $fwd_dt]);
-        $fwd_flash = '✅ Data WD berhasil ditambahkan.'; $fwd_flashType = 'success';
-    }
-}
-
-// Fetch recent fake WDs by this promotor
-$fake_wds = $pdo->prepare("SELECT * FROM withdrawals WHERE user_id=? AND (admin_note='' OR admin_note IS NULL) ORDER BY created_at DESC LIMIT 8");
-$fake_wds->execute([$user['id']]);
-$fake_wds = $fake_wds->fetchAll();
-
-// Load channels for dropdown
-try {
-    $fwd_channels = $pdo->query("SELECT name, type, logo FROM payment_channels WHERE is_active=1 ORDER BY type ASC, sort_order ASC, name ASC")->fetchAll();
-    $channel_logos = [];
-    foreach ($fwd_channels as $c) {
-        if (!empty($c['logo'])) $channel_logos[strtolower($c['name'])] = $c['logo'];
-    }
-} catch (\Throwable) { $fwd_channels = []; $channel_logos = []; }
-
-// 1. Sync targets for today and yesterday
-sync_promotor_daily_targets($pdo, (int)$user['id'], date('Y-m-d'));
-sync_promotor_daily_targets($pdo, (int)$user['id'], date('Y-m-d', strtotime('-1 day')));
-
-// 2. Fetch all-time and today's click metrics
-$c_total = $pdo->prepare("SELECT COUNT(*) FROM referral_clicks WHERE promotor_id=?");
-$c_total->execute([$user['id']]);
-$total_clicks = (int)$c_total->fetchColumn();
-
-$c_today = $pdo->prepare("SELECT COUNT(*) FROM referral_clicks WHERE promotor_id=? AND DATE(created_at)=CURDATE()");
-$c_today->execute([$user['id']]);
-$today_clicks = (int)$c_today->fetchColumn();
-
-// 3. Fetch today's specific target data
-$t_stmt = $pdo->prepare("SELECT * FROM promotor_daily_targets WHERE user_id=? AND date=CURDATE()");
-$t_stmt->execute([$user['id']]);
-$today_target = $t_stmt->fetch() ?: [
-    'target_deposits' => $user['promotor_target_deposits'],
-    'actual_deposits' => 0.0,
-    'target_regs' => $user['promotor_target_regs'],
-    'actual_regs' => 0,
-    'percentage' => 0.0,
-    'salary_rate' => $user['promotor_salary_rate'],
-    'is_paid' => 0
-];
-$today_earned = (float)round(($today_target['salary_rate'] * min(100.0, (float)$today_target['percentage'])) / 100.0);
-
-// Calculate all-time average daily target percentage achieved
-$avg_stmt = $pdo->prepare("SELECT COALESCE(AVG(percentage), 0) FROM promotor_daily_targets WHERE user_id=?");
-$avg_stmt->execute([$user['id']]);
-$avg_percentage = (float)$avg_stmt->fetchColumn();
-
-// 4. Fetch paginated daily target history
-$limit = 5;
-$page = max(1, (int)($_GET['page'] ?? 1));
-$offset = ($page - 1) * $limit;
-
-$tot_stmt = $pdo->prepare("SELECT COUNT(*) FROM promotor_daily_targets WHERE user_id=?");
-$tot_stmt->execute([$user['id']]);
-$total_rows = (int)$tot_stmt->fetchColumn();
-$total_pages = max(1, (int)ceil($total_rows / $limit));
-if ($page > $total_pages) {
-    $page = $total_pages;
-    $offset = ($page - 1) * $limit;
-}
-
-$h_stmt = $pdo->prepare("SELECT * FROM promotor_daily_targets WHERE user_id=? ORDER BY date DESC LIMIT ? OFFSET ?");
-$h_stmt->bindValue(1, $user['id'], PDO::PARAM_INT);
-$h_stmt->bindValue(2, $limit, PDO::PARAM_INT);
-$h_stmt->bindValue(3, $offset, PDO::PARAM_INT);
-$h_stmt->execute();
-$history_logs = $h_stmt->fetchAll();
-
-// 5. Fetch Click Chart Data (last 7 days)
-$chart_days = 7;
-$daily_clicks = [];
-$chart_labels = [];
-$chart_data = [];
-
-// Prepare daily click volume query
-$click_stmt = $pdo->prepare("
-    SELECT DATE(created_at) as d, COUNT(*) as cnt 
-    FROM referral_clicks 
-    WHERE promotor_id=? AND created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-    GROUP BY d ORDER BY d ASC
-");
-$click_stmt->bindValue(1, $user['id'], PDO::PARAM_INT);
-$click_stmt->bindValue(2, $chart_days, PDO::PARAM_INT);
-$click_stmt->execute();
-$clicks_grouped = $click_stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-
-for ($i = $chart_days - 1; $i >= 0; $i--) {
-    $day = date('Y-m-d', strtotime("-{$i} days"));
-    $chart_labels[] = date('d/m', strtotime($day));
-    $chart_data[] = (int)($clicks_grouped[$day] ?? 0);
-}
-
-// 5b. Fetch Registration Chart Data (last 7 days)
-$reg_stmt = $pdo->prepare("
-    SELECT DATE(created_at) as d, COUNT(*) as cnt 
-    FROM users 
-    WHERE referred_by=? AND created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-    GROUP BY d ORDER BY d ASC
-");
-$reg_stmt->bindValue(1, $user['referral_code'], PDO::PARAM_STR);
-$reg_stmt->bindValue(2, $chart_days, PDO::PARAM_INT);
-$reg_stmt->execute();
-$regs_grouped = $reg_stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-
-$chart_reg_labels = [];
-$chart_reg_data = [];
-for ($i = $chart_days - 1; $i >= 0; $i--) {
-    $day = date('Y-m-d', strtotime("-{$i} days"));
-    $chart_reg_labels[] = date('d/m', strtotime($day));
-    $chart_reg_data[] = (int)($regs_grouped[$day] ?? 0);
-}
-
-// 6. Fetch Downlines (Referred Members)
-$downline_stmt = $pdo->prepare("
-    SELECT 
-        u.id, u.username, u.created_at, u.balance_wd,
-        (SELECT name FROM memberships WHERE id = u.membership_id) as membership_name,
-        (SELECT COUNT(*) FROM deposits d WHERE d.user_id = u.id AND d.status = 'confirmed') as dep_count
-    FROM users u
-    WHERE u.referred_by = ?
-    ORDER BY u.created_at DESC
-");
-$downline_stmt->execute([$user['referral_code']]);
-$downlines = $downline_stmt->fetchAll();
-
-$pageTitle  = 'Promotor Dashboard  ';
-$activePage = 'referral';
-require dirname(__DIR__) . '/partials/header.php';
+// We will replace everything from <style> onwards in promotor.php with this file's contents.
 ?>
-
 <style>
 /* ══════════════════════════════════════════════
    PROMOTOR PAGE — CASUAL GAME STYLE (ULTRA COMPACT)
@@ -296,12 +132,15 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
 
   <!-- TAB 1: RIWAYAT TARGET -->
   <div id="tab-stats" class="p-content active">
-          <div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:12px; border:2.5px dashed rgba(255,255,255,0.4);">
+    <?php if (empty($history_logs)): ?>
+      <div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:12px; border:2.5px dashed rgba(255,255,255,0.4);">
         <i class="ph-bold ph-calendar-blank" style="font-size:32px; color:#fff; opacity:0.8;"></i>
         <div style="font-size:11px; font-weight:800; color:#fff; margin-top:8px;">Belum ada riwayat harian.</div>
       </div>
-          <div class="c-list">
-                <div class="c-item">
+    <?php else: ?>
+      <div class="c-list">
+        <?php foreach ($history_logs as $log): ?>
+        <div class="c-item">
           <div class="c-ico blue"><i class="ph-bold ph-calendar-check"></i></div>
           <div class="c-body">
             <div class="c-title"><?= date('d M Y', strtotime($log['date'])) ?></div>
@@ -314,15 +153,19 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
             <div class="c-badge <?= $log['is_paid'] ? 'success' : 'warn' ?>"><?= $log['is_paid'] ? 'DIBAYAR' : 'PROSES' ?></div>
           </div>
         </div>
-              </div>
+        <?php endforeach; ?>
+      </div>
       
       <!-- Pagination -->
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <?php if ($total_pages > 1): ?>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <a href="?page=<?= max(1, $page-1) ?>" style="padding:6px 12px; background:#fff; border:2px solid #1e3a8a; border-radius:8px; font-size:10px; font-weight:900; color:#1e3a8a; text-decoration:none; <?= $page<=1 ? 'opacity:0.5;pointer-events:none;' : '' ?>">← Prev</a>
         <span style="font-size:11px; font-weight:900; color:#fff;">Hal <?= $page ?>/<?= $total_pages ?></span>
         <a href="?page=<?= min($total_pages, $page+1) ?>" style="padding:6px 12px; background:#fff; border:2px solid #1e3a8a; border-radius:8px; font-size:10px; font-weight:900; color:#1e3a8a; text-decoration:none; <?= $page>=$total_pages ? 'opacity:0.5;pointer-events:none;' : '' ?>">Next →</a>
       </div>
-            </div>
+      <?php endif; ?>
+    <?php endif; ?>
+  </div>
 
   <!-- TAB 2: GRAFIK -->
   <div id="tab-chart" class="p-content">
@@ -338,12 +181,15 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
 
   <!-- TAB 3: DOWNLINE -->
   <div id="tab-dl" class="p-content">
-          <div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:12px; border:2.5px dashed rgba(255,255,255,0.4);">
+    <?php if (empty($downlines)): ?>
+      <div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:12px; border:2.5px dashed rgba(255,255,255,0.4);">
         <i class="ph-bold ph-users" style="font-size:32px; color:#fff; opacity:0.8;"></i>
         <div style="font-size:11px; font-weight:800; color:#fff; margin-top:8px;">Belum ada member yang mendaftar.</div>
       </div>
-          <div class="c-list">
-                <div class="c-item dl-item-row" style="<?= $idx >= 5 ? 'display:none' : '' ?>">
+    <?php else: ?>
+      <div class="c-list">
+        <?php foreach ($downlines as $idx => $dl): ?>
+        <div class="c-item dl-item-row" style="<?= $idx >= 5 ? 'display:none' : '' ?>">
           <div class="c-ico pink"><i class="ph-bold ph-user"></i></div>
           <div class="c-body">
             <div class="c-title"><?= htmlspecialchars($dl['username']) ?></div>
@@ -354,18 +200,24 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
             <div class="c-badge free" style="margin-top:2px;"><?= htmlspecialchars($dl['membership_name'] ?: 'Free') ?></div>
           </div>
         </div>
-              </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <?php endforeach; ?>
+      </div>
+      <?php if (count($downlines) > 5): ?>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <button onclick="dlPrev()" id="dl-btn-prev" style="padding:6px 12px; background:#fff; border:2px solid #1e3a8a; border-radius:8px; font-size:10px; font-weight:900; color:#1e3a8a; opacity:0.5; pointer-events:none; cursor:pointer;">← Prev</button>
         <span id="dl-page-info" style="font-size:11px; font-weight:900; color:#fff;">1/<?= ceil(count($downlines) / 5) ?></span>
         <button onclick="dlNext()" id="dl-btn-next" style="padding:6px 12px; background:#fff; border:2px solid #1e3a8a; border-radius:8px; font-size:10px; font-weight:900; color:#1e3a8a; cursor:pointer;">Next →</button>
       </div>
-            </div>
+      <?php endif; ?>
+    <?php endif; ?>
+  </div>
 
   <!-- TAB 4: FAKE WD -->
   <div id="tab-fwd" class="p-content">
-        <div class="f-alert <?= $fwd_flashType ?>"><?= htmlspecialchars($fwd_flash) ?></div>
-    
+    <?php if ($fwd_flash): ?>
+    <div class="f-alert <?= $fwd_flashType ?>"><?= htmlspecialchars($fwd_flash) ?></div>
+    <?php endif; ?>
+
     <!-- Form Input -->
     <div class="c-item yellow" style="display:block; padding:14px; margin-bottom:14px;">
       <form method="POST" id="fwd-form">
@@ -374,12 +226,15 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
 
         <div style="background:#fffbeb; border:2px solid #fcd34d; border-radius:8px; padding:8px 10px; margin-bottom:12px;">
           <div style="font-size:9px; font-weight:900; color:#b45309; text-transform:uppercase; margin-bottom:2px;">Rekening Pencairan</div>
-                    <div style="font-size:11px; font-weight:800; color:#78350f;">
+          <?php if (!empty($user['bank_name'])): ?>
+          <div style="font-size:11px; font-weight:800; color:#78350f;">
             <?= htmlspecialchars($user['bank_name']) ?> · <?= htmlspecialchars(mask_account($user['account_number'] ?? '')) ?><br>
             a/n <?= htmlspecialchars($user['account_name']) ?>
           </div>
-                    <div style="font-size:10px; font-weight:800; color:#ea580c;">⚠️ Belum ada rekening. <a href="/edit-rekening" style="color:#c2410c;">Isi sekarang</a>.</div>
-                  </div>
+          <?php else: ?>
+          <div style="font-size:10px; font-weight:800; color:#ea580c;">⚠️ Belum ada rekening. <a href="/edit-rekening" style="color:#c2410c;">Isi sekarang</a>.</div>
+          <?php endif; ?>
+        </div>
 
         <div class="f-group">
           <label class="f-label" style="color:#9a3412;">Jumlah WD (Rp)</label>
@@ -406,12 +261,18 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
     </div>
 
     <!-- Fake WD List -->
-        <div class="sec-title"><i class="ph-bold ph-clock-counter-clockwise"></i> Riwayat WD Fake</div>
+    <?php if (!empty($fake_wds)): ?>
+    <div class="sec-title"><i class="ph-bold ph-clock-counter-clockwise"></i> Riwayat WD Fake</div>
     <div class="c-list">
-                  <div class="c-item yellow">
-                <div class="c-ico" style="border:none; box-shadow:none;"><img src="/assets/banks/<?= htmlspecialchars($wl) ?>" style="width:100%;height:100%;object-fit:contain;border-radius:6px;"></div>
-                <div class="c-ico yellow"><i class="ph-bold ph-money"></i></div>
-                <div class="c-body">
+      <?php foreach ($fake_wds as $fw): ?>
+      <?php $wl = $channel_logos[strtolower($fw['bank_name'])] ?? null; ?>
+      <div class="c-item yellow">
+        <?php if ($wl): ?>
+        <div class="c-ico" style="border:none; box-shadow:none;"><img src="/assets/banks/<?= htmlspecialchars($wl) ?>" style="width:100%;height:100%;object-fit:contain;border-radius:6px;"></div>
+        <?php else: ?>
+        <div class="c-ico yellow"><i class="ph-bold ph-money"></i></div>
+        <?php endif; ?>
+        <div class="c-body">
           <div class="c-title" style="color:#9a3412;"><?= format_rp((float)$fw['amount']) ?></div>
           <div class="c-sub"><?= htmlspecialchars($fw['bank_name']) ?> · <?= date('d M H:i', strtotime($fw['created_at'])) ?></div>
         </div>
@@ -419,8 +280,10 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
           <div class="c-badge <?= $fw['status'] === 'approved' ? 'success' : 'warn' ?>"><?= ucfirst($fw['status']) ?></div>
         </div>
       </div>
-          </div>
-      </div>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+  </div>
 
 </div>
 
@@ -514,3 +377,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<?php require dirname(__DIR__) . '/partials/footer.php'; ?>
