@@ -6,7 +6,7 @@ $checkin_min  = max(1, (float) setting($pdo, 'checkin_reward_min', '500'));
 $checkin_max  = max($checkin_min, (float) setting($pdo, 'checkin_reward_max', '2000'));
 $today        = date('Y-m-d');
 $last_checkin = $user['last_checkin'] ?? null;
-$already      = false; // DEBUG TESTING: ALWAYS FALSE
+$already      = $last_checkin === $today;
 
 // Streak hitung
 $streak = 0;
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
             // Double-guard: WHERE clause pakai CURDATE() server → tanggal device klien tidak berpengaruh
             $stmt = $pdo->prepare(
                 "UPDATE users SET balance_dep=balance_dep+?, last_checkin=CURDATE()
-                 WHERE id=?" // DEBUG TESTING: removed last_checkin restriction
+                 WHERE id=? AND (last_checkin IS NULL OR last_checkin < CURDATE())"
             );
             $stmt->execute([$reward_given, $user['id']]);
             if ($stmt->rowCount() > 0) {

@@ -6,7 +6,7 @@ require_once dirname(__DIR__) . '/auth/guard.php';
 $level2_name = $pdo->query("SELECT name FROM memberships WHERE id = 2")->fetchColumn() ?: 'Juragan Silver';
 
 
-// ── Mission definitions (hardcoded) ───────────────────────────
+// â”€â”€ Mission definitions (hardcoded) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $ALL_MISSIONS = [
     // HARIAN
     ['slug'=>'daily_watch_3',       'category'=>'daily',    'title'=>'Tonton 3 Video',             'desc'=>'Tonton minimal 3 video hari ini.',              'target'=>3,   'reward'=>1000,  'icon'=>'ph-film-slate'],
@@ -26,7 +26,7 @@ $ALL_MISSIONS = [
 $today    = date('Y-m-d');
 $weekKey  = date('Y-\WW'); // e.g. 2026-W23
 
-// ── Helper: get real-time progress ───────────────────────────
+// â”€â”€ Helper: get real-time progress â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function get_progress(PDO $pdo, array $user, array $mission): int {
     $uid = $user['id'];
     switch ($mission['slug']) {
@@ -69,14 +69,14 @@ function get_progress(PDO $pdo, array $user, array $mission): int {
     return 0;
 }
 
-// ── Helper: get period key ────────────────────────────────────
+// â”€â”€ Helper: get period key â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function get_period_key(string $category): ?string {
     if ($category === 'daily')   return date('Y-m-d');
     if ($category === 'weekly')  return date('Y-\WW');
     return null; // lifetime
 }
 
-// ── Helper: check if already claimed ─────────────────────────
+// â”€â”€ Helper: check if already claimed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function is_claimed(PDO $pdo, int|string $user_id, string $slug, ?string $period_key): bool {
     $user_id = (int)$user_id;
     $s = $pdo->prepare("SELECT claimed_at FROM user_missions WHERE user_id=? AND mission_slug=? AND period_key<=>?");
@@ -85,90 +85,6 @@ function is_claimed(PDO $pdo, int|string $user_id, string $slug, ?string $period
     return $row && $row['claimed_at'] !== null;
 }
 
-// ── Handle AJAX claim ─────────────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'spin_wheel') {
-    header('Content-Type: application/json');
-    if (!csrf_verify()) { echo json_encode(['ok'=>false,'msg'=>'CSRF tidak valid.']); exit; }
-
-    try {
-        $pdo->beginTransaction();
-        
-        $stmt = $pdo->prepare("SELECT spin_tickets FROM users WHERE id=? FOR UPDATE");
-        $stmt->execute([$user['id']]);
-        $tickets = (int)$stmt->fetchColumn();
-
-        if ($tickets <= 0) {
-            $pdo->rollBack();
-            echo json_encode(['ok'=>false,'msg'=>'Tiket Spin habis! Kerjakan misi harian untuk dapat tiket.']);
-            exit;
-        }
-
-        $pdo->prepare("UPDATE users SET spin_tickets = spin_tickets - 1 WHERE id=?")->execute([$user['id']]);
-
-        // SET TINGKAT KESULITAN (WEIGHT / PELUANG) DI SINI
-        // Semakin besar angka, semakin mudah/sering muncul
-        $rate_silver = 1;   // Sangat Sulit
-        $rate_100k   = 5;   // Sangat Sulit
-        $rate_50k    = 10;  // Sulit
-        $rate_diskon = 50;  // Sedang
-        $rate_beli   = 10;  // Dipersulit (Sebelumnya Mudah)
-        $rate_10k    = 200; // Sangat Mudah
-
-        $prizes = [
-            ['id'=>0, 'name'=>$level2_name, 'weight'=>$rate_silver],
-            ['id'=>1, 'name'=>'Tarik Rp 100k', 'weight'=>$rate_100k],
-            ['id'=>2, 'name'=>'Tarik Rp 50k', 'weight'=>$rate_50k],
-            ['id'=>3, 'name'=>'Diskon Rp 10k', 'weight'=>$rate_diskon],
-            ['id'=>4, 'name'=>'Beli Rp 10k', 'weight'=>$rate_beli],
-            ['id'=>5, 'name'=>'Tarik Rp 10k', 'weight'=>$rate_10k],
-        ];
-
-        $totalWeight = array_sum(array_column($prizes, 'weight'));
-        $rand = random_int(1, $totalWeight);
-        $winner = $prizes[count($prizes)-1];
-        $current = 0;
-        foreach ($prizes as $p) {
-            $current += $p['weight'];
-            if ($rand <= $current) {
-                $winner = $p;
-                break;
-            }
-        }
-
-        $msg = "Selamat! Kamu memenangkan: " . $winner['name'];
-        if ($winner['id'] === 0) {
-            $pdo->prepare("UPDATE users SET membership_id=2 WHERE id=?")->execute([$user['id']]);
-        } elseif ($winner['id'] === 1) {
-            $pdo->prepare("UPDATE users SET balance_wd = balance_wd + 100000 WHERE id=?")->execute([$user['id']]);
-        } elseif ($winner['id'] === 2) {
-            $pdo->prepare("UPDATE users SET balance_wd = balance_wd + 50000 WHERE id=?")->execute([$user['id']]);
-        } elseif ($winner['id'] === 3) {
-            $code = "SPIN" . strtoupper(substr(md5(uniqid()), 0, 6));
-            $discountsJson = json_encode(['*'=>'10000rp']);
-            $pdo->prepare("INSERT INTO discount_vouchers (code, discounts, max_claims, claims_count) VALUES (?, ?, 1, 0)")->execute([$code, $discountsJson]);
-            $msg .= ". Kode Vouchermu: " . $code;
-        } elseif ($winner['id'] === 4) {
-            $pdo->prepare("UPDATE users SET balance_dep = balance_dep + 10000 WHERE id=?")->execute([$user['id']]);
-        } elseif ($winner['id'] === 5) {
-            $pdo->prepare("UPDATE users SET balance_wd = balance_wd + 10000 WHERE id=?")->execute([$user['id']]);
-        }
-
-        $tgMsg = "🎁 <b>MEMBER MENANG SPIN!</b>\n";
-        $tgMsg .= "Username: <code>" . htmlspecialchars($user['username']) . "</code>\n";
-        $tgMsg .= "Hadiah: <b>" . htmlspecialchars($winner['name']) . "</b>\n";
-        if ($winner['id'] === 3) {
-            $tgMsg .= "Kode Voucher: <code>" . $code . "</code>\n";
-        }
-        send_telegram_notif($pdo, $tgMsg, [], 'log');
-
-        $pdo->commit();
-        echo json_encode(['ok'=>true, 'prize_index'=>$winner['id'], 'msg'=>$msg, 'prize_name'=>$winner['name']]);
-    } catch (\Throwable $e) {
-        $pdo->rollBack();
-        echo json_encode(['ok'=>false,'msg'=>'Terjadi kesalahan: '.$e->getMessage()]);
-    }
-    exit;
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'claim_mission') {
     header('Content-Type: application/json');
@@ -204,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'claim
         $pdo->prepare("UPDATE users SET balance_wd = balance_wd + ? {$ticketSql} WHERE id=?")
             ->execute([$mission['reward'], $user['id']]);
 
-        $tgMsg = "🎯 <b>MEMBER KLAIM MISI!</b>\n";
+        $tgMsg = "ðŸŽ¯ <b>MEMBER KLAIM MISI!</b>\n";
         $tgMsg .= "Username: <code>" . htmlspecialchars($user['username']) . "</code>\n";
         $tgMsg .= "Misi: <b>" . htmlspecialchars($mission['title']) . "</b>\n";
         $tgMsg .= "Reward: Rp " . number_format($mission['reward'], 0, ',', '.') . "\n";
@@ -215,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'claim
 
         $pdo->commit();
         
-        $msg = '🎉 Reward diklaim! +'.number_format($mission['reward'],0,',','.').' ke Saldo Tarik.';
+        $msg = 'ðŸŽ‰ Reward diklaim! +'.number_format($mission['reward'],0,',','.').' ke Saldo Tarik.';
         if ($is_daily) $msg .= ' (+1 Tiket Spin)';
         echo json_encode(['ok'=>true,'msg'=>$msg,'reward'=>$mission['reward'],'tickets_added'=>$is_daily ? 1 : 0]);
     } catch (\Throwable $e) {
@@ -225,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'claim
     exit;
 }
 
-// ── Build mission data with progress ─────────────────────────
+// â”€â”€ Build mission data with progress â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $missions_data = [];
 foreach ($ALL_MISSIONS as $m) {
     $period   = get_period_key($m['category']);
@@ -251,18 +167,18 @@ $stmt = $pdo->prepare("SELECT spin_tickets FROM users WHERE id=?");
 $stmt->execute([$user['id']]);
 $spin_tickets = (int)$stmt->fetchColumn();
 
-$pageTitle  = 'Misi — Meloton';
+$pageTitle  = 'Misi â€” Meloton';
 $activePage = 'missions';
 require dirname(__DIR__) . '/partials/header.php';
 ?>
 
 <style>
-/* ══════════════════════════════════════════════
-   MISSION PAGE — CASUAL GAME STYLE
-   ══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   MISSION PAGE â€” CASUAL GAME STYLE
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .mission-page { padding: 0 0 20px; }
 
-/* ── Hero Card ── */
+/* â”€â”€ Hero Card â”€â”€ */
 .ms-hero {
   background: linear-gradient(135deg, #0c4a6e 0%, #0e7490 55%, #06b6d4 100%);
   border: 3px solid #075985;
@@ -298,7 +214,7 @@ require dirname(__DIR__) . '/partials/header.php';
 .ms-hero__badge-val { font-size: 22px; font-weight: 900; color: #0c4a6e; line-height: 1; }
 .ms-hero__badge-lbl { font-size: 9px; font-weight: 900; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* ── Tabs ── */
+/* â”€â”€ Tabs â”€â”€ */
 .ms-tabs {
   display: flex;
   background: #e0f9ff;
@@ -325,7 +241,7 @@ require dirname(__DIR__) . '/partials/header.php';
   color: #0891b2;
 }
 
-/* ── Mission Card ── */
+/* â”€â”€ Mission Card â”€â”€ */
 .ms-card {
   background: #fff;
   border: 2.5px solid #7dd3e8;
@@ -364,7 +280,7 @@ require dirname(__DIR__) . '/partials/header.php';
 }
 .ms-card--claimed .ms-card__reward { background: #f1f5f9; border-color: #cbd5e1; color: #94a3b8; box-shadow: none; }
 
-/* ── Progress ── */
+/* â”€â”€ Progress â”€â”€ */
 .ms-prog { padding: 0 12px 12px; }
 .ms-prog-bar-wrap {
   height: 12px; background: #e0f9ff;
@@ -388,7 +304,7 @@ require dirname(__DIR__) . '/partials/header.php';
   font-size: 10px; font-weight: 800; color: #64748b; margin-top: 4px;
 }
 
-/* ── Buttons ── */
+/* â”€â”€ Buttons â”€â”€ */
 .ms-btn {
   width: 100%; margin-top: 10px; padding: 10px;
   border-radius: 12px; font-size: 12px; font-weight: 900;
@@ -415,7 +331,7 @@ require dirname(__DIR__) . '/partials/header.php';
 }
 .ms-btn--claimed:active { transform: none; }
 
-/* ── Sections ── */
+/* â”€â”€ Sections â”€â”€ */
 .ms-panel { display: none; }
 .ms-panel.active { display: block; animation: fade-in 0.3s; }
 .ms-section-hdr {
@@ -431,10 +347,10 @@ require dirname(__DIR__) . '/partials/header.php';
 
 <div class="mission-page">
 
-  <!-- ── HERO ── -->
+  <!-- â”€â”€ HERO â”€â”€ -->
   <div class="ms-hero">
     <div>
-      <div class="ms-hero__title">🎯 Misi</div>
+      <div class="ms-hero__title">ðŸŽ¯ Misi</div>
       <div class="ms-hero__sub">Selesaikan misi, klaim reward gratis!</div>
     </div>
     <div class="ms-hero__badge">
@@ -443,95 +359,19 @@ require dirname(__DIR__) . '/partials/header.php';
     </div>
   </div>
 
-  <!-- ── TABS ── -->
+  <!-- â”€â”€ TABS â”€â”€ -->
   <div class="ms-tabs" role="tablist">
     <button class="ms-tab active" id="tab-daily" onclick="switchTab('daily')">Harian</button>
     <button class="ms-tab" id="tab-weekly" onclick="switchTab('weekly')">Mingguan</button>
     <button class="ms-tab" id="tab-lifetime" onclick="switchTab('lifetime')">Pencapaian</button>
   </div>
 
-  <div class="ms-method" id="card-games" style="background: #fff; border: 2.5px solid #7dd3e8; border-radius: 16px; box-shadow: 0 5px 0 #7dd3e8; overflow: hidden; margin-bottom: 20px; transition: transform 0.1s;">
-    <div class="ms-method__hd" onclick="toggleGames()" style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; user-select: none;">
-      <div style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: linear-gradient(135deg, #fde68a, #f59e0b); color: #fff; box-shadow: 0 3px 0 #d97706;">
-        <i class="ph-fill ph-game-controller"></i>
-      </div>
-      <div style="flex: 1; min-width: 0;">
-        <div style="font-weight: 900; font-size: 14px; color: #1e3a8a;">Minigames</div>
-        <div style="font-size: 10px; color: #64748b; font-weight: 700; margin-top:2px;">Tap Tap Frenzy & Daily Spin</div>
-      </div>
-      <div id="chev-games" style="font-size: 14px; color: #94a3b8; transition: transform 0.2s; flex-shrink: 0;"><i class="ph-bold ph-caret-down"></i></div>
-    </div>
-    <div id="body-games" style="padding: 14px; border-top: 2px dashed #bfdbfe; display: none; background: #f8fafc;">
-      <a href="/minigame" style="display:block; background:linear-gradient(135deg, #fef08a, #f59e0b); border:3px solid #fff; border-radius:20px; box-shadow:0 8px 0 #d97706; padding:16px; text-decoration:none; margin-bottom:12px; position:relative; overflow:hidden; transition:transform 0.2s;" onclick="this.style.transform='translateY(4px)'; this.style.boxShadow='0 4px 0 #d97706'; setTimeout(()=>this.style.transform='none',200);">
-        <div style="position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between;">
-            <div>
-                <h3 style="margin:0 0 4px; font-size:18px; font-weight:900; color:#78350f; text-shadow:1px 1px 0 #fde047;">TAP-TAP FRENZY 🪅</h3>
-                <p style="margin:0; font-size:12px; font-weight:800; color:#92400e;">Mainkan game harian dan menangkan Saldo instan!</p>
-            </div>
-            <div style="background:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#d97706; font-size:24px; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
-                <i class="ph-fill ph-play"></i>
-            </div>
-        </div>
-        <i class="ph-fill ph-coin" style="position:absolute; right:-10px; bottom:-20px; font-size:80px; color:rgba(255,255,255,0.3); z-index:1;"></i>
-      </a>
-      
-      <a href="/luckycard" style="display:block; background:linear-gradient(135deg, #e9d5ff, #a855f7); border:3px solid #fff; border-radius:20px; box-shadow:0 8px 0 #9333ea; padding:16px; text-decoration:none; margin-bottom:20px; position:relative; overflow:hidden; transition:transform 0.2s;" onclick="this.style.transform='translateY(4px)'; this.style.boxShadow='0 4px 0 #9333ea'; setTimeout(()=>this.style.transform='none',200);">
-        <div style="position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between;">
-            <div>
-                <h3 style="margin:0 0 4px; font-size:18px; font-weight:900; color:#4c1d95; text-shadow:1px 1px 0 #d8b4fe;">LUCKY CARD 🃏</h3>
-                <p style="margin:0; font-size:12px; font-weight:800; color:#581c87;">Pilih kartu keberuntunganmu dan menangkan kejutan!</p>
-            </div>
-            <div style="background:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#9333ea; font-size:24px; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
-                <i class="ph-fill ph-cards"></i>
-            </div>
-        </div>
-        <i class="ph-fill ph-sparkle" style="position:absolute; right:-10px; bottom:-20px; font-size:80px; color:rgba(255,255,255,0.3); z-index:1;"></i>
-      </a>
 
-      <div class="spin-container" style="background: linear-gradient(135deg, #a78bfa, #818cf8); border: 4px solid #c4b5fd; border-radius: 24px; padding: 20px; margin-bottom: 0; box-shadow: 0 8px 0 #6366f1; text-align: center; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; font-size: 150px; color: rgba(255,255,255,0.1); transform: rotate(15deg); z-index: 1;"><i class="ph-fill ph-spinner-gap"></i></div>
-        <div style="position: relative; z-index: 2;">
-          <h3 style="margin: 0 0 8px; color: #fff; font-weight: 900; font-size: 20px; text-shadow: 1px 1px 0 #4f46e5;"><i class="ph-fill ph-gift"></i> DAILY SPIN</h3>
-          <p style="margin: 0 0 16px; font-size: 13px; font-weight: 700; color: #e0e7ff;">Gunakan tiket spin untuk memutar roda hadiah!</p>
-          
-          <div style="font-size: 16px; font-weight: 900; background: #fff; color: #4f46e5; padding: 10px 20px; border-radius: 100px; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <i class="ph-fill ph-ticket"></i> Tiket Anda: <span id="spin-tickets-count"><?= $spin_tickets ?></span>
-          </div>
-
-          <div style="position: relative; width: 260px; height: 260px; margin: 0 auto;">
-              <div id="wheel" data-rotation="0" style="width: 100%; height: 100%; border-radius: 50%; border: 6px solid #fff; box-shadow: 0 0 0 6px #6366f1, 0 10px 20px rgba(0,0,0,0.3); background: conic-gradient(from -30deg, #fde047 0% 16.6%, #fbbf24 16.6% 33.3%, #34d399 33.3% 50%, #2dd4bf 50% 66.6%, #60a5fa 66.6% 83.3%, #c084fc 83.3% 100%); transition: transform 8s cubic-bezier(0.1, 0.9, 0.1, 1); position: relative; overflow: hidden;">
-                  <div style="position:absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: bottom center; transform: rotate(0deg); padding-top: 15px; text-align: center; font-weight: 900; font-size: 11px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 2px #000; line-height: 1.1; word-break: break-word;"><i class="ph-fill ph-crown" style="font-size:24px; display:block; margin:0 auto 2px;"></i><?= htmlspecialchars($level2_name) ?></div>
-                  <div style="position:absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: bottom center; transform: rotate(60deg); padding-top: 15px; text-align: center; font-weight: 900; font-size: 11px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 2px #000; line-height: 1.1;"><img src="/assets/moneybag_v2.png" style="width:24px; height:24px; display:block; margin:0 auto 2px; object-fit:contain;">Tarik<br>100k</div>
-                  <div style="position:absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: bottom center; transform: rotate(120deg); padding-top: 15px; text-align: center; font-weight: 900; font-size: 11px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 2px #000; line-height: 1.1;"><img src="/assets/moneybag_v2.png" style="width:24px; height:24px; display:block; margin:0 auto 2px; object-fit:contain;">Tarik<br>50k</div>
-                  <div style="position:absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: bottom center; transform: rotate(180deg); padding-top: 15px; text-align: center; font-weight: 900; font-size: 11px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 2px #000; line-height: 1.1;"><i class="ph-fill ph-ticket" style="font-size:24px; display:block; margin:0 auto 2px;"></i>Diskon<br>10k</div>
-                  <div style="position:absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: bottom center; transform: rotate(240deg); padding-top: 15px; text-align: center; font-weight: 900; font-size: 11px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 2px #000; line-height: 1.1;"><img src="/assets/dollar.png" style="width:24px; height:24px; display:block; margin:0 auto 2px; object-fit:contain;">Beli<br>10k</div>
-                  <div style="position:absolute; top: 0; left: 50%; width: 80px; height: 50%; margin-left: -40px; transform-origin: bottom center; transform: rotate(300deg); padding-top: 15px; text-align: center; font-weight: 900; font-size: 11px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 2px #000; line-height: 1.1;"><img src="/assets/dollar.png" style="width:24px; height:24px; display:block; margin:0 auto 2px; object-fit:contain;">Tarik<br>10k</div>
-              </div>
-              <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 35px solid #ef4444; z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));"></div>
-              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: #ef4444; color: #fff; border: 4px solid #fff; box-shadow: 0 4px 0 #b91c1c; z-index: 11; display:flex; align-items:center; justify-content:center;">
-                  <button id="btn-spin" onclick="spinWheel()" <?= $spin_tickets <= 0 ? 'disabled' : '' ?> style="background:transparent; border:none; color:#fff; font-weight:900; font-size:16px; cursor:pointer; width:100%; height:100%; outline:none; transition:opacity 0.2s; <?= $spin_tickets <= 0 ? 'opacity:0.5;' : '' ?>">SPIN</button>
-              </div>
-          </div>
-        </div>
-
-        <!-- Custom Modal -->
-        <div id="spin-result-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.8); backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center; padding:20px;">
-            <div style="background:#fff; width:100%; max-width:320px; border-radius:24px; padding:30px 20px; text-align:center; border:4px solid #fde047; box-shadow:0 8px 0 #f59e0b; animation:popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                <div id="spin-modal-icon" style="font-size:60px; line-height:1; margin-bottom:16px;">🎁</div>
-                <h2 style="color:#d97706; font-size:24px; font-weight:900; margin:0 0 8px;">SELAMAT!</h2>
-                <p id="spin-modal-text" style="font-size:14px; color:#78350f; font-weight:700; margin:0 0 24px; line-height:1.4;">Kamu memenangkan hadiah!</p>
-                <button onclick="document.getElementById('spin-result-modal').style.display='none'" style="display:inline-block; width:100%; background:#0ea5e9; color:#fff; font-weight:800; font-size:16px; padding:14px 24px; border-radius:100px; border:none; box-shadow:0 4px 0 #0284c7; cursor:pointer; font-family:inherit; transition:transform 0.1s;">Mantap!</button>
-            </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── PANELS ── -->
+  <!-- â”€â”€ PANELS â”€â”€ -->
   
   <!-- DAILY -->
   <div class="ms-panel active" id="panel-daily">
-    <div class="ms-section-hdr"><i class="ph-fill ph-sun" style="color:#f59e0b"></i> Misi Harian — Reset tiap hari</div>
+    <div class="ms-section-hdr"><i class="ph-fill ph-sun" style="color:#f59e0b"></i> Misi Harian â€” Reset tiap hari</div>
     <?php foreach ($daily as $m): ?>
     <?php
       $pct = $m['target'] > 0 ? min(100, round($m['progress'] / $m['target'] * 100)) : 0;
@@ -566,7 +406,7 @@ require dirname(__DIR__) . '/partials/header.php';
 
   <!-- WEEKLY -->
   <div class="ms-panel" id="panel-weekly">
-    <div class="ms-section-hdr"><i class="ph-fill ph-calendar" style="color:#3b82f6"></i> Misi Mingguan — Reset tiap Senin</div>
+    <div class="ms-section-hdr"><i class="ph-fill ph-calendar" style="color:#3b82f6"></i> Misi Mingguan â€” Reset tiap Senin</div>
     <?php foreach ($weekly as $m): ?>
     <?php
       $pct = $m['target'] > 0 ? min(100, round($m['progress'] / $m['target'] * 100)) : 0;
@@ -601,7 +441,7 @@ require dirname(__DIR__) . '/partials/header.php';
 
   <!-- LIFETIME -->
   <div class="ms-panel" id="panel-lifetime">
-    <div class="ms-section-hdr"><i class="ph-fill ph-trophy" style="color:#f59e0b"></i> Pencapaian — Klaim sekali selamanya</div>
+    <div class="ms-section-hdr"><i class="ph-fill ph-trophy" style="color:#f59e0b"></i> Pencapaian â€” Klaim sekali selamanya</div>
     <?php foreach ($lifetime as $m): ?>
     <?php
       $pct = $m['target'] > 0 ? min(100, round($m['progress'] / $m['target'] * 100)) : 0;
@@ -639,19 +479,6 @@ require dirname(__DIR__) . '/partials/header.php';
 <script>
 const _csrf = '<?= csrf_token() ?>';
 
-function toggleGames() {
-  const body = document.getElementById('body-games');
-  const chev = document.getElementById('chev-games');
-  if (body.style.display === 'none') {
-    body.style.display = 'block';
-    chev.style.transform = 'rotate(180deg)';
-    chev.style.color = '#1e3a8a';
-  } else {
-    body.style.display = 'none';
-    chev.style.transform = 'rotate(0deg)';
-    chev.style.color = '#94a3b8';
-  }
-}
 
 function switchTab(cat) {
   document.querySelectorAll('.ms-tab').forEach(t => t.classList.remove('active'));
@@ -725,138 +552,5 @@ function claimMission(slug, btn) {
       if (typeof nToast !== 'undefined') nToast('Koneksi terputus.', 'error');
     });
 }
-function spinWheel() {
-    if (typeof window.isSpinning !== 'undefined' && window.isSpinning) return;
-    const btn = document.getElementById('btn-spin');
-    if (btn.disabled) return;
-    
-    window.isSpinning = true;
-    btn.innerHTML = '<i class="ph-bold ph-spinner-gap ph-spin"></i>';
-    
-    const fd = new FormData();
-    fd.append('action', 'spin_wheel');
-    fd.append('_csrf', _csrf);
-    
-    fetch(location.href, { method: 'POST', body: fd })
-        .then(r => r.json())
-        .then(data => {
-            if (!data.ok) {
-                window.isSpinning = false;
-                btn.innerHTML = 'SPIN';
-                if (typeof nToast !== 'undefined') nToast(data.msg, 'error');
-                return;
-            }
-            
-            const tc = document.getElementById('spin-tickets-count');
-            let t = parseInt(tc.innerText) - 1;
-            tc.innerText = t >= 0 ? t : 0;
-            
-            const sliceDeg = 60;
-            // Add a slight random offset so it doesn't always land exactly in the middle of the slice
-            const offset = Math.floor(Math.random() * 40) - 20; 
-            const targetRotation = (360 - (data.prize_index * sliceDeg)) + offset; 
-            
-            const fullSpins = 360 * 6;
-            const wheel = document.getElementById('wheel');
-            let currentRot = parseFloat(wheel.dataset.rotation || '0');
-            // Normalize current rotation so we don't just spin backwards if logic misaligns
-            const normalizedCurrent = currentRot % 360;
-            const diff = targetRotation - normalizedCurrent;
-            const finalRotation = currentRot + fullSpins + diff;
-            
-            const totalDuration = 8000;
-            const startTime = Date.now();
-            let isTickingActive = true;
-            
-            let actx = null;
-            try {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                if (AudioCtx) actx = new AudioCtx();
-            } catch(e) {}
-            
-            function playTick() {
-                if (!window.isSpinning || !isTickingActive) return;
-                const elapsed = Date.now() - startTime;
-                if (elapsed >= totalDuration) return;
-                
-                if (actx && actx.state !== 'closed') {
-                    try {
-                        const osc = actx.createOscillator();
-                        const gain = actx.createGain();
-                        osc.connect(gain); gain.connect(actx.destination);
-                        osc.frequency.value = 800;
-                        gain.gain.setValueAtTime(0, actx.currentTime);
-                        gain.gain.linearRampToValueAtTime(0.1, actx.currentTime + 0.01);
-                        gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.05);
-                        osc.start(); osc.stop(actx.currentTime + 0.05);
-                    } catch(e) {}
-                }
-                
-                const progress = elapsed / totalDuration;
-                const currentDelay = 50 + (Math.pow(progress, 3) * 450); 
-                setTimeout(playTick, currentDelay);
-            }
-            playTick();
-            
-            wheel.style.transform = `rotate(${finalRotation}deg)`;
-            wheel.dataset.rotation = finalRotation;
-            
-            setTimeout(() => {
-                isTickingActive = false;
-                window.isSpinning = false;
-                btn.innerHTML = 'SPIN';
-                if (t <= 0) {
-                    btn.disabled = true;
-                    btn.style.opacity = '0.5';
-                }
-                
-                if (actx && actx.state !== 'closed') {
-                    try {
-                        const osc = actx.createOscillator();
-                        const gain = actx.createGain();
-                        osc.connect(gain); gain.connect(actx.destination);
-                        osc.frequency.value = 600;
-                        gain.gain.setValueAtTime(0, actx.currentTime);
-                        gain.gain.linearRampToValueAtTime(0.3, actx.currentTime + 0.1);
-                        gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 1.5);
-                        osc.start(); osc.stop(actx.currentTime + 1.5);
-                        
-                        [800, 1000, 1200].forEach((freq, i) => {
-                            setTimeout(() => {
-                                try {
-                                    const o = actx.createOscillator();
-                                    const g = actx.createGain();
-                                    o.connect(g); g.connect(actx.destination);
-                                    o.frequency.value = freq;
-                                    g.gain.setValueAtTime(0, actx.currentTime);
-                                    g.gain.linearRampToValueAtTime(0.2, actx.currentTime + 0.05);
-                                    g.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.8);
-                                    o.start(); o.stop(actx.currentTime + 0.8);
-                                } catch(e) {}
-                            }, i * 150);
-                        });
-                    } catch(e) {}
-                }
-                
-                const icons = {
-                    0: '👑',
-                    1: '💰',
-                    2: '💰',
-                    3: '🎫',
-                    4: '🪙',
-                    5: '🪙',
-                };
-                document.getElementById('spin-modal-icon').innerText = icons[data.prize_index] || '🎁';
-                document.getElementById('spin-modal-text').innerText = data.msg;
-                document.getElementById('spin-result-modal').style.display = 'flex';
-            }, totalDuration);
-        })
-        .catch(e => {
-            window.isSpinning = false;
-            btn.innerHTML = 'SPIN';
-            if (typeof nToast !== 'undefined') nToast('Error: ' + e, 'error');
-        });
-}
-</script>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
