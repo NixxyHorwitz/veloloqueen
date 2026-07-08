@@ -130,7 +130,7 @@ $_psvg = [
 /* ── COMPACT ACCORDIONS ── */
 .c-group { background: #ffffff; border: 2.5px solid #c2410c; border-radius: 14px; box-shadow: 0 4px 0 #9a3412; overflow: hidden; margin-bottom: 12px; }
 .c-hdr { display: flex; align-items: center; gap: 8px; padding: 12px; background: #fffbeb; cursor: pointer; border-bottom: 2px solid transparent; user-select: none; }
-.c-hdr.open { border-bottom-color: #ffedd5; }
+.c-hdr.open { border-bottom-color: #fb923c; }
 .c-hdr i.icon { font-size: 16px; color: #ea580c; width: 24px; text-align: center; }
 .c-hdr span { flex: 1; font-size: 11px; font-weight: 900; color: #9a3412; text-transform: uppercase; }
 .c-hdr i.caret { font-size: 12px; color: #c2410c; transition: transform 0.2s; }
@@ -140,8 +140,8 @@ $_psvg = [
 
 /* Forms inside compact */
 .c-lbl { font-size: 10px; font-weight: 900; color: #ea580c; margin-bottom: 4px; display: block; }
-.c-input { width: 100%; background: #fffbeb; border: 2px solid #ffedd5; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 800; color: #9a3412; margin-bottom: 8px; outline: none; box-sizing: border-box; }
-.c-input:focus { border-color: #ea580c; }
+.c-input { width: 100%; background: #ffffff; border: 2px solid #fb923c; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 800; color: #9a3412; margin-bottom: 8px; outline: none; box-sizing: border-box; }
+.c-input:focus { border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234,88,12,0.2); }
 .c-input:disabled { opacity: 0.7; cursor: not-allowed; }
 .c-btn { width: 100%; background: #22c55e; border: 2px solid #166534; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 1px 0 #14532d; box-shadow: 0 3px 0 #14532d; cursor: pointer; }
 .c-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #14532d; }
