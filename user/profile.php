@@ -177,7 +177,7 @@ $_psvg = [
       <div class="prof-name"><?= htmlspecialchars($user['username']) ?></div>
       <div class="prof-email"><?= htmlspecialchars($user['email']) ?></div>
       <div class="prof-tier">
-        <?= $is_premium ? '⭐ '.$membership_name : 'Free' ?>
+        <?= $is_premium ? '⭐ '.$membership_name : $membership_name ?>
         <?= $user['membership_expires_at'] ? ' • '.date('d/m/y', strtotime($user['membership_expires_at'])) : '' ?>
       </div>
     </div>
