@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/auth/guard.php';
 
@@ -268,7 +268,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 end_post:
 
-<?php
+
+
 // Auto-rename ranks to Game/RPG theme if they don't match yet
 $rankMap = [
   0 => ['name' => 'Pejuang',   'icon' => 'âš”ï¸'],
