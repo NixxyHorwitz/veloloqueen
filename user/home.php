@@ -543,7 +543,7 @@ body { background: #f97316 !important; }
 
   <!-- Balance + Mascot -->
   <div class="hero-balance">
-    <div class="hero-balance__mascot"><img src="/assets/rooster_money.gif" style="width: 60px; height: 60px; object-fit: contain; transform: scale(1.3) translateY(-4px);" alt="Mascot"></div>
+    <div class="hero-balance__mascot"><img src="/assets/rooster_money.gif" style="width: 60px; height: 60px; object-fit: contain; transform: scale(1.3) translateY(4px);" alt="Mascot"></div>
     <div class="hero-balance__info">
       <div class="hero-balance__label">💎 Total Penghasilan</div>
       <div class="hero-balance__amount"><?= format_rp((float)$user['balance_wd']) ?></div>
