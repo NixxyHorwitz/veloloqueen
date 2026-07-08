@@ -165,27 +165,27 @@ i[class^="ph-"] {
 .bal-pill {
   display: flex; align-items: center; gap: 6px;
   background: #fff;
-  border: 2px solid #0f172a;
+  border: 2px solid #fdba74;
   border-radius: 20px;
   padding: 5px 10px 5px 6px;
   cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
   width: 100%;          /* fill the flex container */
-  box-shadow: 0 4px 0 #0f172a;
+  box-shadow: 0 4px 0 #ea580c;
 }
-.bal-pill:active { transform: translateY(3px); box-shadow: 0 1px 0 #0f172a; }
+.bal-pill:active { transform: translateY(3px); box-shadow: 0 1px 0 #ea580c; }
 .bal-pill__icon {
   width: 24px; height: 24px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; flex-shrink: 0;
-  border: 1.5px solid rgba(0,0,0,0.1);
+  border: 1.5px solid rgba(0,0,0,0.05);
 }
 .bal-pill__texts { display: flex; flex-direction: column; gap: 0; min-width: 0; }
 .bal-pill__label {
-  font-size: 9px; font-weight: 800; color: #64748b; line-height: 1;
+  font-size: 9px; font-weight: 800; color: #9a3412; line-height: 1;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .bal-pill__val {
-  font-size: 12px; font-weight: 900; color: #0f172a; line-height: 1.2;
+  font-size: 12px; font-weight: 900; color: #7c2d12; line-height: 1.2;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
