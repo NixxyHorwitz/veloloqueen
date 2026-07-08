@@ -57,11 +57,15 @@ if ($is_guest) {
     } catch (\Throwable) {}
 }
 
-$membership_name = 'Free';
-if ($user['membership_id'] && $user['membership_expires_at'] && strtotime($user['membership_expires_at']) > time()) {
+$membership_name = '';
+if ($user['membership_id'] && $user['membership_expires_at'] && strtotime((string)$user['membership_expires_at']) > time()) {
     $ms = $pdo->prepare("SELECT name FROM memberships WHERE id=?");
     $ms->execute([$user['membership_id']]);
-    $membership_name = $ms->fetchColumn() ?: 'Free';
+    $membership_name = $ms->fetchColumn();
+}
+if (!$membership_name) {
+    $membership_name = $pdo->query("SELECT name FROM memberships WHERE price=0 AND is_active=1 ORDER BY sort_order ASC LIMIT 1")->fetchColumn();
+    if (!$membership_name) $membership_name = 'Free';
 }
 
 $showcase_memberships = $pdo->query("SELECT * FROM memberships WHERE is_active=1 AND price > 0 ORDER BY sort_order ASC")->fetchAll();

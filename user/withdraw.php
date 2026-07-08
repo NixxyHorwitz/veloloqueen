@@ -122,9 +122,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($wd_locked) {
         $flash = '⏰ ' . $wd_lock_notice; $flashType = 'error';
     } elseif ($free_wd_limit_reached) {
-        $flash = '❌ Akun Free maksimal WD 1 kali. Yuk upgrade level buat tarik dana sepuasnya!'; $flashType = 'error';
+        $flash = '❌ Level ' . $user_mem['name'] . ' maksimal WD 1 kali. Yuk upgrade level buat tarik dana sepuasnya!'; $flashType = 'error';
     } elseif ($free_wrong_bank) {
-        $flash = '❌ Akun Free hanya bisa menarik ke e-wallet DANA. Silakan ganti rekening Anda!'; $flashType = 'error';
+        $flash = '❌ Level ' . $user_mem['name'] . ' hanya bisa menarik ke e-wallet DANA. Silakan ganti rekening Anda!'; $flashType = 'error';
     } elseif ($has_pending_wd) {
         $flash = '⏳ Kamu masih punya request WD yang lagi diproses nih. Tunggu kelar dulu ya!'; $flashType = 'error';
     } elseif (!empty($user_mem['is_wd_disabled'])) {
@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($level_blocked) {
         $flash = "Upgrade ke {$min_level_name} dulu yuk biar bisa tarik saldo!"; $flashType = 'error';
     } elseif ($free_age_blocked) {
-        $flash = 'Akun harus berumur min. 1 hari untuk WD (Level Gratis).'; $flashType = 'error';
+        $flash = 'Akun harus berumur min. 1 hari untuk WD (Level ' . $user_mem['name'] . ').'; $flashType = 'error';
     } else {
         $amount  = (float) preg_replace('/\D/', '', $_POST['amount'] ?? '0');
         
@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array((int)$amount, $available_amounts, true)) {
             $flash = 'Nominal penarikan gak valid nih. Harus pilih dari daftar ya!'; $flashType = 'error';
         } elseif ($is_free_level && setting($pdo, 'wd_free_only_dana', '1') === '1' && strtolower($bank) !== 'dana') {
-            $flash = 'Akun Free hanya bisa menggunakan e-wallet DANA.'; $flashType = 'error';
+            $flash = 'Level ' . $user_mem['name'] . ' hanya bisa menggunakan e-wallet DANA.'; $flashType = 'error';
         } elseif ($amount < $min_withdraw) {
             $flash = 'Minimal withdraw ' . format_rp($min_withdraw) . ' ya.'; $flashType = 'error';
         } elseif ($max_withdraw > 0 && $amount > $max_withdraw) {
@@ -669,7 +669,7 @@ html body { background: #f97316 !important; background-image: none !important; m
       <?php if ($free_wd_limit_reached): ?>
         <button type="button" class="wd-submit-btn" disabled>Tarik (Limit Habis)</button>
       <?php elseif ($free_wrong_bank): ?>
-        <button type="button" class="wd-submit-btn" disabled>Tarik (Hanya DANA Untuk Level Free)</button>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Hanya DANA Untuk Level <?= htmlspecialchars($user_mem['name']) ?>)</button>
       <?php elseif ($wd_locked): ?>
         <button type="button" class="wd-submit-btn" disabled>Tarik (Terkunci)</button>
       <?php elseif ($level_blocked): ?>

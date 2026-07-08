@@ -41,19 +41,29 @@ $st = $pdo->prepare("SELECT COUNT(*) FROM watch_history WHERE user_id=?"); $st->
 $refs = $pdo->prepare("SELECT COUNT(*) FROM users WHERE referred_by=?"); $refs->execute([$user['referral_code']]); $refs = (int)$refs->fetchColumn();
 
 // Membership
-$membership_name = 'Free';
+$membership_name = '';
 $membership_allow_edit_bank = false;
-if ($user['membership_id'] && $user['membership_expires_at'] && strtotime($user['membership_expires_at']) > time()) {
+$is_premium = false;
+
+if ($user['membership_id'] && $user['membership_expires_at'] && strtotime((string)$user['membership_expires_at']) > time()) {
     $ms = $pdo->prepare("SELECT name, allow_edit_bank FROM memberships WHERE id=?"); $ms->execute([$user['membership_id']]);
     $ms = $ms->fetch();
-    $membership_name = $ms['name'] ?? 'Free';
+    $membership_name = $ms['name'] ?? '';
     $membership_allow_edit_bank = (bool)($ms['allow_edit_bank'] ?? false);
+    $is_premium = true;
 }
+
+if (!$membership_name) {
+    $ms_free = $pdo->query("SELECT name, allow_edit_bank FROM memberships WHERE price=0 AND is_active=1 ORDER BY sort_order ASC LIMIT 1")->fetch();
+    $membership_name = $ms_free['name'] ?? 'Free';
+    $membership_allow_edit_bank = (bool)($ms_free['allow_edit_bank'] ?? false);
+    $is_premium = false;
+}
+
 $edit_bank_min_dep = (int)($user['edit_bank_deposit_min'] ?? 50000);
 $dep_ok_for_edit   = (float)$user['balance_dep'] >= $edit_bank_min_dep;
 $is_promotor_prof  = ((int)($user['is_promotor'] ?? 0) === 1);
 $show_edit_rek_btn = $membership_allow_edit_bank || $is_promotor_prof;
-$is_premium        = $membership_name !== 'Free';
 
 // Contact buttons
 try {
