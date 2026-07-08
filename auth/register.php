@@ -220,69 +220,182 @@ $final_og_desc = $_seo_desc;
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Nunito',sans-serif;background:#1a1a2e;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
 
-.gc{background:linear-gradient(180deg,#ffcc00 0%,#f0a500 100%);border:4px solid #c47f17;border-radius:28px;box-shadow:0 8px 0 #a06a10,0 12px 24px rgba(0,0,0,.4);padding:48px 12px 12px;position:relative;width:100%;max-width:380px}
-.gc-hd{position:absolute;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;text-shadow:0 2px 0 #c47f17}
-.gc-x{position:absolute;right:12px;top:10px;width:28px;height:28px;background:#e08600;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;text-decoration:none;border:2px solid #c47f17;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15)}
-.gc-in{background:#fef8e8;border:3px solid #e8d5a3;border-radius:20px;padding:24px 18px 18px}
-.gc-title{font-weight:900;font-size:16px;color:#6d3a0a;text-align:center;margin-bottom:18px;line-height:1.35}
+/* Outer Card */
+.auth-card {
+  background: #ffffff;
+  border: 4px solid #fff;
+  border-radius: 36px;
+  box-shadow: inset 0 -6px 0 rgba(0,0,0,0.05), inset 0 6px 0 rgba(255,255,255,1), 0 12px 0 #7c2d12, 0 18px 40px rgba(0,0,0,0.4);
+  padding: 24px 20px 20px;
+  width: 100%;
+  max-width: 380px;
+  position: relative;
+}
 
-.gc-err{background:#fee2e2;border:2px solid #f87171;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:#991b1b;margin-bottom:14px;text-align:center}
-.gc-lbl{font-size:12px;font-weight:800;color:#9a6b3a;margin-bottom:5px;display:block}
-.gc-hint{font-size:10px;font-weight:700;color:#b8a080;margin:-6px 0 10px 2px}
+.auth-close {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 44px;
+  height: 44px;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  text-decoration: none;
+  border: 4px solid #fff;
+  box-shadow: 0 5px 0 #b91c1c;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.auth-close:active { transform: translateY(3px); box-shadow: 0 2px 0 #b91c1c; }
 
-.gc-inp{display:flex;align-items:center;gap:10px;border:2.5px solid #d4a64a;border-radius:14px;padding:11px 14px;background:#fff;margin-bottom:12px}
-.gc-inp:focus-within{border-color:#c47f17;box-shadow:0 0 0 3px rgba(196,127,23,.15)}
-.gc-inp svg{color:#c9a24e;flex-shrink:0}
-.gc-inp input,.gc-inp select{border:none;outline:none;background:none;flex:1;font-size:13px;font-weight:700;color:#5a3510;font-family:inherit;width:100%}
-.gc-inp input::placeholder{color:#c4a370;font-weight:600}
-.gc-inp select{-webkit-appearance:none;appearance:none;cursor:pointer}
-.gc-inp .eye{background:none;border:none;font-size:14px;cursor:pointer;padding:0}
+.auth-header { text-align: center; margin-bottom: 24px; }
+.auth-emoji { font-size: 48px; margin-bottom: 8px; display: inline-block; animation: bounce 2s infinite ease-in-out; }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.auth-title { font-size: 24px; font-weight: 900; color: #0f172a; line-height: 1.2; }
+.auth-subtitle { font-size: 13px; font-weight: 700; color: #64748b; margin-top: 4px; }
 
-.btn3d{width:100%;border:none;border-radius:28px;padding:13px;font-weight:900;font-size:15px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;position:relative;overflow:hidden;text-decoration:none;transition:transform .08s;margin-top:4px}
-.btn3d::after{content:'';position:absolute;top:3px;left:12%;right:12%;height:40%;background:linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 100%);border-radius:20px;pointer-events:none}
-.btn3d:active{transform:translateY(4px)}
-.btn3d-blue{background:linear-gradient(180deg,#5bb8f5 0%,#2e86de 50%,#2574c4 100%);color:#fff;box-shadow:0 5px 0 #1a5fa0,0 7px 12px rgba(0,0,0,.25);border:2px solid #6ec6ff;text-shadow:0 1px 2px rgba(0,0,0,.2)}
-.btn3d-blue:active{box-shadow:0 1px 0 #1a5fa0}
-.btn3d-ghost{background:transparent;color:#c47f17;box-shadow:none;border:2px solid #c47f17;margin-top:0}
-.btn3d-ghost::after{display:none}
-.btn3d-ghost:active{background:rgba(196,127,23,.08);transform:none}
+/* Error alert */
+.auth-err {
+  background: #fee2e2;
+  border: 3px solid #fca5a5;
+  border-radius: 16px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #b91c1c;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 4px 0 #f87171;
+}
 
-.gc-ref-ok{display:inline-flex;align-items:center;gap:3px;background:#d1fae5;color:#166534;font-size:9px;font-weight:800;padding:2px 6px;border-radius:8px}
-.gc-ft{text-align:center;font-size:12px;color:#8b6914;font-weight:700;margin-top:14px}
-.gc-ft a{color:#6d3a0a;font-weight:800;text-decoration:underline}
+/* Input group */
+.inp-group { margin-bottom: 12px; }
+.inp-label { display: block; font-size: 12px; font-weight: 900; color: #475569; margin-bottom: 6px; padding-left: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 
+.inp-box {
+  display: flex; align-items: stretch;
+  background: #fff;
+  border: 2.5px solid #cbd5e1;
+  border-radius: 16px;
+  box-shadow: 0 5px 0 #e2e8f0;
+  transition: all 0.2s;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.inp-box:focus-within {
+  border-color: #f97316;
+  box-shadow: 0 5px 0 #ea580c;
+  transform: translateY(-2px);
+}
+.inp-icon {
+  background: #f1f5f9;
+  padding: 0 14px;
+  display: flex; align-items: center; justify-content: center;
+  border-right: 2.5px solid #cbd5e1;
+  color: #94a3b8;
+  transition: all 0.2s;
+}
+.inp-box:focus-within .inp-icon {
+  background: #fff7ed;
+  border-right-color: #f97316;
+  color: #f97316;
+}
+.inp-icon svg { width: 20px; height: 20px; }
+.inp-field {
+  flex: 1; padding: 10px 14px; display: flex; align-items: center; position: relative;
+}
+.inp-field input, .inp-field select {
+  width: 100%; border: none; outline: none; background: none;
+  font-size: 14px; font-weight: 800; color: #0f172a; font-family: inherit;
+}
+.inp-field input::placeholder { color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+.inp-field .eye { background: none; border: none; font-size: 16px; cursor: pointer; padding: 0; color: #94a3b8; transition: color 0.2s; margin-left: 8px; }
+.inp-field .eye:hover { color: #0f172a; }
+
+/* 3D Buttons */
+.btn-3d {
+  width: 100%;
+  border: none; border-radius: 20px; padding: 12px;
+  font-weight: 900; font-size: 15px; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; position: relative; overflow: hidden; text-decoration: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.15);
+  margin-top: 16px;
+}
+.btn-3d::after {
+  content: ''; position: absolute; top: 4px; left: 10%; right: 10%; height: 35%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 20px; pointer-events: none;
+}
+.btn-3d:active { transform: translateY(5px); }
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff;
+  border: 3.5px solid #93c5fd; box-shadow: 0 5px 0 #1d4ed8;
+}
+.btn-primary:active { box-shadow: 0 1px 0 #1d4ed8; }
+
+.btn-ghost {
+  background: transparent; color: #94a3b8; box-shadow: none; border: 2.5px solid #cbd5e1;
+}
+.btn-ghost::after { display: none; }
+.btn-ghost:active { background: rgba(0,0,0,0.05); transform: none; box-shadow: none; }
+
+/* Footer */
+.auth-ft { text-align: center; font-size: 13px; color: #64748b; font-weight: 700; margin-top: 20px; }
+.auth-ft a { color: #ea580c; font-weight: 900; text-decoration: underline; }
+
+/* Form Steps */
 .fs{display:none;width:100%}
 .fs.active{display:block}
+.inp-hint{font-size:10px;font-weight:700;color:#94a3b8;margin:-8px 0 12px 4px}
 
 /* Emoji CAPTCHA */
-.emoji-captcha{background:#fff;border:2.5px solid #d4a64a;border-radius:16px;padding:16px;margin-bottom:14px;text-align:center}
-.emoji-captcha-q{font-size:14px;font-weight:800;color:#6d3a0a;margin-bottom:12px}
-.emoji-captcha-q span{color:#d35400;font-weight:900;background:#fef8e8;padding:2px 8px;border-radius:8px;border:1.5px solid #e8d5a3}
+.emoji-captcha{background:#fff;border:2.5px solid #cbd5e1;border-radius:16px;padding:16px;margin-bottom:16px;text-align:center;box-shadow:0 4px 0 #e2e8f0}
+.emoji-captcha-q{font-size:14px;font-weight:800;color:#475569;margin-bottom:12px}
+.emoji-captcha-q span{color:#f97316;font-weight:900;background:#fff7ed;padding:2px 8px;border-radius:8px;border:1.5px solid #fed7aa}
 .emoji-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.emoji-btn{background:linear-gradient(180deg,#fff,#f8f9fa);border:2.5px solid #d4a64a;border-radius:12px;padding:8px;font-size:24px;cursor:pointer;transition:transform .1s,box-shadow .1s;box-shadow:0 2px 0 #d4a64a}
-.emoji-btn:active{transform:translateY(2px);box-shadow:0 0 0 #d4a64a}
-.emoji-btn.selected{background:linear-gradient(180deg,#d1fae5,#a7f3d0);border-color:#10b981;box-shadow:0 2px 0 #059669}
+.emoji-btn{background:linear-gradient(180deg,#fff,#f8f9fa);border:2.5px solid #cbd5e1;border-radius:12px;padding:8px;font-size:24px;cursor:pointer;transition:transform .1s,box-shadow .1s;box-shadow:0 3px 0 #cbd5e1}
+.emoji-btn:active{transform:translateY(3px);box-shadow:0 0 0 #cbd5e1}
+.emoji-btn.selected{background:linear-gradient(180deg,#d1fae5,#a7f3d0);border-color:#10b981;box-shadow:0 3px 0 #059669}
 
 /* Summary */
-.gc-sum{background:#fff;border:2px solid #e8d5a3;border-radius:12px;padding:12px;margin-bottom:14px}
-.gc-sum-title{font-size:11px;font-weight:900;color:#9a6b3a;margin-bottom:6px}
-.gc-sum-row{font-size:12px;font-weight:700;color:#6d3a0a;line-height:1.8}
+.auth-sum{background:#fff;border:2.5px solid #cbd5e1;border-radius:16px;padding:12px;margin-bottom:16px;box-shadow:0 4px 0 #e2e8f0}
+.auth-sum-title{font-size:11px;font-weight:900;color:#94a3b8;margin-bottom:6px}
+.auth-sum-row{font-size:12px;font-weight:700;color:#475569;line-height:1.8}
+.ref-ok{display:inline-flex;align-items:center;gap:3px;background:#d1fae5;color:#166534;font-size:9px;font-weight:800;padding:2px 6px;border-radius:8px;margin-left:4px;}
 </style>
 </head>
 <body>
 
-<div class="gc">
-  <div class="gc-hd">Buat Akun</div>
-  <a href="/" class="gc-x">✕</a>
+<div class="auth-card">
+  <a href="/" class="auth-close">✕</a>
+  
+  <div class="auth-header">
+    <div class="auth-emoji">✨</div>
+    <div class="auth-title">Buat Akun</div>
+    <div class="auth-subtitle">Daftar gratis &amp; langsung tonton!</div>
+  </div>
 
-  <div class="gc-in">
-    <div class="gc-title">Daftar gratis &amp;<br>langsung tonton!</div>
-
-    <?php if ($error): ?>
-    <div class="gc-err">⚠️ <?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
+  <?php if ($error): ?>
+  <div class="auth-err">⚠️ <?= htmlspecialchars($error) ?></div>
+  <?php endif; ?>
 
     <form method="POST" id="reg-form" novalidate>
       <?= csrf_field() ?>
@@ -292,97 +405,129 @@ body{font-family:'Nunito',sans-serif;background:#1a1a2e;min-height:100vh;display
 
       <!-- STEP 1: Data Akun -->
       <div class="fs <?= $error_step === 1 ? 'active' : '' ?>" id="step1">
-        <label class="gc-lbl">Username</label>
-        <div class="gc-inp">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input type="text" id="f_username" name="username" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" placeholder="username_kamu" autocomplete="username">
+        <label class="inp-label">Username</label>
+        <div class="inp-box">
+          <div class="inp-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="inp-field">
+            <input type="text" id="f_username" name="username" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" placeholder="username_kamu" autocomplete="username">
+          </div>
         </div>
-        <div class="gc-hint">3–30 karakter, huruf/angka/underscore</div>
+        <div class="inp-hint">3–30 karakter, huruf/angka/underscore</div>
 
-        <label class="gc-lbl">Email</label>
-        <div class="gc-inp">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <input type="email" id="f_email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" placeholder="email@kamu.com" autocomplete="email">
+        <label class="inp-label">Email</label>
+        <div class="inp-box">
+          <div class="inp-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="inp-field">
+            <input type="email" id="f_email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" placeholder="email@kamu.com" autocomplete="email">
+          </div>
         </div>
 
-        <button type="button" class="btn3d btn3d-blue" onclick="goStep2()">Lanjut →</button>
+        <button type="button" class="btn-3d btn-primary" onclick="goStep2()">LANJUT →</button>
       </div>
 
       <!-- STEP 2: Kontak & Password -->
       <div class="fs <?= $error_step === 2 ? 'active' : '' ?>" id="step2">
-        <label class="gc-lbl">Nomor WhatsApp</label>
-        <div class="gc-inp">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16z"/></svg>
-          <input type="tel" id="f_wa" name="whatsapp" value="<?= htmlspecialchars($_POST['whatsapp'] ?? '') ?>" placeholder="08xxxxxxxxxx" autocomplete="tel">
+        <label class="inp-label">Nomor WhatsApp</label>
+        <div class="inp-box">
+          <div class="inp-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16z"/></svg>
+          </div>
+          <div class="inp-field">
+            <input type="tel" id="f_wa" name="whatsapp" value="<?= htmlspecialchars($_POST['whatsapp'] ?? '') ?>" placeholder="08xxxxxxxxxx" autocomplete="tel">
+          </div>
         </div>
 
-        <label class="gc-lbl">Password</label>
-        <div class="gc-inp">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <input type="password" id="f_pwd" name="password" placeholder="Min. 6 karakter" autocomplete="new-password">
-          <button type="button" class="eye" onclick="let p=document.getElementById('f_pwd');p.type=p.type==='password'?'text':'password'">👁</button>
+        <label class="inp-label">Password</label>
+        <div class="inp-box">
+          <div class="inp-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div class="inp-field">
+            <input type="password" id="f_pwd" name="password" placeholder="Min. 6 karakter" autocomplete="new-password">
+            <button type="button" class="eye" onclick="let p=document.getElementById('f_pwd');p.type=p.type==='password'?'text':'password'">👁</button>
+          </div>
         </div>
 
-        <label class="gc-lbl">Kode Referral
-          <?php if ($ref_from_url): ?><span class="gc-ref-ok">✅ Terhubung</span>
-          <?php else: ?><span style="color:#b8a080;font-weight:600">(opsional)</span><?php endif; ?>
+        <label class="inp-label">Kode Referral
+          <?php if ($ref_from_url): ?><span class="ref-ok">✅ Terhubung</span>
+          <?php else: ?><span style="color:#94a3b8;font-weight:700;text-transform:none;letter-spacing:normal">(opsional)</span><?php endif; ?>
         </label>
-        <div class="gc-inp">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-          <input type="text" name="referral" value="<?= htmlspecialchars($_POST['referral'] ?? $ref_from_url) ?>" placeholder="XXXXXXXX" style="text-transform:uppercase;letter-spacing:2px<?= $ref_from_url ? ';color:#166534;font-weight:800' : '' ?>" <?= $ref_from_url ? 'disabled readonly' : '' ?>>
+        <div class="inp-box">
+          <div class="inp-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <div class="inp-field">
+            <input type="text" name="referral" value="<?= htmlspecialchars($_POST['referral'] ?? $ref_from_url) ?>" placeholder="XXXXXXXX" style="text-transform:uppercase;letter-spacing:2px<?= $ref_from_url ? ';color:#166534;font-weight:800' : '' ?>" <?= $ref_from_url ? 'disabled readonly' : '' ?>>
+          </div>
         </div>
         <?php if ($ref_from_url): ?>
-        <div class="gc-hint" style="color:#166534">🔗 Kode referral otomatis dari link.</div>
+        <div class="inp-hint" style="color:#166534">🔗 Kode referral otomatis dari link.</div>
         <input type="hidden" name="referral" value="<?= htmlspecialchars($ref_from_url) ?>">
         <?php endif; ?>
 
         <div style="display:flex;gap:8px">
-          <button type="button" class="btn3d btn3d-ghost" onclick="goStep(1)" style="flex:0 0 70px;font-size:13px">←</button>
-          <button type="button" class="btn3d btn3d-blue" onclick="goStep3()" style="flex:1">Lanjut →</button>
+          <button type="button" class="btn-3d btn-ghost" onclick="goStep(1)" style="flex:0 0 70px;font-size:13px">←</button>
+          <button type="button" class="btn-3d btn-primary" onclick="goStep3()" style="flex:1">LANJUT →</button>
         </div>
       </div>
 
       <!-- STEP 3: Bank -->
       <div class="fs <?= $error_step === 3 ? 'active' : '' ?>" id="step3">
-        <label class="gc-lbl">Bank / E-Wallet</label>
-        <div class="gc-inp">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-          <select id="f_bank_name" name="bank_name" required>
-            <option value="">— Pilih —</option>
-            <?php if (!empty($_banks)): ?>
-            <optgroup label="🏦 Bank">
-              <?php foreach ($_banks as $_ch): ?>
-              <option value="<?= htmlspecialchars($_ch['name']) ?>" <?= ($_POST['bank_name'] ?? '') === $_ch['name'] ? 'selected' : '' ?>><?= htmlspecialchars($_ch['name']) ?></option>
-              <?php endforeach; ?>
-            </optgroup>
-            <?php endif; ?>
-            <?php if (!empty($_ewallets)): ?>
-            <optgroup label="📱 E-Wallet">
-              <?php foreach ($_ewallets as $_ch): ?>
-              <option value="<?= htmlspecialchars($_ch['name']) ?>" <?= ($_POST['bank_name'] ?? '') === $_ch['name'] ? 'selected' : '' ?>><?= htmlspecialchars($_ch['name']) ?></option>
-              <?php endforeach; ?>
-            </optgroup>
-            <?php endif; ?>
-          </select>
+        <label class="inp-label">Bank / E-Wallet</label>
+        <div class="inp-box">
+          <div class="inp-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <div class="inp-field">
+            <select id="f_bank_name" name="bank_name" required>
+              <option value="">— Pilih —</option>
+              <?php if (!empty($_banks)): ?>
+              <optgroup label="🏦 Bank">
+                <?php foreach ($_banks as $_ch): ?>
+                <option value="<?= htmlspecialchars($_ch['name']) ?>" <?= ($_POST['bank_name'] ?? '') === $_ch['name'] ? 'selected' : '' ?>><?= htmlspecialchars($_ch['name']) ?></option>
+                <?php endforeach; ?>
+              </optgroup>
+              <?php endif; ?>
+              <?php if (!empty($_ewallets)): ?>
+              <optgroup label="📱 E-Wallet">
+                <?php foreach ($_ewallets as $_ch): ?>
+                <option value="<?= htmlspecialchars($_ch['name']) ?>" <?= ($_POST['bank_name'] ?? '') === $_ch['name'] ? 'selected' : '' ?>><?= htmlspecialchars($_ch['name']) ?></option>
+                <?php endforeach; ?>
+              </optgroup>
+              <?php endif; ?>
+            </select>
+          </div>
         </div>
 
-        <label class="gc-lbl">Nomor Rekening / Akun</label>
-        <div class="gc-inp">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <input type="text" id="f_account_number" name="account_number" value="<?= htmlspecialchars($_POST['account_number'] ?? '') ?>" placeholder="No. rekening / HP e-wallet">
-          <input type="hidden" id="f_acc_num_record" name="acc_num_record" value="<?= htmlspecialchars($_POST['acc_num_record'] ?? '[]') ?>">
+        <label class="inp-label">Nomor Rekening / Akun</label>
+        <div class="inp-box">
+          <div class="inp-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="inp-field">
+            <input type="text" id="f_account_number" name="account_number" value="<?= htmlspecialchars($_POST['account_number'] ?? '') ?>" placeholder="No. rekening / HP e-wallet">
+            <input type="hidden" id="f_acc_num_record" name="acc_num_record" value="<?= htmlspecialchars($_POST['acc_num_record'] ?? '[]') ?>">
+          </div>
         </div>
 
-        <label class="gc-lbl">Nama Pemilik Rekening</label>
-        <div class="gc-inp">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input type="text" id="f_account_name" name="account_name" value="<?= htmlspecialchars($_POST['account_name'] ?? '') ?>" placeholder="Nama sesuai rekening">
-          <input type="hidden" id="f_acc_name_record" name="acc_name_record" value="<?= htmlspecialchars($_POST['acc_name_record'] ?? '[]') ?>">
+        <label class="inp-label">Nama Pemilik Rekening</label>
+        <div class="inp-box">
+          <div class="inp-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="inp-field">
+            <input type="text" id="f_account_name" name="account_name" value="<?= htmlspecialchars($_POST['account_name'] ?? '') ?>" placeholder="Nama sesuai rekening">
+            <input type="hidden" id="f_acc_name_record" name="acc_name_record" value="<?= htmlspecialchars($_POST['acc_name_record'] ?? '[]') ?>">
+          </div>
         </div>
 
         <div style="display:flex;gap:8px">
-          <button type="button" class="btn3d btn3d-ghost" onclick="goStep(2)" style="flex:0 0 70px;font-size:13px">←</button>
-          <button type="button" class="btn3d btn3d-blue" onclick="goStep4()" style="flex:1">Lanjut →</button>
+          <button type="button" class="btn-3d btn-ghost" onclick="goStep(2)" style="flex:0 0 70px;font-size:13px">←</button>
+          <button type="button" class="btn-3d btn-primary" onclick="goStep4()" style="flex:1">LANJUT →</button>
         </div>
       </div>
 
@@ -402,9 +547,9 @@ body{font-family:'Nunito',sans-serif;background:#1a1a2e;min-height:100vh;display
         </div>
 
         <!-- Summary -->
-        <div class="gc-sum">
-          <div class="gc-sum-title">📋 Ringkasan</div>
-          <div class="gc-sum-row">
+        <div class="auth-sum">
+          <div class="auth-sum-title">📋 Ringkasan</div>
+          <div class="auth-sum-row">
             👤 <span id="sum_user">—</span><br>
             📧 <span id="sum_email">—</span><br>
             📱 <span id="sum_wa">—</span><br>
@@ -413,13 +558,13 @@ body{font-family:'Nunito',sans-serif;background:#1a1a2e;min-height:100vh;display
         </div>
 
         <div style="display:flex;gap:8px">
-          <button type="button" class="btn3d btn3d-ghost" onclick="goStep(3)" style="flex:0 0 70px;font-size:13px">←</button>
-          <button type="submit" id="submit-btn" class="btn3d btn3d-blue no-dbl-submit" style="flex:1">🎉 Daftar Sekarang</button>
+          <button type="button" class="btn-3d btn-ghost" onclick="goStep(3)" style="flex:0 0 70px;font-size:13px">←</button>
+          <button type="submit" id="submit-btn" class="btn-3d btn-primary no-dbl-submit" style="flex:1">🎉 DAFTAR SEKARANG</button>
         </div>
       </div>
     </form>
 
-    <div class="gc-ft">Sudah punya akun? <a href="/login">Masuk di sini</a></div>
+    <div class="auth-ft">Sudah punya akun? <a href="/login">Masuk di sini</a></div>
   </div>
 </div>
 
