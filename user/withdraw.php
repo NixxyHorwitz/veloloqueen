@@ -664,13 +664,13 @@ html body { background: #f97316 !important; background-image: none !important; m
       <?php if ($free_wd_limit_reached): ?>
         <button type="button" class="wd-submit-btn" disabled>Tarik (Limit Habis)</button>
       <?php elseif ($free_wrong_bank): ?>
-        <button type="button" class="wd-submit-btn" disabled>Tarik (Hanya DANA)</button>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Hanya DANA Untuk Level Free)</button>
       <?php elseif ($wd_locked): ?>
         <button type="button" class="wd-submit-btn" disabled>Tarik (Terkunci)</button>
       <?php elseif ($level_blocked): ?>
         <button type="button" class="wd-submit-btn" disabled>Tarik (Butuh Upgrade)</button>
       <?php elseif ($free_age_blocked): ?>
-        <button type="button" class="wd-submit-btn" disabled>Tarik (Akun Baru)</button>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Akun Baru belum bisa narik)</button>
       <?php elseif (!$user['can_withdraw']): ?>
         <button type="button" class="wd-submit-btn" disabled>Tarik (Akses Dibatasi)</button>
       <?php elseif ($has_pending_bank): ?>
