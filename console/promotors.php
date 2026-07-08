@@ -151,7 +151,7 @@ if ($tab === 'members') {
     $stmt = $pdo->prepare("
         SELECT u.id, u.username, u.email, u.created_at, p.username as promotor_name,
                COALESCE((SELECT SUM(amount) FROM deposits WHERE user_id = u.id AND status = 'confirmed'), 0) as total_deposit,
-               COALESCE(m.name, ''' . get_free_tier_name($pdo) . ''') as membership_name
+               COALESCE(m.name, '" . get_free_tier_name($pdo) . "') as membership_name
         FROM users u 
         JOIN users p ON u.referred_by = p.referral_code 
         LEFT JOIN memberships m ON u.membership_id = m.id
