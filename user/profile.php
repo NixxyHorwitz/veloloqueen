@@ -84,86 +84,93 @@ $_psvg = [
 
 <style>
 /* ══════════════════════════════════════════════
-   PROFILE PAGE — COMPACT GAME STYLE
+   PROFILE PAGE — CASUAL GAME STYLE (ULTRA COMPACT)
    ══════════════════════════════════════════════ */
 body { background: #f97316 !important; color: #0f172a; }
-.prof-page { padding: 12px 14px 24px; }
 
-/* ── Flash ── */
-.prof-flash { padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; margin-bottom: 12px; border: 2px solid; display: flex; align-items: center; gap: 8px; box-shadow: 0 3px 0; }
-.prof-flash--success { background: #d1fae5; color: #065f46; border-color: #065f46; box-shadow: 0 3px 0 #065f46; }
-.prof-flash--error   { background: #fee2e2; color: #991b1b; border-color: #991b1b; box-shadow: 0 3px 0 #991b1b; }
+/* ── TOP BANNER (HERO) ── */
+.wd-top { position: relative; background: linear-gradient(180deg, #3b82f6, #1d4ed8); padding: 16px 14px 24px; border-bottom: 3px solid #1e3a8a; z-index: 10; display: flex; align-items: center; gap: 12px; }
+.wd-top::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 2px, transparent 2px); background-size: 20px 20px; pointer-events: none; }
+.prof-ava { width: 50px; height: 50px; background: linear-gradient(135deg, #fde047, #eab308); border: 2.5px solid #ca8a04; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; color: #713f12; text-shadow: 0 1px 1px rgba(255,255,255,0.5); box-shadow: 0 3px 0 #a16207; position: relative; z-index: 2; flex-shrink: 0; }
+.prof-info { flex: 1; min-width: 0; position: relative; z-index: 2; }
+.prof-name { font-size: 16px; font-weight: 900; color: #fff; text-shadow: 0 2px 0 #1e3a8a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.prof-email { font-size: 10px; font-weight: 800; color: #bae6fd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; }
+.prof-tier { display: inline-block; font-size: 9px; font-weight: 900; padding: 3px 6px; background: #fef08a; color: #b45309; border-radius: 6px; border: 1.5px solid #ca8a04; box-shadow: 0 2px 0 #a16207; text-transform: uppercase; }
 
-/* ── COMPACT HERO ── */
-.prof-card {
-  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-  border: 3px solid #1e40af; border-radius: 16px;
-  padding: 12px; display: flex; align-items: center; gap: 12px;
-  box-shadow: 0 4px 0 #1e3a8a; margin-bottom: 12px; position: relative; overflow: hidden;
-}
-.prof-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.1); }
-.prof-ava { width: 48px; height: 48px; border-radius: 14px; background: #fde047; border: 2px solid #ca8a04; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #9a3412; flex-shrink: 0; box-shadow: 0 3px 0 #ca8a04; }
-.prof-info { flex: 1; }
-.prof-name { font-size: 15px; font-weight: 900; color: #fff; margin-bottom: 2px; }
-.prof-email { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
-.prof-tier { display: inline-flex; background: #c2410c; border: 1.5px solid #ffedd5; padding: 2px 6px; border-radius: 8px; font-size: 9px; font-weight: 900; color: #fff; box-shadow: 0 2px 0 #9a3412;}
+/* ── BODY ── */
+.wd-body { flex: 1; background: #f97316; padding: 20px 14px 100px; position: relative; z-index: 2; }
+.wd-body::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%); background-size: 40px 40px; background-position: 0 0, 20px 20px; pointer-events: none; z-index: -1; }
 
 /* ── STATS ROW ── */
-.stat-row { display: flex; gap: 8px; margin-bottom: 12px; }
-.stat-box { flex: 1; background: #ffffff; border: 2.5px solid #c2410c; border-radius: 12px; padding: 10px 6px; text-align: center; box-shadow: 0 3px 0 #9a3412; }
-.stat-val { font-size: 13px; font-weight: 900; color: #ea580c; line-height: 1.2; }
-.stat-lbl { font-size: 9px; font-weight: 900; color: #c2410c; margin-top: 2px; text-transform: uppercase; }
+.stat-row { display: flex; gap: 6px; margin-bottom: 16px; position: relative; z-index: 5; }
+.stat-box { flex: 1; background: #ffffff; border: 2.5px solid #1e3a8a; border-radius: 12px; padding: 10px 4px; text-align: center; box-shadow: 0 3px 0 #1e3a8a; }
+.stat-val { font-size: 13px; font-weight: 900; line-height: 1.2; color: #0f172a; }
+.stat-val.blue { color: #0284c7; }
+.stat-lbl { font-size: 9px; font-weight: 900; color: #64748b; margin-top: 2px; text-transform: uppercase; }
 
-/* ── REFERRAL STRIP ── */
-.ref-strip { display: flex; align-items: center; justify-content: space-between; background: #fffbeb; border: 2.5px solid #c2410c; border-radius: 12px; padding: 8px 12px; box-shadow: 0 3px 0 #9a3412; margin-bottom: 12px; }
-.ref-lbl { font-size: 10px; font-weight: 900; color: #ea580c; text-transform: uppercase; }
-.ref-code { font-size: 14px; font-weight: 900; color: #7c2d12; letter-spacing: 1px; }
-.ref-btn { background: #fde047; border: 2px solid #ca8a04; border-radius: 8px; padding: 6px 10px; font-size: 10px; font-weight: 900; color: #9a3412; cursor: pointer; box-shadow: 0 2px 0 #ca8a04; transition: transform 0.1s; }
-.ref-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #ca8a04; }
+/* ── SHARE STRIP ── */
+.ref-strip { display: flex; align-items: center; justify-content: space-between; background: #fffbeb; border: 2.5px solid #c2410c; border-radius: 12px; padding: 8px 10px; box-shadow: 0 3px 0 #9a3412; margin-bottom: 16px; }
+.ref-lbl { font-size: 9px; font-weight: 900; color: #ea580c; text-transform: uppercase; margin-bottom: 2px; }
+.ref-code { font-size: 13px; font-weight: 900; color: #7c2d12; letter-spacing: 0.5px; }
+.ref-btn { background: linear-gradient(180deg, #fde047, #eab308); border: 2px solid #ca8a04; border-radius: 8px; font-size: 11px; font-weight: 900; color: #713f12; padding: 8px 12px; box-shadow: 0 3px 0 #a16207; cursor: pointer; flex-shrink: 0; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
+.ref-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #a16207; }
 
 /* ── GRID NAV ── */
-.p-nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-.p-nav-item { background: #ffffff; border: 2.5px solid #c2410c; border-radius: 12px; padding: 12px 10px; display: flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 3px 0 #9a3412; color: #9a3412; transition: transform 0.1s; }
-.p-nav-item:active { transform: translateY(2px); box-shadow: 0 0 0 #9a3412; }
-.p-nav-item i { font-size: 20px; color: #ea580c; }
-.p-nav-item span { font-size: 12px; font-weight: 900; }
+.p-nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.p-nav-item { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 10px; border-radius: 12px; font-size: 12px; font-weight: 900; color: #fff; text-decoration: none; border: 2.5px solid rgba(0,0,0,0.2); box-shadow: 0 3px 0 rgba(0,0,0,0.3); transition: transform 0.1s; text-shadow: 0 1px 1px rgba(0,0,0,0.3); }
+.p-nav-item:active { transform: translateY(3px); box-shadow: none; }
+.p-nav-item i { font-size: 18px; color: #fff; }
+.p-nav-item.n-rek { background: linear-gradient(180deg, #34d399, #059669); border-color: #047857; box-shadow: 0 3px 0 #064e3b; }
+.p-nav-item.n-upg { background: linear-gradient(180deg, #c084fc, #9333ea); border-color: #7e22ce; box-shadow: 0 3px 0 #581c87; }
+.p-nav-item.n-riw { background: linear-gradient(180deg, #60a5fa, #2563eb); border-color: #1d4ed8; box-shadow: 0 3px 0 #1e3a8a; }
+.p-nav-item.n-pan { background: linear-gradient(180deg, #fbbf24, #d97706); border-color: #b45309; box-shadow: 0 3px 0 #78350f; }
 
 /* ── COMPACT ACCORDIONS ── */
-.c-group { background: #ffffff; border: 2.5px solid #c2410c; border-radius: 14px; box-shadow: 0 4px 0 #9a3412; overflow: hidden; margin-bottom: 12px; }
-.c-hdr { display: flex; align-items: center; gap: 8px; padding: 12px; background: #fffbeb; cursor: pointer; border-bottom: 2px solid transparent; user-select: none; }
-.c-hdr.open { border-bottom-color: #fb923c; }
-.c-hdr i.icon { font-size: 16px; color: #ea580c; width: 24px; text-align: center; }
-.c-hdr span { flex: 1; font-size: 11px; font-weight: 900; color: #9a3412; text-transform: uppercase; }
-.c-hdr i.caret { font-size: 12px; color: #c2410c; transition: transform 0.2s; }
+.c-group { background: #ffffff; border: 2.5px solid #1e3a8a; border-radius: 14px; box-shadow: 0 4px 0 #1e3a8a; overflow: hidden; margin-bottom: 16px; }
+.c-hdr { display: flex; align-items: center; gap: 8px; padding: 12px; background: #f0f9ff; cursor: pointer; border-bottom: 2.5px solid transparent; user-select: none; }
+.c-hdr.open { border-bottom-color: #bae6fd; background: #e0f2fe; }
+.c-hdr i.icon { font-size: 16px; color: #0284c7; width: 24px; text-align: center; }
+.c-hdr span { flex: 1; font-size: 11px; font-weight: 900; color: #0369a1; text-transform: uppercase; }
+.c-hdr i.caret { font-size: 12px; color: #0284c7; transition: transform 0.2s; }
 .c-hdr.open i.caret { transform: rotate(180deg); }
-.c-body { display: none; padding: 12px; }
+.c-body { display: none; padding: 12px; background: #fff; }
 .c-body.open { display: block; }
 
 /* Forms inside compact */
-.c-lbl { font-size: 10px; font-weight: 900; color: #ea580c; margin-bottom: 4px; display: block; }
-.c-input { width: 100%; background: #ffffff; border: 2px solid #fb923c; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 800; color: #9a3412; margin-bottom: 8px; outline: none; box-sizing: border-box; }
-.c-input:focus { border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234,88,12,0.2); }
-.c-input:disabled { opacity: 0.7; cursor: not-allowed; }
-.c-btn { width: 100%; background: #22c55e; border: 2px solid #166534; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 1px 0 #14532d; box-shadow: 0 3px 0 #14532d; cursor: pointer; }
-.c-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #14532d; }
+.c-lbl { font-size: 10px; font-weight: 900; color: #0369a1; margin-bottom: 4px; display: block; }
+.c-input { width: 100%; background: #ffffff; border: 2px solid #bae6fd; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 800; color: #0f172a; margin-bottom: 8px; outline: none; box-sizing: border-box; }
+.c-input:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2,132,199,0.2); }
+.c-input:disabled { background: #f8fafc; color: #64748b; border-color: #e2e8f0; cursor: not-allowed; }
+.c-btn { width: 100%; background: linear-gradient(180deg, #38bdf8, #0ea5e9); border: 2px solid #0284c7; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,0.2); box-shadow: 0 3px 0 #0369a1; cursor: pointer; transition: transform 0.1s; }
+.c-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #0369a1; }
 
 /* ── CONTACT ROW ── */
-.contact-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+.contact-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; justify-content: center; }
 .contact-row::-webkit-scrollbar { display: none; }
-.contact-btn { flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2.5px solid rgba(0,0,0,0.2); box-shadow: 0 3px 0 rgba(0,0,0,0.3); transition: transform 0.1s; text-decoration: none; }
-.contact-btn:active { transform: translateY(2px); box-shadow: 0 0 0 rgba(0,0,0,0.3); }
+.contact-btn { flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2.5px solid rgba(0,0,0,0.2); box-shadow: 0 3px 0 rgba(0,0,0,0.3); transition: transform 0.1s; text-decoration: none; color: #fff; }
+.contact-btn:active { transform: translateY(3px); box-shadow: none; }
 
 /* ── LOGOUT ── */
-.logout-btn { display: flex; align-items: center; justify-content: center; gap: 6px; background: #ef4444; border: 2.5px solid #7f1d1d; border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 900; color: #fff; text-decoration: none; box-shadow: 0 4px 0 #7f1d1d; transition: transform 0.1s; }
-.logout-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #7f1d1d; }
+.logout-btn { display: flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(180deg, #f87171, #ef4444); border: 2.5px solid #b91c1c; border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 900; color: #fff; text-decoration: none; box-shadow: 0 4px 0 #991b1b; transition: transform 0.1s; text-shadow: 0 1px 1px rgba(0,0,0,0.3); margin-top: 10px; }
+.logout-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #991b1b; }
 
 #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 8px 16px; border-radius: 10px; font-size: 11px; font-weight: 900; border: 2px solid #14532d; box-shadow: 0 3px 0 #14532d; display: none; z-index: 100; }
 </style>
 
-<!-- BACKGROUND -->
-<div style="position:fixed;inset:0;background:radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%);background-size:50px 50px;background-position:0 0, 25px 25px;pointer-events:none;z-index:-1;"></div>
+<!-- TOP BANNER (HERO) -->
+<div class="wd-top">
+  <div class="prof-ava"><?= strtoupper(substr($user['username'], 0, 1)) ?></div>
+  <div class="prof-info">
+    <div class="prof-name"><?= htmlspecialchars($user['username']) ?></div>
+    <div class="prof-email"><?= htmlspecialchars($user['email']) ?></div>
+    <div class="prof-tier">
+      <?= $is_premium ? '★ '.$membership_name : $membership_name ?>
+      <?= $user['membership_expires_at'] ? ' • '.date('d/m/y', strtotime($user['membership_expires_at'])) : '' ?>
+    </div>
+  </div>
+</div>
 
-<div class="prof-page">
+<div class="wd-body">
   <?php if ($flash): ?>
   <div class="prof-flash prof-flash--<?= $flashType === 'error' ? 'error' : 'success' ?>">
     <i class="ph-bold ph-<?= $flashType === 'error' ? 'warning-circle' : 'check-circle' ?>" style="font-size:16px;"></i>
@@ -171,23 +178,10 @@ body { background: #f97316 !important; color: #0f172a; }
   </div>
   <?php endif; ?>
 
-  <!-- HERO COMPACT -->
-  <div class="prof-card">
-    <div class="prof-ava"><?= strtoupper(substr($user['username'], 0, 1)) ?></div>
-    <div class="prof-info">
-      <div class="prof-name"><?= htmlspecialchars($user['username']) ?></div>
-      <div class="prof-email"><?= htmlspecialchars($user['email']) ?></div>
-      <div class="prof-tier">
-        <?= $is_premium ? '⭐ '.$membership_name : $membership_name ?>
-        <?= $user['membership_expires_at'] ? ' • '.date('d/m/y', strtotime($user['membership_expires_at'])) : '' ?>
-      </div>
-    </div>
-  </div>
-
-  <!-- STATS -->
+  <!-- STATS ROW -->
   <div class="stat-row">
     <div class="stat-box">
-      <div class="stat-val"><?= format_rp((float)$user['total_earned']) ?></div>
+      <div class="stat-val blue"><?= format_rp((float)$user['total_earned']) ?></div>
       <div class="stat-lbl">Earned</div>
     </div>
     <div class="stat-box">
@@ -200,7 +194,7 @@ body { background: #f97316 !important; color: #0f172a; }
     </div>
   </div>
 
-  <!-- REFERRAL -->
+  <!-- SHARE STRIP -->
   <div class="ref-strip">
     <div>
       <div class="ref-lbl">Kode Referral</div>
@@ -211,24 +205,24 @@ body { background: #f97316 !important; color: #0f172a; }
 
   <!-- GRID NAV -->
   <div class="p-nav-grid">
-    <a href="/edit-rekening" class="p-nav-item">
-      <i class="ph-fill ph-bank"></i> <span>Rekening</span>
+    <a href="/edit-rekening" class="p-nav-item n-rek">
+      <i class="ph-bold ph-bank"></i> <span>Rekening</span>
     </a>
-    <a href="/upgrade" class="p-nav-item">
-      <i class="ph-fill ph-rocket-launch"></i> <span>Upgrade</span>
+    <a href="/upgrade" class="p-nav-item n-upg">
+      <i class="ph-bold ph-rocket-launch"></i> <span>Upgrade</span>
     </a>
-    <a href="/history" class="p-nav-item">
-      <i class="ph-fill ph-receipt"></i> <span>Riwayat</span>
+    <a href="/history" class="p-nav-item n-riw">
+      <i class="ph-bold ph-receipt"></i> <span>Riwayat</span>
     </a>
-    <a href="/panduan" class="p-nav-item">
-      <i class="ph-fill ph-book-open"></i> <span>Panduan</span>
+    <a href="/panduan" class="p-nav-item n-pan">
+      <i class="ph-bold ph-book-open"></i> <span>Panduan</span>
     </a>
   </div>
 
-  <!-- SETTINGS -->
+  <!-- SETTINGS ACCORDION -->
   <div class="c-group">
     <div class="c-hdr" onclick="t('info')" id="h-info">
-      <i class="icon ph-fill ph-identification-card"></i> <span>Info Akun</span> <i class="caret ph-bold ph-caret-down" id="c-info"></i>
+      <i class="icon ph-bold ph-identification-card"></i> <span>Info Akun</span> <i class="caret ph-bold ph-caret-down" id="c-info"></i>
     </div>
     <div class="c-body" id="b-info">
       <div class="c-lbl">WhatsApp</div>
@@ -238,7 +232,7 @@ body { background: #f97316 !important; color: #0f172a; }
     </div>
 
     <div class="c-hdr <?= $active_section === 'edit' ? 'open' : '' ?>" onclick="t('edit')" id="h-edit">
-      <i class="icon ph-fill ph-pencil-simple"></i> <span>Ubah Username</span> <i class="caret ph-bold ph-caret-down <?= $active_section === 'edit' ? 'open' : '' ?>" id="c-edit"></i>
+      <i class="icon ph-bold ph-pencil-simple"></i> <span>Ubah Username</span> <i class="caret ph-bold ph-caret-down <?= $active_section === 'edit' ? 'open' : '' ?>" id="c-edit"></i>
     </div>
     <div class="c-body <?= $active_section === 'edit' ? 'open' : '' ?>" id="b-edit">
       <form method="POST">
@@ -246,71 +240,76 @@ body { background: #f97316 !important; color: #0f172a; }
         <input type="hidden" name="action" value="update_profile">
         <div class="c-lbl">Username Baru (Huruf/Angka/_)</div>
         <input class="c-input" type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" required minlength="3">
-        <button class="c-btn"><i class="ph-bold ph-floppy-disk"></i> Simpan</button>
+        <button class="c-btn"><i class="ph-bold ph-floppy-disk"></i> Simpan Username</button>
       </form>
     </div>
 
-    <div class="c-hdr <?= $active_section === 'password' ? 'open' : '' ?>" onclick="t('pass')" id="h-pass">
-      <i class="icon ph-fill ph-lock-key"></i> <span>Ganti Password</span> <i class="caret ph-bold ph-caret-down <?= $active_section === 'password' ? 'open' : '' ?>" id="c-pass"></i>
+    <div class="c-hdr <?= $active_section === 'password' ? 'open' : '' ?>" onclick="t('password')" id="h-password">
+      <i class="icon ph-bold ph-lock-key"></i> <span>Ganti Password</span> <i class="caret ph-bold ph-caret-down <?= $active_section === 'password' ? 'open' : '' ?>" id="c-password"></i>
     </div>
-    <div class="c-body <?= $active_section === 'password' ? 'open' : '' ?>" id="b-pass">
+    <div class="c-body <?= $active_section === 'password' ? 'open' : '' ?>" id="b-password">
       <form method="POST">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="change_password">
         <div class="c-lbl">Password Lama</div>
-        <input class="c-input" type="password" name="old_password" required>
-        <div class="c-lbl">Password Baru (min 6)</div>
-        <input class="c-input" type="password" name="new_password" required>
-        <button class="c-btn" style="background:#ef4444;border-color:#7f1d1d;box-shadow:0 3px 0 #7f1d1d;"><i class="ph-bold ph-lock-key"></i> Update Password</button>
+        <input class="c-input" type="password" name="old_password" required minlength="6">
+        <div class="c-lbl">Password Baru</div>
+        <input class="c-input" type="password" name="new_password" required minlength="6">
+        <button class="c-btn"><i class="ph-bold ph-key"></i> Update Password</button>
       </form>
     </div>
   </div>
 
-  <!-- CONTACT (Horizontal scroll) -->
-  <?php if (count($_contact_btns) > 0): ?>
+  <!-- CONTACT ROW -->
   <div class="contact-row">
-    <?php foreach ($_contact_btns as $_cb): ?>
-    <a href="<?= htmlspecialchars($_cb['url']) ?>" target="_blank" class="contact-btn" style="background:<?= htmlspecialchars($_cb['bg_color']) ?>;">
-      <?php if ($_cb['icon_type'] === 'custom'): ?>
-        <img src="<?= htmlspecialchars($_cb['icon_value']) ?>" style="width:20px;height:20px;object-fit:contain" alt="">
-      <?php else: ?>
-        <span style="color:#fff;display:flex"><?= $_psvg[$_cb['icon_value']] ?? $_psvg['cs'] ?></span>
-      <?php endif; ?>
-    </a>
+    <?php foreach ($_contact_btns as $cb): ?>
+      <?php
+        $t = strtolower($cb['type']);
+        $svg = $_psvg[$t] ?? $_psvg['cs'];
+        $c = match($t) {
+            'wa' => 'background:linear-gradient(135deg, #4ade80, #16a34a);border-color:#14532d;box-shadow:0 3px 0 #14532d;',
+            'tele' => 'background:linear-gradient(135deg, #60a5fa, #2563eb);border-color:#1e3a8a;box-shadow:0 3px 0 #1e3a8a;',
+            'ig' => 'background:linear-gradient(135deg, #f43f5e, #be123c);border-color:#881337;box-shadow:0 3px 0 #881337;',
+            'fb' => 'background:linear-gradient(135deg, #3b82f6, #1d4ed8);border-color:#1e3a8a;box-shadow:0 3px 0 #1e3a8a;',
+            default => 'background:linear-gradient(135deg, #94a3b8, #475569);border-color:#1e293b;box-shadow:0 3px 0 #1e293b;'
+        };
+      ?>
+      <a href="<?= htmlspecialchars($cb['url']) ?>" class="contact-btn" target="_blank" style="<?= $c ?>">
+        <?= $svg ?>
+      </a>
     <?php endforeach; ?>
   </div>
-  <?php endif; ?>
 
   <!-- LOGOUT -->
-  <a href="/logout" id="logout-btn" class="logout-btn"><i class="ph-bold ph-sign-out"></i> Keluar Akun</a>
-</div>
-<div id="toast">Disalin!</div>
+  <a href="/logout" class="logout-btn">
+    <i class="ph-bold ph-sign-out"></i> Keluar
+  </a>
 
+</div>
+
+<div id="toast">✅ Tersalin!</div>
+<script src="/assets/js/toast.js"></script>
 <script>
 function t(id) {
-  const b = document.getElementById('b-'+id);
-  const h = document.getElementById('h-'+id);
-  const c = document.getElementById('c-'+id);
-  const open = b.classList.contains('open');
-  b.classList.toggle('open', !open);
-  h.classList.toggle('open', !open);
-  c.classList.toggle('open', !open);
+  let b = document.getElementById('b-'+id);
+  let h = document.getElementById('h-'+id);
+  let c = document.getElementById('c-'+id);
+  let o = b.classList.contains('open');
+  // close all
+  document.querySelectorAll('.c-body, .c-hdr, .caret').forEach(e => e.classList.remove('open'));
+  if(!o) {
+    b.classList.add('open');
+    h.classList.add('open');
+    c.classList.add('open');
+  }
 }
 function copyRef() {
-  const code = document.getElementById('ref-code').innerText;
-  navigator.clipboard.writeText(code);
-  const toast = document.getElementById('toast');
-  toast.style.display = 'block';
-  setTimeout(()=>toast.style.display='none', 2000);
+  let txt = document.getElementById('ref-code').innerText;
+  navigator.clipboard.writeText(txt).then(()=>{
+    let t = document.getElementById('toast');
+    t.style.display='block';
+    setTimeout(()=>t.style.display='none', 2000);
+  });
 }
-document.getElementById('logout-btn').addEventListener('click', function(e) {
-  if (!this.dataset.conf) {
-    e.preventDefault();
-    this.innerText = "Klik lagi untuk keluar";
-    this.dataset.conf = "1";
-    setTimeout(() => { this.innerText = "Keluar Akun"; delete this.dataset.conf; }, 3000);
-  }
-});
 </script>
-
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
