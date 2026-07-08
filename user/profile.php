@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/auth/guard.php';
-
 $flash = $flashType = '';
 $active_section = 'main'; // default
 
@@ -85,500 +84,232 @@ $_psvg = [
 
 <style>
 /* ══════════════════════════════════════════════
-   PROFILE PAGE — CASUAL GAME STYLE
+   PROFILE PAGE — COMPACT GAME STYLE
    ══════════════════════════════════════════════ */
-
-.prof-page { padding: 0 0 20px; }
+body { background: #f97316 !important; color: #0f172a; }
+.prof-page { padding: 12px 14px 24px; position: relative; z-index: 2;}
 
 /* ── Flash ── */
-.prof-flash { padding: 10px 14px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-bottom: 12px; border: 2px solid; display: flex; align-items: center; gap: 8px; }
-.prof-flash--success { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
-.prof-flash--error   { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+.prof-flash { padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; margin-bottom: 12px; border: 2px solid; display: flex; align-items: center; gap: 8px; box-shadow: 0 3px 0; }
+.prof-flash--success { background: #d1fae5; color: #065f46; border-color: #065f46; box-shadow: 0 3px 0 #065f46; }
+.prof-flash--error   { background: #fee2e2; color: #991b1b; border-color: #991b1b; box-shadow: 0 3px 0 #991b1b; }
 
-/* ── Hero Card ── */
-.prof-hero {
-  background: linear-gradient(135deg, #0c4a6e 0%, #0e7490 55%, #06b6d4 100%);
-  border: 3px solid #075985;
-  border-radius: 22px;
-  box-shadow: 0 8px 0 #0c4a6e;
-  padding: 20px 16px 16px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 12px;
+/* ── COMPACT HERO ── */
+.prof-card {
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  border: 3px solid #1e40af; border-radius: 16px;
+  padding: 12px; display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 4px 0 #1e3a8a; margin-bottom: 12px; position: relative; overflow: hidden;
 }
-.prof-hero::before {
-  content: '';
-  position: absolute;
-  top: -40px; right: -30px;
-  width: 150px; height: 150px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.05);
-  pointer-events: none;
-}
-.prof-hero::after {
-  content: '';
-  position: absolute;
-  bottom: -30px; left: -20px;
-  width: 100px; height: 100px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.04);
-  pointer-events: none;
-}
+.prof-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.1); }
+.prof-ava { width: 48px; height: 48px; border-radius: 14px; background: #fde047; border: 2px solid #ca8a04; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #9a3412; flex-shrink: 0; box-shadow: 0 3px 0 #ca8a04; }
+.prof-info { flex: 1; }
+.prof-name { font-size: 15px; font-weight: 900; color: #fff; margin-bottom: 2px; }
+.prof-email { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+.prof-tier { display: inline-flex; background: #c2410c; border: 1.5px solid #ffedd5; padding: 2px 6px; border-radius: 8px; font-size: 9px; font-weight: 900; color: #fff; box-shadow: 0 2px 0 #9a3412;}
 
-/* Avatar circle */
-.prof-avatar-ring {
-  position: relative;
-  width: 76px; height: 76px;
-  margin: 0 auto 10px;
-}
-.prof-avatar {
-  width: 76px; height: 76px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #fde68a, #f59e0b);
-  border: 3.5px solid rgba(255,255,255,0.35);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 32px; color: #0c4a6e;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-}
-.prof-tier-badge {
-  position: absolute;
-  bottom: -4px; right: -4px;
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  border: 2.5px solid #fff;
-  border-radius: 20px;
-  padding: 2px 8px;
-  font-size: 9px; font-weight: 900;
-  color: #0c4a6e;
-  box-shadow: 0 2px 0 rgba(0,0,0,0.2);
-  white-space: nowrap;
-}
-.prof-tier-badge--premium { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; }
+/* ── STATS ROW ── */
+.stat-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.stat-box { flex: 1; background: #ffffff; border: 2.5px solid #c2410c; border-radius: 12px; padding: 10px 6px; text-align: center; box-shadow: 0 3px 0 #9a3412; }
+.stat-val { font-size: 13px; font-weight: 900; color: #ea580c; line-height: 1.2; }
+.stat-lbl { font-size: 9px; font-weight: 900; color: #c2410c; margin-top: 2px; text-transform: uppercase; }
 
-.prof-hero__name {
-  font-size: 18px; font-weight: 900; color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  margin-bottom: 2px;
-}
-.prof-hero__email {
-  font-size: 10px; color: rgba(255,255,255,0.6);
-  font-weight: 700; margin-bottom: 12px;
-}
+/* ── REFERRAL STRIP ── */
+.ref-strip { display: flex; align-items: center; justify-content: space-between; background: #fffbeb; border: 2.5px solid #c2410c; border-radius: 12px; padding: 8px 12px; box-shadow: 0 3px 0 #9a3412; margin-bottom: 12px; }
+.ref-lbl { font-size: 10px; font-weight: 900; color: #ea580c; text-transform: uppercase; }
+.ref-code { font-size: 14px; font-weight: 900; color: #7c2d12; letter-spacing: 1px; }
+.ref-btn { background: #fde047; border: 2px solid #ca8a04; border-radius: 8px; padding: 6px 10px; font-size: 10px; font-weight: 900; color: #9a3412; cursor: pointer; box-shadow: 0 2px 0 #ca8a04; transition: transform 0.1s; }
+.ref-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #ca8a04; }
 
-/* Stats row inside hero */
-.prof-hero-stats {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-.prof-hero-stat {
-  background: rgba(255,255,255,0.12);
-  border: 1.5px solid rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 8px 4px;
-  backdrop-filter: blur(4px);
-}
-.prof-hero-stat__val { font-size: 15px; font-weight: 900; color: #fde68a; line-height: 1; }
-.prof-hero-stat__lbl { font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.65); margin-top: 3px; }
+/* ── GRID NAV ── */
+.nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.nav-item { background: #ffffff; border: 2.5px solid #c2410c; border-radius: 12px; padding: 12px 10px; display: flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 3px 0 #9a3412; color: #9a3412; transition: transform 0.1s; }
+.nav-item:active { transform: translateY(2px); box-shadow: 0 0 0 #9a3412; }
+.nav-item i { font-size: 20px; color: #ea580c; }
+.nav-item span { font-size: 12px; font-weight: 900; }
 
-/* ── Referral Strip ── */
-.prof-ref {
-  display: flex; align-items: center; gap: 10px;
-  background: #fff;
-  border: 2.5px solid #7dd3e8;
-  border-radius: 14px;
-  padding: 10px 12px;
-  box-shadow: 0 4px 0 #7dd3e8;
-  margin-bottom: 12px;
-}
-.prof-ref__icon { font-size: 20px; color: #0891b2; flex-shrink: 0; }
-.prof-ref__body { flex: 1; min-width: 0; }
-.prof-ref__label { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-.prof-ref__code  { font-size: 15px; font-weight: 900; color: #0c4a6e; letter-spacing: 2px; }
-.prof-ref__btn {
-  background: #e0f9ff; border: 1.5px solid #7dd3e8; border-radius: 10px;
-  padding: 6px 12px; font-size: 11px; font-weight: 900; color: #0891b2;
-  cursor: pointer; flex-shrink: 0; display: flex; align-items: center; gap: 4px;
-  transition: background 0.1s;
-}
-.prof-ref__btn:active { background: #bae6fd; }
+/* ── COMPACT ACCORDIONS ── */
+.c-group { background: #ffffff; border: 2.5px solid #c2410c; border-radius: 14px; box-shadow: 0 4px 0 #9a3412; overflow: hidden; margin-bottom: 12px; }
+.c-hdr { display: flex; align-items: center; gap: 8px; padding: 12px; background: #fffbeb; cursor: pointer; border-bottom: 2px solid transparent; user-select: none; }
+.c-hdr.open { border-bottom-color: #ffedd5; }
+.c-hdr i.icon { font-size: 16px; color: #ea580c; width: 24px; text-align: center; }
+.c-hdr span { flex: 1; font-size: 11px; font-weight: 900; color: #9a3412; text-transform: uppercase; }
+.c-hdr i.caret { font-size: 12px; color: #c2410c; transition: transform 0.2s; }
+.c-hdr.open i.caret { transform: rotate(180deg); }
+.c-body { display: none; padding: 12px; }
+.c-body.open { display: block; }
 
-/* ── Section Card ── */
-.prof-section {
-  background: #fff;
-  border: 2.5px solid #7dd3e8;
-  border-radius: 16px;
-  box-shadow: 0 5px 0 #7dd3e8;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-.prof-section-hdr {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 2px solid #e0f9ff;
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-.prof-section-hdr__icon {
-  width: 32px; height: 32px;
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0;
-}
-.prof-section-hdr__title { flex: 1; font-size: 13px; font-weight: 900; color: #0c4a6e; }
-.prof-section-hdr__caret { font-size: 14px; color: #94a3b8; transition: transform 0.2s; }
-.prof-section-hdr__caret.open { transform: rotate(180deg); }
-.prof-section-body { padding: 12px; display: none; }
-.prof-section-body.open { display: block; }
+/* Forms inside compact */
+.c-lbl { font-size: 10px; font-weight: 900; color: #ea580c; margin-bottom: 4px; display: block; }
+.c-input { width: 100%; background: #fffbeb; border: 2px solid #ffedd5; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 800; color: #9a3412; margin-bottom: 8px; outline: none; box-sizing: border-box; }
+.c-input:focus { border-color: #ea580c; }
+.c-input:disabled { opacity: 0.7; cursor: not-allowed; }
+.c-btn { width: 100%; background: #22c55e; border: 2px solid #166534; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 1px 0 #14532d; box-shadow: 0 3px 0 #14532d; cursor: pointer; }
+.c-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #14532d; }
 
-/* ── Info Row (label: value) ── */
-.info-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 7px 0;
-  border-bottom: 1.5px solid #f0fdff;
-  font-size: 12px;
-}
-.info-row:last-child { border-bottom: none; }
-.info-row__label { color: #64748b; font-weight: 700; display: flex; align-items: center; gap: 5px; }
-.info-row__val   { font-weight: 900; color: #0c4a6e; }
+/* ── CONTACT ROW ── */
+.contact-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+.contact-row::-webkit-scrollbar { display: none; }
+.contact-btn { flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2.5px solid rgba(0,0,0,0.2); box-shadow: 0 3px 0 rgba(0,0,0,0.3); transition: transform 0.1s; text-decoration: none; }
+.contact-btn:active { transform: translateY(2px); box-shadow: 0 0 0 rgba(0,0,0,0.3); }
 
-/* ── Bank card ── */
-.bank-display {
-  background: linear-gradient(135deg, #0c4a6e, #0e7490);
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 10px;
-  position: relative;
-  overflow: hidden;
-}
-.bank-display::before {
-  content: '';
-  position: absolute; top: -20px; right: -20px;
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.06);
-}
-.bank-display__name   { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; }
-.bank-display__bank   { font-size: 14px; font-weight: 900; color: #fde68a; margin: 4px 0 2px; }
-.bank-display__number { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: 2px; }
-.bank-display__holder { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 4px; font-weight: 700; }
+/* ── LOGOUT ── */
+.logout-btn { display: flex; align-items: center; justify-content: center; gap: 6px; background: #ef4444; border: 2.5px solid #7f1d1d; border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 900; color: #fff; text-decoration: none; box-shadow: 0 4px 0 #7f1d1d; transition: transform 0.1s; }
+.logout-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #7f1d1d; }
 
-/* ── Form ── */
-.pf-label { font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 4px; display: block; }
-.pf-input {
-  width: 100%; background: #f8fafc;
-  border: 2px solid #e2e8f0; border-radius: 10px;
-  padding: 10px 12px; font-size: 13px; font-family: inherit;
-  font-weight: 700; color: #0c4a6e; outline: none;
-  transition: border-color 0.2s;
-}
-.pf-input:focus { border-color: #7dd3e8; background: #fff; }
-.pf-input:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
-.pf-group { margin-bottom: 10px; }
-.pf-hint { font-size: 10px; color: #94a3b8; font-weight: 700; margin-top: 3px; }
-
-/* ── Action buttons (save/ganti password) ── */
-.pf-btn-primary {
-  width: 100%; padding: 11px;
-  background: linear-gradient(135deg, #22d3ee, #0891b2);
-  border: 2px solid #a5f3fc; border-radius: 12px;
-  box-shadow: 0 4px 0 #0e7490;
-  color: #fff; font-size: 13px; font-weight: 900;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-  transition: transform 0.1s;
-}
-.pf-btn-primary:active { transform: translateY(3px); box-shadow: none; }
-.pf-btn-danger {
-  width: 100%; padding: 11px;
-  background: linear-gradient(135deg, #fb923c, #dc2626);
-  border: 2px solid #fed7aa; border-radius: 12px;
-  box-shadow: 0 4px 0 #991b1b;
-  color: #fff; font-size: 13px; font-weight: 900;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-  transition: transform 0.1s;
-}
-.pf-btn-danger:active { transform: translateY(3px); box-shadow: none; }
-
-/* ── Menu link list ── */
-.prof-menu-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px;
-  border-bottom: 1.5px solid #f0fdff;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.1s;
-  -webkit-tap-highlight-color: transparent;
-}
-.prof-menu-item:last-child { border-bottom: none; }
-.prof-menu-item:active { background: #f0fdff; }
-.prof-menu-icon {
-  width: 36px; height: 36px;
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; flex-shrink: 0;
-}
-.prof-menu-label { flex: 1; font-size: 13px; font-weight: 800; color: #0c4a6e; }
-.prof-menu-arrow { font-size: 14px; color: #94a3b8; }
-
-/* ── Logout ── */
-.prof-logout {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: linear-gradient(135deg, #f87171, #dc2626);
-  border: 2.5px solid #fca5a5;
-  border-radius: 16px;
-  box-shadow: 0 5px 0 #991b1b;
-  padding: 13px; font-weight: 900; font-size: 14px;
-  color: #fff; text-decoration: none;
-  transition: transform 0.1s;
-  width: 100%;
-  margin-bottom: 4px;
-}
-.prof-logout:active { transform: translateY(4px); box-shadow: none; }
-
-/* ── Ref copy toast ── */
-#prof-ref-toast {
-  text-align: center; font-size: 11px; font-weight: 700;
-  color: #15803d; background: #f0fdf4; border-radius: 8px;
-  padding: 5px; margin-bottom: 8px; display: none;
-}
+#toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 8px 16px; border-radius: 10px; font-size: 11px; font-weight: 900; border: 2px solid #14532d; box-shadow: 0 3px 0 #14532d; display: none; z-index: 100; }
 </style>
 
+<!-- BACKGROUND -->
+<div style="position:fixed;inset:0;background:radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%);background-size:50px 50px;background-position:0 0, 25px 25px;pointer-events:none;z-index:1;"></div>
+
 <div class="prof-page">
-
-<?php if ($flash): ?>
-<div class="prof-flash prof-flash--<?= $flashType === 'error' ? 'error' : 'success' ?>">
-  <i class="ph-bold ph-<?= $flashType === 'error' ? 'warning-circle' : 'check-circle' ?>" style="font-size:16px;flex-shrink:0"></i>
-  <?= htmlspecialchars($flash) ?>
-</div>
-<?php endif; ?>
-
-<!-- ── HERO CARD ── -->
-<div class="prof-hero">
-  <div class="prof-avatar-ring">
-    <div class="prof-avatar"><?= strtoupper(substr($user['username'], 0, 1)) ?></div>
-    <div class="prof-tier-badge <?= $is_premium ? 'prof-tier-badge--premium' : '' ?>">
-      <?= $is_premium ? '⭐ '.$membership_name : 'Free' ?>
-    </div>
+  <?php if ($flash): ?>
+  <div class="prof-flash prof-flash--<?= $flashType === 'error' ? 'error' : 'success' ?>">
+    <i class="ph-bold ph-<?= $flashType === 'error' ? 'warning-circle' : 'check-circle' ?>" style="font-size:16px;"></i>
+    <?= htmlspecialchars($flash) ?>
   </div>
-  <div class="prof-hero__name"><?= htmlspecialchars($user['username']) ?></div>
-  <div class="prof-hero__email"><?= htmlspecialchars($user['email']) ?></div>
-  <?php if ($user['membership_expires_at'] && strtotime($user['membership_expires_at']) > time()): ?>
-  <div style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;margin-bottom:8px">
-    s/d <?= date('d M Y', strtotime($user['membership_expires_at'])) ?>
-  </div>
-  <?php else: ?>
-  <div style="margin-bottom:8px"></div>
   <?php endif; ?>
-  <div class="prof-hero-stats">
-    <div class="prof-hero-stat">
-      <div class="prof-hero-stat__val" style="font-size:12px"><?= format_rp((float)$user['total_earned']) ?></div>
-      <div class="prof-hero-stat__lbl">Total Earned</div>
-    </div>
-    <div class="prof-hero-stat">
-      <div class="prof-hero-stat__val"><?= number_format($total_watches) ?></div>
-      <div class="prof-hero-stat__lbl">Ditonton</div>
-    </div>
-    <div class="prof-hero-stat">
-      <div class="prof-hero-stat__val"><?= $refs ?></div>
-      <div class="prof-hero-stat__lbl">Referral</div>
-    </div>
-  </div>
-</div>
 
-<!-- ── REFERRAL STRIP ── -->
-<div class="prof-ref">
-  <i class="ph-fill ph-share-network prof-ref__icon"></i>
-  <div class="prof-ref__body">
-    <div class="prof-ref__label">Kode Referral</div>
-    <div class="prof-ref__code" id="ref-code"><?= htmlspecialchars($user['referral_code']) ?></div>
+  <!-- HERO COMPACT -->
+  <div class="prof-card">
+    <div class="prof-ava"><?= strtoupper(substr($user['username'], 0, 1)) ?></div>
+    <div class="prof-info">
+      <div class="prof-name"><?= htmlspecialchars($user['username']) ?></div>
+      <div class="prof-email"><?= htmlspecialchars($user['email']) ?></div>
+      <div class="prof-tier">
+        <?= $is_premium ? '⭐ '.$membership_name : 'Free' ?>
+        <?= $user['membership_expires_at'] ? ' • '.date('d/m/y', strtotime($user['membership_expires_at'])) : '' ?>
+      </div>
+    </div>
   </div>
-  <button type="button" class="prof-ref__btn" onclick="copyRef()">
-    <i class="ph-bold ph-copy"></i> Salin
-  </button>
-</div>
-<div id="prof-ref-toast">✓ Kode referral disalin!</div>
 
-<!-- ── INFO AKUN ── -->
-<div class="prof-section">
-  <div class="prof-section-hdr" onclick="toggleSection('info')" id="hdr-info">
-    <div class="prof-section-hdr__icon" style="background:#e0f9ff"><i class="ph-fill ph-user-circle" style="color:#0891b2"></i></div>
-    <div class="prof-section-hdr__title">Info Akun</div>
-    <i class="ph-bold ph-caret-down prof-section-hdr__caret open" id="caret-info"></i>
-  </div>
-  <div class="prof-section-body open" id="body-info">
-    <div class="info-row">
-      <span class="info-row__label"><i class="ph-bold ph-identification-card" style="color:#0891b2"></i> Username</span>
-      <span class="info-row__val"><?= htmlspecialchars($user['username']) ?></span>
+  <!-- STATS -->
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="stat-val"><?= format_rp((float)$user['total_earned']) ?></div>
+      <div class="stat-lbl">Earned</div>
     </div>
-    <div class="info-row">
-      <span class="info-row__label"><i class="ph-bold ph-envelope-simple" style="color:#a78bfa"></i> Email</span>
-      <span class="info-row__val" style="font-size:11px"><?= htmlspecialchars($user['email']) ?></span>
+    <div class="stat-box">
+      <div class="stat-val"><?= number_format($total_watches) ?></div>
+      <div class="stat-lbl">Ditonton</div>
     </div>
-    <div class="info-row">
-      <span class="info-row__label"><i class="ph-bold ph-whatsapp-logo" style="color:#10b981"></i> WhatsApp</span>
-      <span class="info-row__val"><?= htmlspecialchars(mask_account($user['whatsapp'] ?? '')) ?></span>
-    </div>
-    <div class="info-row">
-      <span class="info-row__label"><i class="ph-bold ph-crown" style="color:#f59e0b"></i> Paket</span>
-      <span class="info-row__val"><?= $membership_name ?></span>
-    </div>
-    <div class="info-row" style="border:none;padding-top:10px">
-      <a href="/upgrade" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:#e0f9ff;border:1.5px solid #7dd3e8;border-radius:10px;padding:8px;font-size:12px;font-weight:900;color:#0891b2;text-decoration:none">
-        <i class="ph-fill ph-rocket-launch"></i> Upgrade Membership
-      </a>
+    <div class="stat-box">
+      <div class="stat-val"><?= $refs ?></div>
+      <div class="stat-lbl">Referral</div>
     </div>
   </div>
-</div>
 
-<!-- ── REKENING BANK ── -->
-<div class="prof-section">
-  <div class="prof-section-hdr" onclick="toggleSection('bank')" id="hdr-bank">
-    <div class="prof-section-hdr__icon" style="background:#dbeafe"><i class="ph-fill ph-bank" style="color:#3b82f6"></i></div>
-    <div class="prof-section-hdr__title">Rekening Bank</div>
-    <i class="ph-bold ph-caret-down prof-section-hdr__caret" id="caret-bank"></i>
+  <!-- REFERRAL -->
+  <div class="ref-strip">
+    <div>
+      <div class="ref-lbl">Kode Referral</div>
+      <div class="ref-code" id="ref-code"><?= htmlspecialchars($user['referral_code']) ?></div>
+    </div>
+    <button class="ref-btn" onclick="copyRef()"><i class="ph-bold ph-copy"></i> Salin</button>
   </div>
-  <div class="prof-section-body" id="body-bank">
-    <?php if (!empty($user['bank_name'])): ?>
-    <div class="bank-display">
-      <div class="bank-display__name">Rekening Penarikan</div>
-      <div class="bank-display__bank"><?= htmlspecialchars($user['bank_name']) ?></div>
-      <div class="bank-display__number"><?= htmlspecialchars(mask_account($user['account_number'] ?? '')) ?></div>
-      <div class="bank-display__holder"><?= htmlspecialchars($user['account_name']) ?></div>
-    </div>
-    <?php else: ?>
-    <div style="text-align:center;color:#94a3b8;font-size:12px;font-weight:700;padding:12px 0">
-      <i class="ph-fill ph-bank" style="font-size:28px;display:block;margin-bottom:4px;opacity:0.3"></i>
-      Belum ada rekening tersimpan
-    </div>
-    <?php endif; ?>
-    <?php if ($show_edit_rek_btn): ?>
-    <a href="/edit-rekening" style="display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#60a5fa,#3b82f6);border:1.5px solid #93c5fd;border-radius:10px;padding:10px;font-size:12px;font-weight:900;color:#fff;text-decoration:none;box-shadow:0 3px 0 #1d4ed8">
-      <i class="ph-bold ph-pencil-simple"></i> Edit Rekening
-      <?php if (!$dep_ok_for_edit): ?>
-      <span style="font-size:9px;opacity:0.75">· Butuh Rp<?= number_format($edit_bank_min_dep,0,'','') ?></span>
-      <?php endif; ?>
+
+  <!-- GRID NAV -->
+  <div class="nav-grid">
+    <a href="/edit-rekening" class="nav-item">
+      <i class="ph-fill ph-bank"></i> <span>Rekening</span>
     </a>
-    <?php endif; ?>
+    <a href="/upgrade" class="nav-item">
+      <i class="ph-fill ph-rocket-launch"></i> <span>Upgrade</span>
+    </a>
+    <a href="/history" class="nav-item">
+      <i class="ph-fill ph-receipt"></i> <span>Riwayat</span>
+    </a>
+    <a href="/panduan" class="nav-item">
+      <i class="ph-fill ph-book-open"></i> <span>Panduan</span>
+    </a>
   </div>
-</div>
 
-<!-- ── EDIT USERNAME ── -->
-<div class="prof-section">
-  <div class="prof-section-hdr" onclick="toggleSection('edit')" id="hdr-edit">
-    <div class="prof-section-hdr__icon" style="background:#fef3c7"><i class="ph-fill ph-pencil-simple" style="color:#d97706"></i></div>
-    <div class="prof-section-hdr__title">Edit Username</div>
-    <i class="ph-bold ph-caret-down prof-section-hdr__caret <?= $active_section === 'edit' ? 'open' : '' ?>" id="caret-edit"></i>
-  </div>
-  <div class="prof-section-body <?= $active_section === 'edit' ? 'open' : '' ?>" id="body-edit">
-    <form method="POST">
-      <?= csrf_field() ?>
-      <input type="hidden" name="action" value="update_profile">
-      <div class="pf-group">
-        <label class="pf-label">Username Baru</label>
-        <input class="pf-input" type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>"
-               pattern="[a-zA-Z0-9_]+" minlength="3" required>
-        <div class="pf-hint">3–30 karakter · huruf, angka, underscore</div>
-      </div>
-      <div class="pf-group">
-        <label class="pf-label">WhatsApp <span style="color:#94a3b8;font-size:9px">· tidak dapat diubah</span></label>
-        <input class="pf-input" type="tel" value="<?= htmlspecialchars($user['whatsapp'] ?? '') ?>" disabled>
-      </div>
-      <button type="submit" class="pf-btn-primary">
-        <i class="ph-bold ph-floppy-disk"></i> Simpan Username
-      </button>
-    </form>
-  </div>
-</div>
+  <!-- SETTINGS -->
+  <div class="c-group">
+    <div class="c-hdr" onclick="t('info')" id="h-info">
+      <i class="icon ph-fill ph-identification-card"></i> <span>Info Akun</span> <i class="caret ph-bold ph-caret-down" id="c-info"></i>
+    </div>
+    <div class="c-body" id="b-info">
+      <div class="c-lbl">WhatsApp</div>
+      <input class="c-input" value="<?= htmlspecialchars(mask_account($user['whatsapp'] ?? '')) ?>" disabled>
+      <div class="c-lbl">Bank Terdaftar</div>
+      <input class="c-input" value="<?= $user['bank_name'] ? htmlspecialchars($user['bank_name'] . ' - ' . mask_account($user['account_number'] ?? '')) : 'Belum Ada' ?>" disabled>
+    </div>
 
-<!-- ── GANTI PASSWORD ── -->
-<div class="prof-section">
-  <div class="prof-section-hdr" onclick="toggleSection('password')" id="hdr-password">
-    <div class="prof-section-hdr__icon" style="background:#dcfce7"><i class="ph-fill ph-lock-key" style="color:#16a34a"></i></div>
-    <div class="prof-section-hdr__title">Ganti Password</div>
-    <i class="ph-bold ph-caret-down prof-section-hdr__caret <?= $active_section === 'password' ? 'open' : '' ?>" id="caret-password"></i>
-  </div>
-  <div class="prof-section-body <?= $active_section === 'password' ? 'open' : '' ?>" id="body-password">
-    <form method="POST">
-      <?= csrf_field() ?>
-      <input type="hidden" name="action" value="change_password">
-      <div class="pf-group">
-        <label class="pf-label">Password Lama</label>
-        <input class="pf-input" type="password" name="old_password" required>
-      </div>
-      <div class="pf-group">
-        <label class="pf-label">Password Baru <span style="color:#94a3b8;font-size:9px">min. 6 karakter</span></label>
-        <input class="pf-input" type="password" name="new_password" required>
-      </div>
-      <button type="submit" class="pf-btn-danger">
-        <i class="ph-bold ph-lock-key"></i> Ganti Password
-      </button>
-    </form>
-  </div>
-</div>
+    <div class="c-hdr <?= $active_section === 'edit' ? 'open' : '' ?>" onclick="t('edit')" id="h-edit">
+      <i class="icon ph-fill ph-pencil-simple"></i> <span>Ubah Username</span> <i class="caret ph-bold ph-caret-down <?= $active_section === 'edit' ? 'open' : '' ?>" id="c-edit"></i>
+    </div>
+    <div class="c-body <?= $active_section === 'edit' ? 'open' : '' ?>" id="b-edit">
+      <form method="POST">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="update_profile">
+        <div class="c-lbl">Username Baru (Huruf/Angka/_)</div>
+        <input class="c-input" type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" required minlength="3">
+        <button class="c-btn"><i class="ph-bold ph-floppy-disk"></i> Simpan</button>
+      </form>
+    </div>
 
-<!-- ── MENU NAVIGASI ── -->
-<div class="prof-section" style="margin-bottom:12px">
-  <a href="/history" class="prof-menu-item" style="color:inherit;text-decoration:none">
-    <div class="prof-menu-icon" style="background:#e0f9ff"><i class="ph-fill ph-receipt" style="color:#0891b2;font-size:18px"></i></div>
-    <span class="prof-menu-label">Riwayat Transaksi</span>
-    <i class="ph-bold ph-caret-right prof-menu-arrow"></i>
-  </a>
-  <a href="/panduan" class="prof-menu-item" style="color:inherit;text-decoration:none">
-    <div class="prof-menu-icon" style="background:#f0fdf4"><i class="ph-fill ph-book-open" style="color:#16a34a;font-size:18px"></i></div>
-    <span class="prof-menu-label">Buku Panduan</span>
-    <i class="ph-bold ph-caret-right prof-menu-arrow"></i>
-  </a>
-  <?php foreach ($_contact_btns as $_cb): ?>
-  <a href="<?= htmlspecialchars($_cb['url']) ?>" target="_blank" rel="noopener" class="prof-menu-item" style="color:inherit;text-decoration:none">
-    <div class="prof-menu-icon" style="background:<?= htmlspecialchars($_cb['bg_color']) ?>">
+    <div class="c-hdr <?= $active_section === 'password' ? 'open' : '' ?>" onclick="t('pass')" id="h-pass">
+      <i class="icon ph-fill ph-lock-key"></i> <span>Ganti Password</span> <i class="caret ph-bold ph-caret-down <?= $active_section === 'password' ? 'open' : '' ?>" id="c-pass"></i>
+    </div>
+    <div class="c-body <?= $active_section === 'password' ? 'open' : '' ?>" id="b-pass">
+      <form method="POST">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="change_password">
+        <div class="c-lbl">Password Lama</div>
+        <input class="c-input" type="password" name="old_password" required>
+        <div class="c-lbl">Password Baru (min 6)</div>
+        <input class="c-input" type="password" name="new_password" required>
+        <button class="c-btn" style="background:#ef4444;border-color:#7f1d1d;box-shadow:0 3px 0 #7f1d1d;"><i class="ph-bold ph-lock-key"></i> Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONTACT (Horizontal scroll) -->
+  <?php if (count($_contact_btns) > 0): ?>
+  <div class="contact-row">
+    <?php foreach ($_contact_btns as $_cb): ?>
+    <a href="<?= htmlspecialchars($_cb['url']) ?>" target="_blank" class="contact-btn" style="background:<?= htmlspecialchars($_cb['bg_color']) ?>;">
       <?php if ($_cb['icon_type'] === 'custom'): ?>
-        <img src="<?= htmlspecialchars($_cb['icon_value']) ?>" style="width:22px;height:22px;object-fit:contain" alt="">
+        <img src="<?= htmlspecialchars($_cb['icon_value']) ?>" style="width:20px;height:20px;object-fit:contain" alt="">
       <?php else: ?>
         <span style="color:#fff;display:flex"><?= $_psvg[$_cb['icon_value']] ?? $_psvg['cs'] ?></span>
       <?php endif; ?>
-    </div>
-    <span class="prof-menu-label"><?= htmlspecialchars($_cb['label']) ?></span>
-    <i class="ph-bold ph-caret-right prof-menu-arrow"></i>
-  </a>
-  <?php endforeach; ?>
-</div>
+    </a>
+    <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
 
-<!-- ── LOGOUT ── -->
-<a href="/logout" id="logout-btn" class="prof-logout">
-  <i class="ph-bold ph-sign-out" style="font-size:18px"></i>
-  Keluar dari Akun
-</a>
-
+  <!-- LOGOUT -->
+  <a href="/logout" id="logout-btn" class="logout-btn"><i class="ph-bold ph-sign-out"></i> Keluar Akun</a>
 </div>
+<div id="toast">Disalin!</div>
 
 <script>
-function toggleSection(id) {
-  const body  = document.getElementById('body-' + id);
-  const caret = document.getElementById('caret-' + id);
-  const isOpen = body.classList.contains('open');
-  body.classList.toggle('open', !isOpen);
-  caret.classList.toggle('open', !isOpen);
+function t(id) {
+  const b = document.getElementById('b-'+id);
+  const h = document.getElementById('h-'+id);
+  const c = document.getElementById('c-'+id);
+  const open = b.classList.contains('open');
+  b.classList.toggle('open', !open);
+  h.classList.toggle('open', !open);
+  c.classList.toggle('open', !open);
 }
-
 function copyRef() {
-  const code = document.getElementById('ref-code').textContent.trim();
-  navigator.clipboard.writeText(code).then(() => {
-    const toast = document.getElementById('prof-ref-toast');
-    toast.style.display = 'block';
-    setTimeout(() => toast.style.display = 'none', 2000);
-  }).catch(() => {});
+  const code = document.getElementById('ref-code').innerText;
+  navigator.clipboard.writeText(code);
+  const toast = document.getElementById('toast');
+  toast.style.display = 'block';
+  setTimeout(()=>toast.style.display='none', 2000);
 }
-
 document.getElementById('logout-btn').addEventListener('click', function(e) {
-  e.preventDefault();
-  const url = this.href;
-  if (!this.dataset.confirmed) {
-    if (typeof nToast !== 'undefined') nToast('Klik Keluar lagi untuk konfirmasi', 'warn', 3000);
-    this.dataset.confirmed = '1';
-    setTimeout(() => delete this.dataset.confirmed, 3500);
-    return;
+  if (!this.dataset.conf) {
+    e.preventDefault();
+    this.innerText = "Klik lagi untuk keluar";
+    this.dataset.conf = "1";
+    setTimeout(() => { this.innerText = "Keluar Akun"; delete this.dataset.conf; }, 3000);
   }
-  window.location.href = url;
 });
 </script>
 
