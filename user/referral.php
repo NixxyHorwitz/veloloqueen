@@ -56,7 +56,7 @@ body { background: #f97316 !important; color: #0f172a; }
 .wd-top-sub { position: relative; font-size: 13px; font-weight: 800; color: #bae6fd; z-index: 2; }
 
 /* ── BODY ── */
-.wd-body { flex: 1; background: #f97316; padding: 0 14px 100px; position: relative; z-index: 2; margin-top: -30px; }
+.wd-body { flex: 1; background: #f97316; padding: 20px 14px 100px; position: relative; z-index: 2; }
 .wd-body::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%); background-size: 50px 50px; background-position: 0 0, 25px 25px; pointer-events: none; z-index: -1; }
 
 /* ── STATS ROW ── */
