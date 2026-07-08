@@ -248,40 +248,7 @@ i[class^="ph-"] {
       return 'Rp ' . (string)(int)$n;
     }
     ?>
-    <!-- Row 2: Balance Pills — sits BELOW row1, full width -->
-    <div class="topbar__row2">
-      <div class="bal-dropdown" id="bal-dropdown-wd">
-        <button type="button" class="bal-pill" onclick="toggleBal('wd', event)" aria-label="Saldo pencairan">
-          <div class="bal-pill__icon" style="background:#d1fae5"><i class="ph-bold ph-arrow-circle-up" style="color:#059669;font-size:13px"></i></div>
-          <div class="bal-pill__texts">
-            <span class="bal-pill__label">💰 Dompet</span>
-            <span class="bal-pill__val"><?= fmt_short((float)$user['balance_wd']) ?></span>
-          </div>
-        </button>
-        <div class="bal-dropdown__panel" id="bal-panel-wd">
-          <div class="bal-dropdown__row bal-dropdown__row--wd">
-            <span class="bal-dropdown__lbl"><i class="ph-bold ph-arrow-circle-up" style="font-size:13px"></i> Saldo Cair</span>
-            <span><?= format_rp((float)$user['balance_wd']) ?></span>
-          </div>
-        </div>
-      </div>
 
-      <div class="bal-dropdown" id="bal-dropdown-dep">
-        <button type="button" class="bal-pill" onclick="toggleBal('dep', event)" aria-label="Saldo beli">
-          <div class="bal-pill__icon" style="background:#dbeafe"><i class="ph-bold ph-bank" style="color:#2563eb;font-size:13px"></i></div>
-          <div class="bal-pill__texts">
-            <span class="bal-pill__label">🛒 Top Up</span>
-            <span class="bal-pill__val"><?= fmt_short((float)$user['balance_dep']) ?></span>
-          </div>
-        </button>
-        <div class="bal-dropdown__panel" id="bal-panel-dep">
-          <div class="bal-dropdown__row bal-dropdown__row--dep">
-            <span class="bal-dropdown__lbl"><i class="ph-bold ph-bank" style="font-size:13px"></i> Saldo Beli</span>
-            <span><?= format_rp((float)$user['balance_dep']) ?></span>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <script>
     (function(){
