@@ -661,8 +661,20 @@ html body { background: #f97316 !important; background-image: none !important; m
       <?php endif; ?>
 
       <!-- SUBMIT BUTTON -->
-      <?php if ($free_wd_limit_reached || $free_wrong_bank || $wd_locked || $level_blocked || $free_age_blocked || !$user['can_withdraw'] || $has_pending_bank): ?>
-        <button type="button" class="wd-submit-btn" disabled>Tarik (Tidak Memenuhi Syarat)</button>
+      <?php if ($free_wd_limit_reached): ?>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Limit Habis)</button>
+      <?php elseif ($free_wrong_bank): ?>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Hanya DANA)</button>
+      <?php elseif ($wd_locked): ?>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Terkunci)</button>
+      <?php elseif ($level_blocked): ?>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Butuh Upgrade)</button>
+      <?php elseif ($free_age_blocked): ?>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Akun Baru)</button>
+      <?php elseif (!$user['can_withdraw']): ?>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Akses Dibatasi)</button>
+      <?php elseif ($has_pending_bank): ?>
+        <button type="button" class="wd-submit-btn" disabled>Tarik (Verifikasi Bank)</button>
       <?php elseif ($has_pending_wd): ?>
         <button type="button" class="wd-submit-btn" disabled>Ada Penarikan Pending</button>
       <?php elseif ((float)$user['balance_wd'] < $min_withdraw): ?>
