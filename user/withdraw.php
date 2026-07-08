@@ -613,16 +613,21 @@ html body { background: #f97316 !important; background-image: none !important; m
         <?php endif; ?>
 
         <?php 
-        // Pad with disabled "Kesempatan Habis" buttons for aesthetic
-        $dummies = [300, 10000];
-        foreach ($dummies as $d) {
-          if (!in_array($d, $available_amounts)) {
+        // Render opsi yang terkunci (harus upgrade)
+        $locked_amounts = array_diff($predefined_amounts, $available_amounts);
+        $shown_locked = 0;
+        
+        foreach ($locked_amounts as $locked) {
+          // Hanya tampilkan nominal yang lebih besar dari batas maksimal user saat ini (untuk memancing upgrade)
+          if ($max_withdraw > 0 && $locked > $max_withdraw) {
+            if ($shown_locked >= 4) break; // Maksimal tampilkan 4 tombol terkunci
             ?>
-            <div class="wd-amt-disabled">
-              <div class="wd-amt-disabled-badge">Kesempatan Habis</div>
-              <div class="wd-amt-disabled-val"><?= format_rp($d) ?></div>
+            <div class="wd-amt-disabled" style="cursor: pointer;" onclick="window.location.href='/upgrade'">
+              <div class="wd-amt-disabled-badge">Harus Upgrade</div>
+              <div class="wd-amt-disabled-val"><?= format_rp($locked) ?></div>
             </div>
             <?php
+            $shown_locked++;
           }
         }
         ?>
