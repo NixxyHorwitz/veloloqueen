@@ -273,7 +273,7 @@ html body { background: #f97316 !important; background-image: none !important; m
 .wd-back-btn {
   width: 32px; height: 32px;
   background: #fde047;
-  border: 2px solid #ca8a04;
+  border: none;
   border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
   color: #ca8a04; font-size: 16px;
@@ -403,14 +403,14 @@ html body { background: #f97316 !important; background-image: none !important; m
 }
 .wd-amt-btn {
   background: #fffbeb;
-  border: 2px solid #ca8a04;
+  border: none;
   border-radius: 14px;
   padding: 16px 8px;
   text-align: center;
   font-size: 16px;
   font-weight: 900;
   color: #c2410c;
-  box-shadow: 0 4px 0 #ca8a04;
+  box-shadow: 0 5px 0 #ca8a04, 0 8px 10px rgba(0,0,0,0.1);
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s;
   outline: none;
@@ -429,8 +429,8 @@ html body { background: #f97316 !important; background-image: none !important; m
 .wd-amt-btn.active:active { box-shadow: 0 0 0 #166534; transform: translateY(4px); }
 
 .wd-amt-disabled {
-  background: rgba(234, 88, 12, 0.4);
-  border: 2px solid rgba(194, 65, 12, 0.4);
+  background: #ea580c;
+  border: none; box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
   border-radius: 14px;
   padding: 16px 8px;
   text-align: center;
@@ -440,14 +440,13 @@ html body { background: #f97316 !important; background-image: none !important; m
 .wd-amt-disabled-val {
   font-size: 16px;
   font-weight: 900;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.6);
 }
 .wd-amt-disabled-badge {
   position: absolute;
   top: -8px; left: 50%;
   transform: translateX(-50%);
-  background: #fcd34d;
-  color: #b45309;
+  background: #fef08a; color: #b45309;
   border: 1px solid #d97706;
   font-size: 8px;
   font-weight: 900;
@@ -524,7 +523,7 @@ html body { background: #f97316 !important; background-image: none !important; m
   box-shadow: 0 2px 0 #94a3b8, inset 0 2px 4px rgba(255,255,255,1);
 }
 .wd-submit-btn:disabled {
-  background: rgba(241, 245, 249, 0.5); border-color:#cbd5e1; color:#94a3b8; box-shadow:none; transform:none;
+  background: #e2e8f0; border-color:#cbd5e1; color:#64748b; box-shadow:none; transform:none;
 }
 
 /* Modals */
