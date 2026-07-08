@@ -114,148 +114,214 @@ $qr_url      = !empty($qris_str)
     : '';
 $qr_dl_url   = '?id=' . $dep_id . '&action=dl_qr';
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#FFE566">
-<title>Bayar QRIS — Meloton</title>
-<?php if ($fav_url): ?>
-<link rel="icon" href="<?= htmlspecialchars($fav_url) ?>">
-<link rel="apple-touch-icon" href="<?= htmlspecialchars($fav_url) ?>">
-<?php endif; ?>
-<link rel="stylesheet" href="/assets/css/app.css?v=<?= @filemtime($_SERVER['DOCUMENT_ROOT'].'/assets/css/app.css') ?: time() ?>">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<?php
+$pageTitle  = 'Bayar QRIS — Meloton';
+$activePage = 'deposit';
+require dirname(__DIR__) . '/partials/header.php';
+?>
 <style>
-/* Scoped overrides */
-.pay-ticket { background: #fff; border-radius: 20px; border: 2.5px solid var(--ink); box-shadow: 0 4px 0 var(--ink); overflow: hidden; margin-bottom: 16px; }
-.pay-ticket__head { background: var(--brand-light); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--ink); }
+/* ══════════════════════════════════════════════
+   PAY PAGE — CASUAL GAME STYLE (HIGH CONTRAST)
+   ══════════════════════════════════════════════ */
+body { background: #f97316 !important; color: #0f172a; }
+.wd-page { padding: 0 0 20px; }
+
+/* ── TOP BANNER ── */
+.wd-top {
+  position: relative;
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+  padding: 16px 14px 40px;
+  border-bottom: 4px solid #1e3a8a;
+  z-index: 10;
+}
+.wd-top::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+  background-size: 30px 20px; pointer-events: none;
+}
+.wd-top-flex { position: relative; display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; }
+.wd-back {
+  background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4);
+  color: #fff; width: 36px; height: 36px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 18px; text-decoration: none;
+}
+.wd-notice {
+  background: #fef08a; border: 2px solid #ca8a04; border-radius: 12px;
+  padding: 6px 12px; box-shadow: 0 4px 0 #ca8a04;
+  display: flex; gap: 6px; align-items: center; position: relative; margin-top: 4px;
+}
+.wd-notice::after {
+  content: ''; position: absolute; right: -8px; top: 12px;
+  border-width: 6px; border-style: solid; border-color: transparent transparent transparent #fef08a;
+}
+.wd-notice-txt { font-size: 11px; font-weight: 900; color: #854d0e; }
+
+/* ── BODY ── */
+.wd-body { flex: 1; background: #f97316; padding: 16px 14px 100px; position: relative; }
+.wd-body::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%);
+  background-size: 50px 50px; background-position: 0 0, 25px 25px; pointer-events: none;
+}
+
+/* ── TICKET CARD ── */
+.pay-ticket { background: #ffffff; border: 3px solid #c2410c; border-radius: 20px; padding: 0; margin-bottom: 20px; box-shadow: 0 5px 0 #9a3412; position: relative; z-index: 2; overflow: hidden; }
+.pay-ticket__head { background: #fef08a; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #c2410c; }
+.pay-ticket__id { font-size: 14px; font-weight: 900; color: #9a3412; }
+.pay-ticket__timer { background: #fee2e2; color: #dc2626; border: 2px solid #fca5a5; padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 0 #fca5a5; }
+
 .pay-ticket__body { padding: 24px 16px; text-align: center; }
-.pay-ticket__timer { font-weight: 900; color: #dc2626; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 6px; font-size: 14px; }
-.qr-min { width: 180px; height: 180px; margin: 0 auto 16px; border: 2.5px dashed #cbd5e1; border-radius: 16px; padding: 10px; background: #fff; display: block; }
-.btn-min { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 800; border: 2px solid var(--ink); border-radius: 12px; cursor: pointer; text-decoration: none; color: var(--ink); box-shadow: 0 3px 0 var(--ink); transition: transform 0.1s, box-shadow 0.1s; }
-.btn-min:active { transform: translateY(3px); box-shadow: none; }
-.btn-min--dark { background: var(--brand); color: #fff; border-color: #0369a1; box-shadow: 0 3px 0 #0369a1; }
-.btn-min--light { background: #fff; }
+.qr-min { width: 220px; height: 220px; margin: 0 auto 20px; border: 4px solid #3b82f6; border-radius: 20px; padding: 12px; background: #fff; display: block; box-shadow: 0 4px 0 #1d4ed8; }
+.qr-lbl { font-size: 12px; font-weight: 900; color: #9a3412; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.qr-val { font-size: 36px; font-weight: 900; color: #ea580c; letter-spacing: -1.5px; line-height: 1; margin-bottom: 24px; text-shadow: 0 2px 0 #ffedd5; }
 
-.mini-steps { background: #fff; border: 2.5px solid var(--ink); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 0 var(--ink); }
-.mini-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.4; }
+/* ── BUTTONS ── */
+.wd-submit-btn {
+  width: 100%; background: linear-gradient(180deg, #4ade80, #16a34a); border: none; border-radius: 16px; padding: 16px;
+  font-size: 16px; font-weight: 900; color: #fff; text-shadow: 0 2px 2px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 0 #14532d, inset 0 2px 4px rgba(255,255,255,0.5); cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; position: relative; z-index: 2;
+  text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.wd-submit-btn:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #14532d, inset 0 2px 4px rgba(255,255,255,0.5); }
+
+.wd-btn-blue { background: linear-gradient(180deg, #3b82f6, #1d4ed8); box-shadow: 0 6px 0 #1e3a8a, inset 0 2px 4px rgba(255,255,255,0.5); }
+.wd-btn-blue:active:not(:disabled) { box-shadow: 0 0 0 #1e3a8a, inset 0 2px 4px rgba(255,255,255,0.5); }
+
+.wd-btn-yellow { background: linear-gradient(180deg, #fde047, #eab308); color: #7c2d12; text-shadow: none; box-shadow: 0 6px 0 #a16207, inset 0 2px 4px rgba(255,255,255,0.5); }
+.wd-btn-yellow:active:not(:disabled) { box-shadow: 0 0 0 #a16207, inset 0 2px 4px rgba(255,255,255,0.5); }
+
+.wd-btn-cancel { background: none; border: none; font-size: 13px; font-weight: 900; color: #fff; cursor: pointer; padding: 12px; width: 100%; text-align: center; font-family: inherit; position: relative; z-index: 2; text-decoration: underline; text-shadow: 0 2px 2px rgba(0,0,0,0.3); }
+.wd-btn-cancel:disabled { color: rgba(255,255,255,0.5); cursor: not-allowed; text-decoration: none; }
+
+.btn-grid { display: flex; gap: 12px; margin-bottom: 24px; }
+.btn-grid .wd-submit-btn { padding: 14px; font-size: 14px; }
+
+/* ── ALERTS / STEPS ── */
+.wd-alert { background: #1e3a8a; color: #fff; border: 2px solid #1e40af; padding: 12px; border-radius: 14px; font-size: 12px; font-weight: 800; display: flex; gap: 8px; align-items: center; margin-bottom: 16px; box-shadow: 0 4px 0 #1e40af; position: relative; z-index: 2; }
+.wd-alert-icon { font-size: 20px; flex-shrink: 0; }
+
+.mini-steps { background: #ffffff; border: 3px solid #c2410c; border-radius: 16px; padding: 16px; margin-bottom: 20px; box-shadow: 0 5px 0 #9a3412; position: relative; z-index: 2; }
+.mini-step { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; font-size: 12px; font-weight: 800; color: #7c2d12; line-height: 1.4; }
 .mini-step:last-child { margin-bottom: 0; }
-.mini-step span { width: 22px; height: 22px; background: var(--yellow); border: 1.5px solid var(--ink); color: var(--ink); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; flex-shrink: 0; margin-top: -1px; }
+.mini-step span { width: 24px; height: 24px; background: #fef08a; border: 2px solid #ca8a04; color: #9a3412; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; flex-shrink: 0; box-shadow: 0 2px 0 #ca8a04;}
 
-.text-btn { display: inline-block; background: none; border: none; font-size: 12px; font-weight: 800; color: #ef4444; cursor: pointer; padding: 8px; width: 100%; text-align: center; font-family: inherit; }
-.text-btn:disabled { color: #fca5a5; cursor: not-allowed; text-decoration: none; }
+/* ── FILE UPLOAD ── */
+.upload-card { background: #ffffff; border: 3px solid #c2410c; border-radius: 16px; padding: 16px; margin-bottom: 20px; box-shadow: 0 5px 0 #9a3412; position: relative; z-index: 2; }
+.dep-file { width: 100%; background: #fffbeb; border: 3px dashed #c2410c; border-radius: 14px; padding: 12px; font-size: 11px; font-weight: 800; color: #c2410c; cursor: pointer; box-sizing: border-box; text-align: center; margin-bottom: 16px; }
+.dep-file::file-selector-button { background: #fde047; border: 2px solid #ca8a04; border-radius: 8px; padding: 6px 10px; margin-right: 10px; font-weight: 900; color: #9a3412; cursor: pointer; transition: background 0.2s; box-shadow: 0 2px 0 #ca8a04; }
 
-/* Toast */
+/* ── TOAST OVERRIDE ── */
 #toast-container { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9999; display:flex; flex-direction:column; gap:8px; pointer-events:none; width:calc(100% - 32px); max-width:380px; }
-.nb-toast { display:flex; align-items:center; gap:10px; padding:12px 16px; border:2.5px solid var(--ink); border-radius:14px; box-shadow:0 5px 0 var(--ink); font-size:14px; font-weight:800; color:var(--ink); pointer-events:auto; width:100%; animation:toastIn .22s cubic-bezier(.2,.8,.4,1.2) both; background: var(--white); }
+.nb-toast { display:flex; align-items:center; gap:10px; padding:12px 16px; border:3px solid #1e3a8a; border-radius:14px; box-shadow:0 5px 0 #1e3a8a; font-size:13px; font-weight:900; color:#1e3a8a; pointer-events:auto; width:100%; animation:toastIn .22s cubic-bezier(.2,.8,.4,1.2) both; background: #fff; }
 .nb-toast.out { animation:toastOut .18s ease forwards; }
-.nb-toast--success { background:#d1fae5; }
-.nb-toast--error   { background:#fee2e2; }
-.nb-toast--warn    { background:#fff3cd; }
+.nb-toast--success { background:#d1fae5; border-color:#065f46; box-shadow:0 5px 0 #065f46; color:#065f46; }
+.nb-toast--error   { background:#fee2e2; border-color:#991b1b; box-shadow:0 5px 0 #991b1b; color:#991b1b; }
+.nb-toast--warn    { background:#fef3c7; border-color:#b45309; box-shadow:0 5px 0 #b45309; color:#b45309; }
 @keyframes toastIn  { from{opacity:0;transform:translateY(12px) scale(0.9)} to{opacity:1;transform:none scale(1)} }
 @keyframes toastOut { from{opacity:1} to{opacity:0;transform:translateY(6px) scale(0.95)} }
 </style>
-</head>
-<body>
-<div id="toast-container"></div>
-<div class="app-shell" style="background:var(--bg); margin:0 auto; padding-bottom:40px; min-height:100dvh;">
 
-  <!-- Minimal Topbar -->
-  <div class="topbar" style="background:var(--bg); border-bottom:none; box-shadow:none;">
-    <a href="/deposit" style="color:var(--ink); text-decoration:none; font-weight:800; display:flex; align-items:center; gap:6px;">
-      <i class="fas fa-chevron-left"></i> Kembali
-    </a>
-    <div style="color:var(--ink); font-weight:900; font-size:16px;">Deposit QRIS</div>
-    <div style="width: 24px;"></div> <!-- spacer -->
+<div class="wd-page">
+  <!-- TOP BANNER -->
+  <div class="wd-top">
+    <div class="wd-top-flex">
+      <a href="/deposit" class="wd-back"><i class="ph-bold ph-caret-left"></i></a>
+      <div class="wd-notice">
+        <div class="wd-notice-txt">Menunggu Pembayaran</div>
+      </div>
+    </div>
   </div>
 
-  <div style="padding:0 16px; display:flex; flex-direction:column;">
+  <div class="wd-body">
+    
     <?php if ($flash): ?>
-    <div class="alert alert--<?= $flashType==='error'?'error':'success' ?>" style="box-shadow:var(--shadow-sm);"><i class="fas fa-<?= $flashType==='error'?'exclamation-circle':'check-circle' ?>"></i> <?= htmlspecialchars($flash) ?></div>
+    <div class="wd-alert" style="background:<?= $flashType==='error'?'#fee2e2':'#d1fae5' ?>; color:<?= $flashType==='error'?'#991b1b':'#065f46' ?>; border-color:<?= $flashType==='error'?'#fca5a5':'#86efac' ?>; box-shadow:0 4px 0 <?= $flashType==='error'?'#fca5a5':'#86efac' ?>;">
+      <div class="wd-alert-icon"><?= $flashType==='error'?'❌':'✅' ?></div>
+      <div style="flex:1"><?= htmlspecialchars($flash) ?></div>
+    </div>
     <?php endif; ?>
 
     <?php if ($dep['status'] === 'confirmed'): ?>
     <div class="pay-ticket" style="text-align:center; padding:40px 16px;">
-      <div style="font-size:64px; margin-bottom:12px;">🎉</div>
-      <div style="font-size:22px; font-weight:900; color:var(--ink); margin-bottom:8px;">Pembayaran Sukses</div>
-      <div style="font-size:13px; color:var(--text-muted); font-weight:600; margin-bottom:32px;">Saldo belimu sudah otomatis ditambahkan.</div>
-      <a href="/home" class="btn btn--primary btn--full"><i class="fas fa-home"></i> Ke Beranda</a>
+      <div style="font-size:72px; margin-bottom:16px;">🎉</div>
+      <div style="font-size:24px; font-weight:900; color:#ea580c; margin-bottom:8px;">Pembayaran Sukses</div>
+      <div style="font-size:13px; color:#7c2d12; font-weight:800; margin-bottom:32px;">Saldo belimu sudah otomatis ditambahkan.</div>
+      <a href="/home" class="wd-submit-btn"><i class="ph-bold ph-house"></i> Ke Beranda</a>
     </div>
 
     <?php elseif ($dep['proof_image']): ?>
     <div class="pay-ticket" style="text-align:center; padding:40px 16px;">
-      <div style="font-size:64px; margin-bottom:12px;">⏳</div>
-      <div style="font-size:20px; font-weight:900; color:var(--ink); margin-bottom:8px;">Bukti Diterima</div>
-      <div style="font-size:13px; color:var(--text-muted); font-weight:600; margin-bottom:32px;">Tim kami sedang mengecek pembayaranmu (1–15 menit).</div>
-      <a href="/history" class="btn btn--primary btn--full"><i class="fas fa-history"></i> Lihat Riwayat</a>
+      <div style="font-size:72px; margin-bottom:16px;">⏳</div>
+      <div style="font-size:24px; font-weight:900; color:#ea580c; margin-bottom:8px;">Bukti Diterima</div>
+      <div style="font-size:13px; color:#7c2d12; font-weight:800; margin-bottom:32px;">Tim kami sedang mengecek pembayaranmu.</div>
+      <a href="/history" class="wd-submit-btn"><i class="ph-bold ph-clock-counter-clockwise"></i> Lihat Riwayat</a>
     </div>
 
     <?php else: ?>
 
-    <!-- Compact Ticket -->
+    <!-- TICKET -->
     <div class="pay-ticket">
       <div class="pay-ticket__head" id="exp-strip">
-        <span style="font-size:12px; font-weight:800; color:var(--ink);">#<?= $dep_id ?></span>
+        <span class="pay-ticket__id">#<?= $dep_id ?></span>
         <div class="pay-ticket__timer">
-          <i class="fas fa-stopwatch"></i> <span id="exp-timer">--:--</span>
+          <i class="ph-bold ph-stopwatch"></i> <span id="exp-timer">--:--</span>
         </div>
       </div>
+      
       <div class="pay-ticket__body">
         <?php if ($qr_url): ?>
         <img id="qr-img" src="<?= htmlspecialchars($qr_url) ?>" alt="QRIS" class="qr-min">
-        <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Total Bayar</div>
-        <div style="font-size:32px; font-weight:900; color:var(--ink); letter-spacing:-1px; line-height:1; margin-bottom:20px;"><?= format_rp($amount) ?></div>
+        <div class="qr-lbl">Total Bayar</div>
+        <div class="qr-val"><?= format_rp((float)$amount) ?></div>
         
-        <div style="display:flex; gap:12px;">
-          <a href="<?= htmlspecialchars($qr_dl_url) ?>" class="btn-min btn-min--dark"><i class="fas fa-download"></i> Unduh</a>
-          <a href="<?= htmlspecialchars($qr_url) ?>" target="_blank" class="btn-min btn-min--light"><i class="fas fa-external-link-alt"></i> Buka QR</a>
+        <div class="btn-grid">
+          <a href="<?= htmlspecialchars($qr_dl_url) ?>" class="wd-submit-btn wd-btn-yellow"><i class="ph-bold ph-download-simple"></i> Unduh QR</a>
+          <a href="<?= htmlspecialchars($qr_url) ?>" target="_blank" class="wd-submit-btn wd-btn-blue"><i class="ph-bold ph-arrow-square-out"></i> Buka QR</a>
         </div>
         <?php else: ?>
-        <div class="alert alert--warn" style="margin:0;"><i class="fas fa-exclamation-triangle"></i> QRIS belum dikonfigurasi. Hubungi admin.</div>
+        <div class="wd-alert" style="margin-bottom:0;"><i class="ph-bold ph-warning"></i> QRIS belum dikonfigurasi. Hubungi admin.</div>
         <?php endif; ?>
       </div>
     </div>
 
-    <!-- Micro Notice -->
-    <div style="text-align:center; margin-bottom:16px;">
-      <a href="javascript:void(0)" onclick="alert('Silakan chat Admin di pojok kanan bawah jika saldo e-wallet Anda tidak bisa disesuaikan nominal uniknya.')" style="font-size:11px; font-weight:800; color:#b45309; text-decoration:none; background:#fef3c7; padding:6px 12px; border-radius:20px; border:1.5px solid #fde68a; display:inline-flex; align-items:center; gap:6px;">
-        <i class="fas fa-info-circle"></i> Keberatan nominal unik? Hubungi Admin.
-      </a>
+    <div class="wd-alert" style="background:#1e3a8a; border-color:#1e40af; cursor:pointer;" onclick="alert('Silakan chat Admin jika nominal unik bermasalah.')">
+      <div class="wd-alert-icon">ℹ️</div>
+      <div style="flex:1;">Keberatan nominal unik? Hubungi Admin.</div>
     </div>
 
-    <!-- Compact Steps -->
+    <!-- STEPS -->
     <div class="mini-steps">
-      <div style="font-size:13px; font-weight:900; color:var(--ink); margin-bottom:12px;">📋 Cara Bayar Praktis</div>
-      <div class="mini-step"><span>1</span> Buka aplikasi E-Wallet (OVO, Dana, dll) atau m-Banking.</div>
-      <div class="mini-step"><span>2</span> Scan QR di atas. Nominal akan terisi otomatis, mohon jangan diubah.</div>
-      <div class="mini-step"><span>3</span> <?= $confirm_mode === 'manual' ? 'Selesaikan pembayaran, lalu upload bukti di bawah.' : 'Selesaikan pembayaran, saldo masuk seketika.' ?></div>
+      <div style="font-size:14px; font-weight:900; color:#9a3412; margin-bottom:16px;"><i class="ph-fill ph-clipboard-text"></i> Cara Bayar Praktis</div>
+      <div class="mini-step"><span>1</span> <div>Buka aplikasi E-Wallet (OVO, Dana) atau m-Banking.</div></div>
+      <div class="mini-step"><span>2</span> <div>Scan QR di atas. Nominal otomatis, mohon jangan diubah.</div></div>
+      <div class="mini-step"><span>3</span> <div><?= $confirm_mode === 'manual' ? 'Selesaikan pembayaran, lalu upload bukti.' : 'Selesaikan pembayaran, saldo masuk seketika.' ?></div></div>
     </div>
 
-    <!-- Upload Proof (Compact) -->
+    <!-- UPLOAD PROOF -->
     <?php 
     $pending_secs = time() - $created_ts;
     $show_upload = ($confirm_mode !== 'auto' || $pending_secs >= 300);
     ?>
-    <div id="upload-proof-card" style="display: <?= $show_upload ? 'block' : 'none' ?>; margin-bottom:16px;">
-      <form method="POST" enctype="multipart/form-data" style="background:#fff; border:2.5px solid var(--ink); border-radius:16px; padding:16px; box-shadow:0 4px 0 var(--ink);">
+    <div id="upload-proof-card" class="upload-card" style="display: <?= $show_upload ? 'block' : 'none' ?>;">
+      <form method="POST" enctype="multipart/form-data">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="upload_proof">
-        <div style="font-size:13px; font-weight:900; margin-bottom:10px;"><i class="fas fa-camera"></i> Upload Struk Pembayaran</div>
-        <input type="file" name="proof" accept="image/*" required style="width:100%; font-size:12px; margin-bottom:12px; background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:8px;">
-        <button type="submit" class="btn btn--primary btn--full" style="padding:10px; font-size:13px; border-radius:10px;"><i class="fas fa-paper-plane"></i> Kirim Bukti</button>
+        <div style="font-size:14px; font-weight:900; color:#9a3412; margin-bottom:12px;"><i class="ph-fill ph-camera"></i> Upload Struk Bayar</div>
+        <input class="dep-file" type="file" name="proof" accept="image/*" required>
+        <button type="submit" class="wd-submit-btn wd-btn-blue"><i class="ph-bold ph-paper-plane-tilt"></i> Kirim Bukti</button>
       </form>
     </div>
 
-    <!-- Actions Stack -->
+    <!-- ACTIONS -->
     <div style="display:flex; flex-direction:column; gap:8px;">
-      <button id="btn-check-status" onclick="manualCheckStatus()" class="btn btn--primary btn--full" style="padding:14px; font-size:14px; border-radius:16px; background:var(--white); color:var(--ink); border:2.5px solid var(--ink); box-shadow:0 4px 0 var(--ink); text-shadow:none;">
-        <i class="fas fa-sync-alt"></i> Cek Status Pembayaran
+      <button id="btn-check-status" onclick="manualCheckStatus()" class="wd-submit-btn">
+        <i class="ph-bold ph-arrows-clockwise"></i> Cek Status Pembayaran
       </button>
+      
       <form method="POST" style="margin:0; margin-top:8px;">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="cancel_deposit">
-        <button id="btn-cancel-dep" type="submit" class="text-btn">Batalkan Deposit</button>
+        <button id="btn-cancel-dep" type="submit" class="wd-btn-cancel">Batalkan Deposit</button>
       </form>
     </div>
 
@@ -266,7 +332,7 @@ $qr_dl_url   = '?id=' . $dep_id . '&action=dl_qr';
     let isChecking    = false;
 
     function toast(msg, type = 'success', duration = 3200) {
-      const icons = { success:'<i class="fas fa-check-circle" style="color:#10b981"></i>', error:'<i class="fas fa-times-circle" style="color:#ef4444"></i>', warn:'<i class="fas fa-exclamation-triangle" style="color:#f59e0b"></i>' };
+      const icons = { success:'✅', error:'❌', warn:'⚠️' };
       const c  = document.getElementById('toast-container');
       const el = document.createElement('div');
       el.className = 'nb-toast nb-toast--' + type;
@@ -283,8 +349,8 @@ $qr_dl_url   = '?id=' . $dep_id . '&action=dl_qr';
 
     function updateExpTimer() {
       if (expSecs <= 0) {
-        if (timerEl) { timerEl.textContent = '00:00'; timerEl.style.color = '#ef4444'; }
-        if (stripEl) { stripEl.style.background = '#fef2f2'; }
+        if (timerEl) { timerEl.textContent = '00:00'; timerEl.parentNode.style.background = '#fef2f2'; }
+        if (stripEl) { stripEl.style.background = '#fef08a'; }
         return;
       }
       const m = Math.floor(expSecs / 60), s = expSecs % 60;
@@ -318,8 +384,8 @@ $qr_dl_url   = '?id=' . $dep_id . '&action=dl_qr';
 
     function confirmAndRedirect() {
       clearInterval(pollTimer); clearInterval(expTimer);
-      if (timerEl) { timerEl.textContent = 'Sukses'; timerEl.style.color = '#10b981'; }
-      if (stripEl) stripEl.style.background = '#d1fae5';
+      if (timerEl) { timerEl.textContent = 'Sukses'; timerEl.parentNode.style.background = '#d1fae5'; timerEl.parentNode.style.color = '#065f46'; timerEl.parentNode.style.borderColor = '#86efac'; timerEl.parentNode.style.boxShadow = '0 2px 0 #86efac'; }
+      if (stripEl) stripEl.style.background = '#bbf7d0';
       setTimeout(()=>location.href='/history?tab=deposit', 1500);
     }
 
@@ -328,7 +394,7 @@ $qr_dl_url   = '?id=' . $dep_id . '&action=dl_qr';
       isChecking = true;
       const btn  = document.getElementById('btn-check-status');
       const orig = btn.innerHTML;
-      btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengecek...';
+      btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Mengecek...';
       fetch('?id=' + DEP_ID, {
         method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:'_csrf=' + CSRF_TOK + '&action=check_status'
@@ -350,13 +416,12 @@ $qr_dl_url   = '?id=' . $dep_id . '&action=dl_qr';
       const ci = setInterval(()=>{
         cancelSecs--;
         cancelBtn.textContent = cancelSecs>0 ? 'Tunggu '+cancelSecs+'s untuk membatalkan' : 'Batalkan Deposit';
-        if(cancelSecs<=0){ clearInterval(ci); cancelBtn.disabled=false; cancelBtn.style.textDecoration='underline'; }
+        if(cancelSecs<=0){ clearInterval(ci); cancelBtn.disabled=false; cancelBtn.style.textDecoration='underline'; cancelBtn.style.color='#fff'; }
       },1000);
     }
     </script>
-
     <?php endif; ?>
   </div>
 </div>
-</body>
-</html>
+<div id="toast-container"></div>
+<?php require dirname(__DIR__) . '/partials/footer.php'; ?>
