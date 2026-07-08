@@ -111,7 +111,7 @@ body { background: #f97316 !important; color: #0f172a; }
 /* The visual cup graphic (SVG or CSS shape) */
 .cup-graphic { width: 100%; height: 100%; background: linear-gradient(180deg, #ef4444 0%, #b91c1c 80%, #7f1d1d 100%); border-radius: 8px 8px 12px 12px; border: 3px solid #7f1d1d; border-top: 6px solid #fca5a5; box-shadow: inset 0 -10px 15px rgba(0,0,0,0.4), 0 8px 10px rgba(0,0,0,0.5); position: relative; z-index: 11; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
 /* Lift animation */
-.cup.lifted .cup-graphic { transform: translateY(-70px) rotate(-10deg); }
+.cup.lifted .cup-graphic { transform: translateY(-110px) rotate(-15deg); }
 .cup.disabled { pointer-events: none; }
 
 /* ── REVEAL CONTENT (Behind Cup) ── */
@@ -119,11 +119,11 @@ body { background: #f97316 !important; color: #0f172a; }
 .cup.lifted .cup-content { opacity: 1; }
 /* The Rooster */
 .rooster { width: 100%; height: 100%; object-fit: contain; transform: scale(0.5) translateY(20px); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.cup.lifted .rooster { transform: scale(1.3) translateY(-10px); opacity: 1; }
+.cup.lifted .rooster { transform: scale(1.6) translateY(-20px); opacity: 1; }
 /* The Reward Text (appears after rooster) */
 .reward-text { position: absolute; font-size: 16px; font-weight: 900; color: #fde047; text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(253, 224, 71, 0.5); transform: translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; }
 .cup.show-reward .rooster { opacity: 0; transform: scale(0.8) translateY(20px); }
-.cup.show-reward .reward-text { opacity: 1; transform: translateY(-40px) scale(1.2); }
+.cup.show-reward .reward-text { opacity: 1; transform: translateY(-30px) scale(1.4); }
 
 /* Start Button */
 .btn-play { background: linear-gradient(180deg, #fde047, #eab308); border: 3px solid #ca8a04; border-radius: 12px; font-size: 16px; font-weight: 900; color: #713f12; padding: 12px 24px; box-shadow: 0 6px 0 #a16207; cursor: pointer; text-shadow: 0 1px 0 rgba(255,255,255,0.5); width: 100%; margin-bottom: 16px; transition: transform 0.1s; }
@@ -336,9 +336,9 @@ body { background: #f97316 !important; color: #0f172a; }
       // 3. Submit form to claim
       setTimeout(() => {
         document.getElementById('checkin-form').submit();
-      }, 1500);
+      }, 2000);
       
-    }, 1200); // Rooster mocks for 1.2 seconds
+    }, 2800); // Rooster mocks for 2.8 seconds
   }
 </script>
 <?php endif; ?>
