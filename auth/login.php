@@ -100,10 +100,12 @@ body {
 
 /* Outer Card */
 .auth-card {
-  background: #fff8f0;
+  background: #ffffff;
   border: 4px solid #fff;
   border-radius: 36px;
-  box-shadow: 0 10px 0 #c2410c, 0 20px 40px rgba(0,0,0,0.3);
+  /* Use a very dark brown/orange for the 3D block base so it contrasts with the bright orange background! */
+  /* And an inner shadow to make the top surface look carved/beveled */
+  box-shadow: inset 0 -6px 0 rgba(0,0,0,0.05), inset 0 6px 0 rgba(255,255,255,1), 0 12px 0 #7c2d12, 0 18px 40px rgba(0,0,0,0.4);
   padding: 24px 20px 20px;
   width: 100%;
   max-width: 380px;
