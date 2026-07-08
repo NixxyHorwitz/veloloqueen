@@ -783,43 +783,7 @@ body { background: #f97316 !important; }
   </div>
   <?php endif; ?>
 
-  <!-- ── Membership Showcase — Horizontal Scroll ── -->
-  <?php if (!empty($showcase_memberships)): ?>
-  <div class="sh" style="margin-bottom:8px">
-    <div class="sh__title"><i class="ph-fill ph-crown-simple" style="color:#f59e0b"></i> Pilih Levelmu 👑</div>
-    <a href="/upgrade" class="sh__link">Semua →</a>
-  </div>
-  <div class="m-scroll" style="margin-bottom:14px">
-    <?php foreach ($showcase_memberships as $i => $m):
-      $m_class = "m-card--" . ($i % 5);
-      $txt_color = ['#334155','#0369a1','#92400e','#6b21a8','#991b1b'][$i % 5];
-      $ico_bg = ['#e2e8f0','#dbeafe','#fde68a','#ede9fe','#fecaca'][$i % 5];
-    ?>
-    <a href="/upgrade" class="m-card <?= $m_class ?>">
-      <?php if ($i === 2): ?>
-        <div class="m-badge-hot">🔥 POPULER</div>
-      <?php elseif ((float)$m['original_price'] > 0): ?>
-        <div class="m-badge-promo">🎉 PROMO</div>
-      <?php endif; ?>
-      <div class="m-ico" style="background:<?= $ico_bg ?>;color:<?= $txt_color ?>;border-color:<?= $txt_color ?>">
-        <?= htmlspecialchars($m['icon'] ?: '⭐') ?>
-      </div>
-      <div class="m-name" style="color:<?= $txt_color ?>"><?= htmlspecialchars($m['name']) ?></div>
-      <div class="m-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
-      <div class="m-divider"></div>
-      <?php if ((float)$m['original_price'] > 0): ?>
-      <div class="m-price-old"><?= format_rp((float)$m['original_price']) ?></div>
-      <?php endif; ?>
-      <div class="m-price" style="color:<?= $txt_color ?>"><?= format_rp((float)$m['price']) ?></div>
-      <div class="m-specs">
-        <div class="m-spec-row"><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>× /hari</div>
-        <div class="m-spec-row"><i class="ph-bold ph-trend-up"></i> Maks <?= (float)$m['max_wd'] > 0 ? format_rp((float)$m['max_wd']) : 'Bebas' ?></div>
-      </div>
-      <div class="m-cta"><i class="ph-bold ph-rocket-launch" style="font-size:12px"></i> Pilih Ini</div>
-    </a>
-    <?php endforeach; ?>
-  </div>
-  <?php endif; ?>
+
 
   <!-- ── Recent Activity ── -->
   <?php if (!empty($history)): ?>
