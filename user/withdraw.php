@@ -578,7 +578,7 @@ html body { background: #f97316 !important; background-image: none !important; m
       <div class="wd-saldo-lbl">Saldo</div>
       <div class="wd-saldo-val">
         <span class="wd-saldo-icon">💵</span>
-        <?= format_rp_short((float)$user['balance_wd']) ?>
+        <?= format_rp((float)$user['balance_wd']) ?>
       </div>
     </div>
 
@@ -603,7 +603,7 @@ html body { background: #f97316 !important; background-image: none !important; m
         foreach ($available_amounts as $amt): 
         ?>
           <button type="button" class="wd-amt-btn" data-value="<?= $amt ?>" onclick="selectWdAmount(this, <?= $amt ?>)">
-            <?= format_rp_short($amt) ?>
+            <?= format_rp($amt) ?>
           </button>
         <?php $rendered++; endforeach; ?>
 
@@ -621,7 +621,7 @@ html body { background: #f97316 !important; background-image: none !important; m
             ?>
             <div class="wd-amt-disabled">
               <div class="wd-amt-disabled-badge">Kesempatan Habis</div>
-              <div class="wd-amt-disabled-val"><?= format_rp_short($d) ?></div>
+              <div class="wd-amt-disabled-val"><?= format_rp($d) ?></div>
             </div>
             <?php
           }
