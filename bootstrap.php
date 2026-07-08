@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 // ============================================================
-// BOOTSTRAP — Velostar Platform
+// BOOTSTRAP   Platform
 // ============================================================
 
 // Load .env

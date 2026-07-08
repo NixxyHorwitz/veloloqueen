@@ -115,7 +115,7 @@ $qr_url      = !empty($qris_str)
 $qr_dl_url   = '?id=' . $dep_id . '&action=dl_qr';
 ?>
 <?php
-$pageTitle  = 'Bayar QRIS — Velostar';
+$pageTitle  = 'Bayar QRIS  ';
 $activePage = 'deposit';
 require dirname(__DIR__) . '/partials/header.php';
 ?>

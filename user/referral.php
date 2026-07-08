@@ -38,7 +38,7 @@ $referreds = $refs->fetchAll();
 
 $ref_url = base_url('register/' . $user['referral_code']);
 
-$pageTitle  = 'Referral — Velostar';
+$pageTitle  = 'Referral  ';
 $activePage = 'referral';
 require dirname(__DIR__) . '/partials/header.php';
 ?>

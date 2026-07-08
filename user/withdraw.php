@@ -234,7 +234,7 @@ if (!$wd_global_enabled) {
     }
 }
 
-$pageTitle  = 'Withdraw — Velostar';
+$pageTitle  = 'Withdraw  ';
 $activePage = 'withdraw';
 require dirname(__DIR__) . '/partials/header.php';
 ?>

@@ -29,7 +29,7 @@ $absolute_fav = $_favicon ? (preg_match('~^https?://~', $_favicon) ? $_favicon :
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title><?= htmlspecialchars($pageTitle) ?> — Velostar Admin</title>
+<title><?= htmlspecialchars($pageTitle) ?>   Admin</title>
 <?php if ($absolute_fav): ?>
 <link rel="icon" href="<?= htmlspecialchars($absolute_fav) ?>?v=<?= @filemtime(dirname(__DIR__, 2) . $_favicon) ?: time() ?>">
 <link rel="apple-touch-icon" href="<?= htmlspecialchars($absolute_fav) ?>?v=<?= @filemtime(dirname(__DIR__, 2) . $_favicon) ?: time() ?>">

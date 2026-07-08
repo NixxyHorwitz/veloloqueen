@@ -223,7 +223,7 @@ $profit_logs = $pdo->prepare("
 $profit_logs->execute([$user['id']]);
 $profit_logs = $profit_logs->fetchAll();
 
-$pageTitle = 'Investasi Ponzi — Velostar';
+$pageTitle = 'Investasi Ponzi  ';
 $activePage = 'invest';
 require dirname(__DIR__) . '/partials/header.php';
 ?>

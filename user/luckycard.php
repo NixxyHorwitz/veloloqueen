@@ -73,7 +73,7 @@ $stmt = $pdo->prepare("SELECT COUNT(*) FROM minigame_logs WHERE user_id=? AND ga
 $stmt->execute([$user['id']]);
 $played_today = (int)$stmt->fetchColumn();
 
-$pageTitle = 'Lucky Card — Velostar';
+$pageTitle = 'Lucky Card  ';
 $activePage = 'missions';
 require dirname(__DIR__) . '/partials/header.php';
 ?>
