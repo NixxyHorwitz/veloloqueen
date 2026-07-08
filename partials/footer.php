@@ -6,20 +6,21 @@
      ══════════════════════════════════════════════════════ */
   .bottom-nav {
     position: fixed !important;
-    bottom: 12px !important;
+    bottom: 0 !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: calc(100% - 24px) !important;
-    max-width: 456px !important;
+    width: 100% !important;
+    max-width: 480px !important;
     background: #ffffff !important;
-    border: 3px solid #ea580c !important;
-    border-radius: 28px !important;
-    box-shadow: 0 6px 0 #c2410c, 0 16px 24px rgba(0,0,0,0.15) !important;
+    /* DOME SHAPE */
+    border-top: 5px solid #ea580c !important;
+    border-radius: 40px 40px 0 0 !important;
+    box-shadow: 0 -8px 24px rgba(234,88,12,0.2) !important;
     display: grid !important;
     grid-template-columns: repeat(5, 1fr) !important;
-    align-items: stretch !important;
-    height: 70px !important;
-    padding: 0 4px !important;
+    align-items: center !important;
+    height: 76px !important;
+    padding: 0 12px !important;
     z-index: 9999 !important;
   }
 
@@ -32,55 +33,67 @@
     justify-content: center !important;
     text-decoration: none !important;
     color: #94a3b8 !important;
-    font-size: 9px !important;
+    font-size: 10px !important;
     font-weight: 900 !important;
     font-family: 'Nunito', sans-serif !important;
     gap: 4px !important;
-    border: none !important;
+    height: 58px !important;
+    border: 2.5px solid transparent !important;
     background: transparent !important;
     position: relative;
-    transition: all 0.2s ease !important;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     border-radius: 20px !important;
-    margin: 6px 2px !important;
+    margin: 0 3px !important;
   }
   .nav-item i {
-    font-size: 22px !important;
+    font-size: 24px !important;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     color: #94a3b8 !important;
   }
 
-  /* Active state */
-  .nav-item.active { background: #fff8f0 !important; color: #ea580c !important; }
+  /* Active state - 3D POP UP */
+  .nav-item.active { 
+    background: #fff8f0 !important; 
+    border-color: #ea580c !important; 
+    color: #ea580c !important; 
+    box-shadow: 0 4px 0 #c2410c !important;
+    transform: translateY(-4px) !important;
+  }
   .nav-item.active i {
     color: #ea580c !important;
-    transform: translateY(-2px) scale(1.1) !important;
+    transform: scale(1.1) !important;
   }
 
   /* Center PLAY button */
   .nav-item--play {
     position: relative !important;
     overflow: visible !important;
+    height: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
   }
   .nav-play-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    margin-top: -24px; /* lift above nav bar */
+    margin-top: -34px; /* lift above nav bar dome */
   }
   .nav-play-btn {
-    width: 54px; height: 54px;
+    width: 66px; height: 66px; /* BIGGER */
     background: linear-gradient(135deg, #f97316, #ea580c);
-    border: 3.5px solid #fff;
-    border-radius: 20px;
+    border: 4px solid #fff;
+    border-radius: 24px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 0 #c2410c, 0 8px 20px rgba(234,88,12,0.4);
+    box-shadow: 0 6px 0 #c2410c, 0 10px 24px rgba(234,88,12,0.4);
     transition: transform 0.1s, box-shadow 0.1s;
     position: relative;
     z-index: 10;
   }
-  .nav-play-btn i { font-size: 26px !important; color: #fff !important; transform: none !important; margin-left: 2px; }
-  .nav-item--play:active .nav-play-btn { transform: translateY(4px); box-shadow: 0 2px 0 #c2410c; }
+  .nav-play-btn i { font-size: 32px !important; color: #fff !important; transform: none !important; margin-left: 3px; }
+  .nav-item--play:active .nav-play-btn { transform: translateY(5px); box-shadow: 0 1px 0 #c2410c; }
   .nav-item--play.active .nav-play-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); box-shadow: 0 6px 0 #d97706; }
   .nav-play-label { font-size: 9px; font-weight: 900; color: #94a3b8; font-family: 'Nunito', sans-serif; }
   .nav-item--play.active .nav-play-label { color: #d97706; }
