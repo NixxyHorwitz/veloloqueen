@@ -73,7 +73,7 @@ $stmt = $pdo->prepare("SELECT COUNT(*) FROM minigame_logs WHERE user_id=? AND DA
 $stmt->execute([$user['id']]);
 $played_today = (int)$stmt->fetchColumn();
 
-$pageTitle = 'Tap-Tap Game — Meloton';
+$pageTitle = 'Tap-Tap Game — Velostar';
 $activePage = 'missions'; // Keep missions active in bottom nav
 require dirname(__DIR__) . '/partials/header.php';
 ?>

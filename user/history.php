@@ -81,7 +81,7 @@ $total_dep->execute([$user['id']]); $total_dep = (float)$total_dep->fetchColumn(
 $total_wd     = $pdo->prepare("SELECT COALESCE(SUM(amount),0) FROM withdrawals WHERE user_id=? AND status='approved'");
 $total_wd->execute([$user['id']]); $total_wd = (float)$total_wd->fetchColumn();
 
-$pageTitle  = 'Riwayat — Meloton';
+$pageTitle  = 'Riwayat — Velostar';
 $activePage = 'history';
 require dirname(__DIR__) . '/partials/header.php';
 ?>

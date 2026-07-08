@@ -1,5 +1,5 @@
 /**
- * Meloton — Casual Game Style Toast System
+ * Velostar — Casual Game Style Toast System
  * Usage: nToast('Pesan kamu', 'success'|'error'|'info'|'warn')
  *        nToast.copy('teks') — copy + toast otomatis
  */

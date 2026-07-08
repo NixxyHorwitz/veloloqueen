@@ -1,12 +1,12 @@
 <?php
 /** partials/header.php — requires: $pageTitle, $activePage, $user */
-$_seo_title  = setting($pdo, 'seo_title', 'Meloton');
+$_seo_title  = setting($pdo, 'seo_title', 'Velostar');
 $_seo_desc   = setting($pdo, 'seo_description', '');
 $_seo_kw     = setting($pdo, 'seo_keywords', '');
 $_seo_robots = setting($pdo, 'seo_robots', 'index,follow');
 $_seo_og       = setting($pdo, 'seo_og_image', '');
 $_seo_twcard   = setting($pdo, 'seo_twitter_card', 'summary_large_image');
-$_seo_author   = setting($pdo, 'seo_author', 'Meloton');
+$_seo_author   = setting($pdo, 'seo_author', 'Velostar');
 $_seo_og_title = setting($pdo, 'seo_og_title', '');
 $_seo_og_desc  = setting($pdo, 'seo_og_description', '');
 $_seo_og_type  = setting($pdo, 'seo_og_type', 'website');

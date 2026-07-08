@@ -33,7 +33,7 @@ if (($_GET['action'] ?? '') === 'dl_qr') {
     $img    = @file_get_contents($remote);
     if (!$img) { http_response_code(502); exit('Failed to generate QR'); }
     header('Content-Type: image/png');
-    header('Content-Disposition: attachment; filename="QRIS-Meloton-dep' . $dep_id . '.png"');
+    header('Content-Disposition: attachment; filename="QRIS-Velostar-dep' . $dep_id . '.png"');
     header('Content-Length: ' . strlen($img));
     header('Cache-Control: no-store');
     echo $img;
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'uploa
             
             // Telegram Notif
             $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
-            $host = $_SERVER['HTTP_HOST'] ?? 'Meloton.online';
+            $host = $_SERVER['HTTP_HOST'] ?? 'Velostar.online';
             $proofUrl = $scheme . '://' . $host . '/uploads/deposits/' . $fname;
             
             $msg = "📢 <b>BUKTI DEPOSIT DIUPLOAD</b>\n";
@@ -115,7 +115,7 @@ $qr_url      = !empty($qris_str)
 $qr_dl_url   = '?id=' . $dep_id . '&action=dl_qr';
 ?>
 <?php
-$pageTitle  = 'Bayar QRIS — Meloton';
+$pageTitle  = 'Bayar QRIS — Velostar';
 $activePage = 'deposit';
 require dirname(__DIR__) . '/partials/header.php';
 ?>

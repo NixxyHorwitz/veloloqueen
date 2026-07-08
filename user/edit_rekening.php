@@ -90,7 +90,7 @@ foreach ($channels as $c) {
 $banks    = array_filter($channels, fn($c) => $c['type'] === 'bank');
 $ewallets = array_filter($channels, fn($c) => $c['type'] === 'ewallet');
 
-$pageTitle  = 'Edit Rekening — Meloton';
+$pageTitle  = 'Edit Rekening — Velostar';
 $activePage = 'profile';
 require dirname(__DIR__) . '/partials/header.php';
 ?>

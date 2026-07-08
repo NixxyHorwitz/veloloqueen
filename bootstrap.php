@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 // ============================================================
-// BOOTSTRAP — Meloton Platform
+// BOOTSTRAP — Velostar Platform
 // ============================================================
 
 // Load .env

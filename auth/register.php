@@ -48,7 +48,7 @@ shuffle($emoji_keys);
 $cap_options = array_slice($emoji_keys, 0, 4);
 $cap_target = $cap_options[array_rand($cap_options)];
 $cap_target_name = $emojis[$cap_target];
-$cap_hash = hash_hmac('sha256', $cap_target, 'MELOTON_EMOJI_' . session_id());
+$cap_hash = hash_hmac('sha256', $cap_target, 'Velostar_EMOJI_' . session_id());
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (time() < $lock_until) {
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Emoji CAPTCHA validation
     $user_answer = trim($_POST['captcha_answer'] ?? '');
     $expected_hash = $_POST['captcha_hash'] ?? '';
-    $check_hash = hash_hmac('sha256', $user_answer, 'MELOTON_EMOJI_' . session_id());
+    $check_hash = hash_hmac('sha256', $user_answer, 'Velostar_EMOJI_' . session_id());
 
     if (!$user_answer || !hash_equals($expected_hash, $check_hash)) {
         $error = 'Pilihan gambar salah, coba lagi!';
@@ -178,7 +178,7 @@ $_pay_channels = $pdo->query("SELECT name, type FROM payment_channels WHERE is_a
 $_banks    = array_filter($_pay_channels, fn($c) => $c['type'] === 'bank');
 $_ewallets = array_filter($_pay_channels, fn($c) => $c['type'] === 'ewallet');
 
-$_seo_title  = setting($pdo, 'seo_title', 'Meloton');
+$_seo_title  = setting($pdo, 'seo_title', 'Velostar');
 $_seo_desc   = setting($pdo, 'seo_description', 'Daftar gratis dan mulai tonton video untuk dapat reward!');
 $_seo_kw     = setting($pdo, 'seo_keywords', '');
 $_seo_og     = setting($pdo, 'seo_og_image', '');

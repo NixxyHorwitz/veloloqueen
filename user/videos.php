@@ -75,7 +75,7 @@ if (isset($_GET['ajax'])) {
     exit;
 }
 
-$pageTitle  = 'Tonton Video — Meloton';
+$pageTitle  = 'Tonton Video — Velostar';
 $activePage = 'videos';
 require dirname(__DIR__) . '/partials/header.php';
 ?>

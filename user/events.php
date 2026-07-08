@@ -4,7 +4,7 @@ require_once dirname(__DIR__) . '/auth/guard.php';
 
 
 
-$pageTitle  = 'Event Khusus — Meloton';
+$pageTitle  = 'Event Khusus — Velostar';
 $activePage = 'events';
 require dirname(__DIR__) . '/partials/header.php';
 ?>
