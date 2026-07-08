@@ -604,11 +604,19 @@ body { background: #f97316 !important; }
   <div class="bento-grid" style="margin-bottom:16px">
 
     <!-- BIG: Tonton Video -->
-    <a href="/videos" class="bento-big" style="background:#0f172a; border-color:#1e293b; box-shadow:0 6px 0 #020617;">
-      <i class="ph-bold ph-play-circle bento-big__emoji" style="color:#6366f1"></i>
-      <i class="ph-fill ph-video-camera bento-big__icon" style="color:#a5b4fc"></i>
-      <div class="bento-big__label">Tonton Video</div>
-      <div class="bento-big__sub">Mulai hasilkan uang!</div>
+    <?php
+    $bento_bg_style = "background:#0f172a;";
+    if (!empty($videos)) {
+        $rand_vid = $videos[array_rand($videos)];
+        $thumb_url = yt_thumb($rand_vid['youtube_id']);
+        $bento_bg_style = "background: linear-gradient(to top, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.2) 100%), url('{$thumb_url}') center/cover;";
+    }
+    ?>
+    <a href="/videos" class="bento-big" style="<?= $bento_bg_style ?> border-color:#1e293b; box-shadow:0 6px 0 #020617;">
+      <i class="ph-bold ph-play-circle bento-big__emoji" style="color:rgba(255,255,255,0.1)"></i>
+      <i class="ph-fill ph-video-camera bento-big__icon" style="color:#a5b4fc; text-shadow:0 2px 4px rgba(0,0,0,0.5);"></i>
+      <div class="bento-big__label" style="text-shadow:0 1px 4px rgba(0,0,0,0.8);">Tonton Video</div>
+      <div class="bento-big__sub" style="text-shadow:0 1px 2px rgba(0,0,0,0.8); color:rgba(255,255,255,0.9);">Mulai hasilkan uang!</div>
     </a>
 
     <!-- SM: Tantangan -->
