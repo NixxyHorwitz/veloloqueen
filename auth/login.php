@@ -93,40 +93,20 @@ body {
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  padding: 0;
-}
-
-.auth-wrapper {
-  flex: 1;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.auth-hero {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  padding: 16px;
 }
-.auth-hero-logo { font-size: 36px; font-weight: 900; text-shadow: 0 4px 0 #c2410c; margin-bottom: 12px; }
-.auth-hero-logo em { color: #fde68a; font-style: normal; }
-.auth-hero-emoji { font-size: 80px; animation: float-hero 3s ease-in-out infinite; filter: drop-shadow(0 10px 10px rgba(234,88,12,0.5)); }
-@keyframes float-hero { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-/* Outer Card - Bottom Sheet */
+/* Outer Card */
 .auth-card {
   background: #fff8f0;
-  border-top: 5px solid #fff;
-  border-radius: 40px 40px 0 0;
-  box-shadow: 0 -10px 30px rgba(194,65,12,0.4);
-  padding: 36px 24px 40px;
+  border: 4px solid #fff;
+  border-radius: 36px;
+  box-shadow: 0 10px 0 #c2410c, 0 20px 40px rgba(0,0,0,0.3);
+  padding: 32px 24px 24px;
   width: 100%;
+  max-width: 380px;
   position: relative;
 }
 
@@ -152,7 +132,9 @@ body {
 .auth-close:active { transform: translateY(3px); box-shadow: 0 2px 0 #b91c1c; }
 
 .auth-header { text-align: center; margin-bottom: 24px; }
-.auth-title { font-size: 24px; font-weight: 900; color: #0f172a; line-height: 1.2; }
+.auth-emoji { font-size: 48px; margin-bottom: 8px; display: inline-block; animation: bounce 2s infinite ease-in-out; }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.auth-title { font-size: 22px; font-weight: 900; color: #0f172a; line-height: 1.2; }
 .auth-subtitle { font-size: 13px; font-weight: 700; color: #64748b; margin-top: 4px; }
 
 /* Error alert */
@@ -170,35 +152,49 @@ body {
 }
 
 /* Input group */
-.inp-group { margin-bottom: 16px; }
-.inp-label { display: block; font-size: 12px; font-weight: 900; color: #475569; margin-bottom: 6px; padding-left: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 .inp-box {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: stretch;
   background: #fff;
-  border: 3px solid #cbd5e1;
+  border: 3.5px solid #cbd5e1;
   border-radius: 20px;
-  padding: 12px 16px;
-  box-shadow: 0 5px 0 #e2e8f0;
+  box-shadow: 0 6px 0 #e2e8f0;
   transition: all 0.2s;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
 .inp-box:focus-within {
   border-color: #f97316;
-  box-shadow: 0 5px 0 #ea580c;
+  box-shadow: 0 6px 0 #ea580c;
   transform: translateY(-2px);
 }
-.inp-box svg { color: #94a3b8; flex-shrink: 0; width: 22px; height: 22px; transition: color 0.2s; }
-.inp-box:focus-within svg { color: #f97316; }
-.inp-box input {
-  border: none; outline: none; background: none; flex: 1;
+.inp-icon {
+  background: #f1f5f9;
+  padding: 0 16px;
+  display: flex; align-items: center; justify-content: center;
+  border-right: 3.5px solid #cbd5e1;
+  color: #94a3b8;
+  transition: all 0.2s;
+}
+.inp-box:focus-within .inp-icon {
+  background: #fff7ed;
+  border-right-color: #f97316;
+  color: #f97316;
+}
+.inp-icon svg { width: 22px; height: 22px; }
+.inp-field {
+  flex: 1; padding: 14px 16px; display: flex; align-items: center; position: relative;
+}
+.inp-field input {
+  width: 100%; border: none; outline: none; background: none;
   font-size: 15px; font-weight: 800; color: #0f172a; font-family: inherit;
 }
-.inp-box input::placeholder { color: #94a3b8; font-weight: 700; }
-.inp-box .eye { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; color: #94a3b8; transition: color 0.2s; }
-.inp-box .eye:hover { color: #0f172a; }
+.inp-field input::placeholder { color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; }
+.inp-field .eye { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; color: #94a3b8; transition: color 0.2s; margin-left: 10px; }
+.inp-field .eye:hover { color: #0f172a; }
 
 /* 3D Buttons */
 .btn-3d {
-  width: 100%; border: none; border-radius: 24px; padding: 14px;
+  border: none; border-radius: 20px; padding: 14px;
   font-weight: 900; font-size: 16px; font-family: inherit;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   cursor: pointer; position: relative; overflow: hidden; text-decoration: none;
@@ -212,15 +208,21 @@ body {
 }
 .btn-3d:active { transform: translateY(5px); }
 
+.auth-actions {
+  display: flex; gap: 12px; margin-top: 10px;
+}
+
 .btn-primary {
+  flex: 1;
   background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff;
-  border: 3.5px solid #93c5fd; box-shadow: 0 6px 0 #1d4ed8; margin-top: 10px;
+  border: 3.5px solid #93c5fd; box-shadow: 0 6px 0 #1d4ed8;
 }
 .btn-primary:active { box-shadow: 0 1px 0 #1d4ed8; }
 
 .btn-secondary {
+  width: 64px; flex-shrink: 0;
   background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff;
-  border: 3.5px solid #fde68a; box-shadow: 0 6px 0 #d97706; margin-top: 14px;
+  border: 3.5px solid #fde68a; box-shadow: 0 6px 0 #d97706;
 }
 .btn-secondary:active { box-shadow: 0 1px 0 #d97706; }
 
@@ -231,50 +233,48 @@ body {
 </head>
 <body>
 
-<div class="auth-wrapper">
+<div class="auth-card">
+  <a href="/" class="auth-close">✕</a>
   
-  <div class="auth-hero">
-    <div class="auth-hero-emoji">🚀</div>
-    <div class="auth-hero-logo">Velo<em>star</em></div>
+  <div class="auth-header">
+    <div class="auth-emoji">👋</div>
+    <div class="auth-title">Selamat Datang</div>
+    <div class="auth-subtitle">Masuk ke akunmu dan mulai nonton!</div>
   </div>
 
-  <div class="auth-card">
-    <a href="/" class="auth-close">✕</a>
-    
-    <div class="auth-header">
-      <div class="auth-title">Selamat Datang</div>
-      <div class="auth-subtitle">Masuk ke akunmu dan mulai nonton!</div>
+  <?php if ($error): ?>
+  <div class="auth-err">⚠️ <?= htmlspecialchars($error) ?></div>
+  <?php endif; ?>
+
+  <form method="POST">
+    <?= csrf_field() ?>
+
+    <div class="inp-box">
+      <div class="inp-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="inp-field">
+        <input type="text" name="login" value="<?= htmlspecialchars($_POST['login'] ?? '') ?>" placeholder="Username / Email" autofocus autocomplete="username">
+      </div>
     </div>
 
-    <?php if ($error): ?>
-    <div class="auth-err">⚠️ <?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
-
-    <form method="POST">
-      <?= csrf_field() ?>
-
-      <div class="inp-group">
-        <label class="inp-label">Username / Email</label>
-        <div class="inp-box">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input type="text" name="login" value="<?= htmlspecialchars($_POST['login'] ?? '') ?>" placeholder="username atau email" autofocus autocomplete="username">
-        </div>
+    <div class="inp-box">
+      <div class="inp-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       </div>
-
-      <div class="inp-group">
-        <label class="inp-label">Password</label>
-        <div class="inp-box">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <input type="password" id="pwd" name="password" placeholder="Password kamu" autocomplete="current-password">
-          <button type="button" class="eye" onclick="let p=document.getElementById('pwd');p.type=p.type==='password'?'text':'password'">👁</button>
-        </div>
+      <div class="inp-field">
+        <input type="password" id="pwd" name="password" placeholder="Password" autocomplete="current-password">
+        <button type="button" class="eye" onclick="let p=document.getElementById('pwd');p.type=p.type==='password'?'text':'password'">👁</button>
       </div>
+    </div>
 
-      <button type="submit" class="btn-3d btn-primary">Masuk Sekarang 🚀</button>
-      <a href="/register" class="btn-3d btn-secondary">Belum Punya Akun? Daftar ✨</a>
-    </form>
-  </div>
-  
+    <div class="auth-actions">
+      <a href="/register" class="btn-3d btn-secondary" title="Daftar Baru">
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 4v16m8-8H4"/></svg>
+      </a>
+      <button type="submit" class="btn-3d btn-primary">MASUK SEKARANG 🚀</button>
+    </div>
+  </form>
 </div>
 
 </body>
