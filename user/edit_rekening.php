@@ -99,278 +99,453 @@ require dirname(__DIR__) . '/partials/header.php';
 /* ══════════════════════════════════════════════
    EDIT REKENING PAGE — CASUAL GAME STYLE
    ══════════════════════════════════════════════ */
+body {
+  background: #f97316 !important;
+  color: #0f172a;
+}
 .wd-page { padding: 0 0 20px; }
 
-/* ── Hero Balance (Compact & Ornamented) ── */
-.wd-hero {
-  background: linear-gradient(135deg, #4c1d95, #6d28d9, #a78bfa);
-  border: 3px solid #4c1d95;
-  border-radius: 18px;
-  box-shadow: 0 6px 0 #4c1d95;
-  padding: 16px;
-  text-align: center;
+/* ── TOP BANNER ── */
+.wd-top {
   position: relative;
-  overflow: hidden;
-  margin-bottom: 12px;
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+  padding: 16px 14px 40px;
+  border-bottom: 4px solid #1e3a8a;
+  z-index: 10;
 }
-.wd-hero::before { content:''; position:absolute; top:-20px; left:-20px; width:80px; height:80px; background:url('/assets/dollar.png') no-repeat center/contain; opacity:0.1; transform:rotate(-15deg); pointer-events:none; }
-.wd-hero::after { content:''; position:absolute; bottom:-20px; right:-20px; width:100px; height:100px; background:rgba(255,255,255,0.06); border-radius:50%; pointer-events:none; }
-.wd-hero-dot { position:absolute; bottom:15px; left:40px; width:8px; height:8px; background:#fde68a; border-radius:50%; opacity:0.2; pointer-events:none; }
-
-.wd-hero__lbl { font-size:11px; font-weight:900; color:rgba(255,255,255,0.7); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; position:relative; z-index:1; }
-.wd-hero__val { font-size:24px; font-weight:900; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.4); letter-spacing:1px; position:relative; z-index:1; display:flex; align-items:center; justify-content:center; gap:8px; }
-
-/* ── Alerts ── */
-.wd-alert {
-  padding: 10px 12px; border-radius: 12px;
-  font-size: 11px; font-weight: 800; display: flex; gap: 8px; align-items: center; margin-bottom: 12px;
-  border: 2px solid; line-height: 1.3;
+.wd-top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+  background-size: 30px 20px;
+  pointer-events: none;
 }
+.wd-top-flex {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 2;
+}
+.wd-back {
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.4);
+  color: #fff;
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; text-decoration: none;
+}
+.wd-notice {
+  background: #fef08a;
+  border: 2px solid #ca8a04;
+  border-radius: 12px;
+  padding: 6px 12px;
+  box-shadow: 0 4px 0 #ca8a04;
+  display: flex; gap: 6px; align-items: center;
+  position: relative;
+  margin-top: 4px;
+}
+.wd-notice::after {
+  content: '';
+  position: absolute;
+  right: -8px; top: 12px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent #fef08a;
+}
+.wd-notice-icon { font-size: 16px; flex-shrink: 0; }
+.wd-notice-txt {
+  font-size: 11px; font-weight: 800; color: #854d0e; line-height: 1.2;
+}
+.wd-dog-mascot {
+  position: absolute;
+  bottom: -4px; right: 14px;
+  font-size: 46px; line-height: 1;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+  z-index: 5;
+}
+
+/* ── BODY ── */
+.wd-body {
+  flex: 1;
+  background: #f97316;
+  padding: 16px 14px 100px;
+  position: relative;
+}
+.wd-body::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%),
+              radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%);
+  background-size: 50px 50px; background-position: 0 0, 25px 25px;
+  pointer-events: none;
+}
+
+/* ── SALDO ROW / CURRENT BANK ROW ── */
+.wd-saldo-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; position: relative; z-index: 2; }
+.wd-saldo-icon { width: 50px; height: 50px; background: #fffbeb; border: 3px solid #fde047; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 0 #ca8a04; }
+.wd-saldo-lbl { font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 2px 0 #c2410c; margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+.wd-saldo-val { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 3px 0 #9a3412, 0 4px 6px rgba(0,0,0,0.3); font-style: italic; letter-spacing: -0.5px; display:flex; align-items:center; gap:8px;}
+
+/* ── ALERTS ── */
+.wd-alert { padding: 10px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; display: flex; gap: 8px; align-items: center; margin-bottom: 12px; border: 2px solid; line-height: 1.3; position: relative; z-index: 2; }
 .wd-alert--err { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
 .wd-alert--warn { background: #fffbeb; color: #b45309; border-color: #fcd34d; }
 .wd-alert--succ { background: #f0fdf4; color: #166534; border-color: #86efac; }
 .wd-alert-icon { font-size: 18px; flex-shrink: 0; }
 .wd-alert-btn { background: #fbbf24; color: #92400e; border: 2px solid #fff; border-radius: 8px; font-size: 9px; font-weight: 900; padding: 4px 10px; text-decoration: none; box-shadow: 0 2px 0 rgba(0,0,0,0.1); flex-shrink: 0; }
 
-/* ── Form Card ── */
-.wd-card {
-  background: #fff; border: 2.5px solid #a78bfa; border-radius: 16px;
-  box-shadow: 0 5px 0 #a78bfa; padding: 16px; margin-bottom: 12px;
+/* ── FORM ── */
+.wd-input-grp { margin-bottom: 14px; position: relative; z-index: 2; }
+.wd-input-grp label { display: block; font-size: 11px; font-weight: 900; color: #fff; text-shadow: 0 1px 0 #c2410c; margin-bottom: 6px; padding-left: 4px; }
+.wd-input-grp input, .custom-select-trigger {
+  width: 100%;
+  background: #fffbeb;
+  border: 3px solid #ea580c;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #7c2d12;
+  box-shadow: 0 4px 0 #ca8a04;
+  outline: none;
+  font-family: inherit;
 }
-.wd-card-title { font-size: 14px; font-weight: 900; color: #4c1d95; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; border-bottom: 2px solid #f5f3ff; padding-bottom: 10px; }
+.wd-input-grp input::placeholder { color: #d97706; opacity: 0.6; }
+.wd-input-grp input:focus, .custom-select-trigger.open { border-color: #c2410c; background: #fff; }
 
-/* ── Inputs ── */
-.wd-group { margin-bottom: 10px; }
-.wd-label { font-size: 10px; font-weight: 900; color: #64748b; margin-bottom: 4px; display: block; }
-.wd-input {
-  width: 100%; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px;
-  padding: 10px; font-size: 12px; font-weight: 800; color: #0c4a6e;
-  font-family: inherit; outline: none; transition: border-color 0.2s;
-}
-.wd-input:focus { border-color: #94a3b8; background: #fff; }
-
-/* ── Custom Select (Fix Logo Meledak) ── */
+/* Custom Select Specific */
 .custom-select-wrap { position: relative; width: 100%; }
-.custom-select-trigger {
-  width: 100%; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px;
-  padding: 10px; font-size: 12px; font-weight: 800; color: #0c4a6e;
-  display: flex; align-items: center; justify-content: space-between; cursor: pointer;
-}
-.custom-select-trigger.open { border-color: #94a3b8; background: #fff; }
+.custom-select-trigger { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
 .sel-val { display: flex; align-items: center; gap: 8px; }
-.sel-val img, .custom-option img { height: 16px; width: auto; border-radius: 2px; object-fit: contain; }
+.sel-val img, .custom-option img { height: 18px; width: auto; border-radius: 4px; object-fit: contain; }
 .custom-select-options {
   position: absolute; top: calc(100% + 4px); left: 0; width: 100%;
-  background: #fff; border: 2px solid #e2e8f0; border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100;
-  max-height: 200px; overflow-y: auto; display: none; padding: 4px;
+  background: #fff; border: 3px solid #ea580c; border-radius: 14px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 100;
+  max-height: 200px; overflow-y: auto; display: none; padding: 6px;
 }
 .custom-select-options.open { display: block; }
-.custom-optgroup { font-size: 10px; font-weight: 900; color: #94a3b8; padding: 6px 8px 2px; text-transform: uppercase; }
+.custom-optgroup { font-size: 11px; font-weight: 900; color: #ea580c; padding: 8px 8px 4px; text-transform: uppercase; border-bottom: 2px dashed #ffedd5; margin-bottom: 4px;}
 .custom-option {
-  padding: 8px; font-size: 12px; font-weight: 700; color: #334155;
-  border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; font-size: 13px; font-weight: 800; color: #7c2d12;
+  border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px;
 }
-.custom-option:hover { background: #f1f5f9; color: #0f172a; }
+.custom-option:hover { background: #ffedd5; color: #9a3412; }
 
-/* ── Submit Button ── */
-.wd-submit {
-  width: 100%; padding: 12px; background: linear-gradient(135deg, #10b981, #059669);
-  border: 2.5px solid #34d399; border-radius: 14px; color: #fff; font-size: 13px; font-weight: 900;
-  box-shadow: 0 5px 0 #047857; cursor: pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px;
+/* ── SUBMIT BUTTON ── */
+.wd-submit-btn {
+  width: 100%;
+  background: linear-gradient(180deg, #4ade80, #16a34a);
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 0 #14532d, inset 0 2px 4px rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  position: relative;
+  z-index: 2;
+  margin-top: 10px;
 }
-.wd-submit:active { transform: translateY(4px); box-shadow: 0 1px 0 #047857; }
+.wd-submit-btn:active:not(:disabled) {
+  transform: translateY(6px);
+  box-shadow: 0 0 0 #14532d, inset 0 2px 4px rgba(255,255,255,0.5);
+}
+.wd-submit-btn:disabled {
+  background: #cbd5e1; border-color:#94a3b8; color:#334155; box-shadow:none; transform:none; text-shadow:none;
+}
 
 /* ── Modal ── */
 #cg-modal { display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); z-index:99999; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(4px); }
-.cg-modal-box { background: #fff; width:100%; max-width:300px; border-radius:20px; border:3px solid #cbd5e1; box-shadow:0 8px 0 #0f172a; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); overflow:hidden; }
-.cg-modal-hdr { background: linear-gradient(135deg, #fde68a, #f59e0b); padding: 12px; text-align: center; color: #78350f; font-weight: 900; font-size: 14px; border-bottom: 2px solid rgba(255,255,255,0.5); }
-.cg-modal-bd { padding: 16px; text-align: left; }
-.cg-modal-actions { display:flex; gap:8px; padding:0 16px 16px; }
-.cg-btn-cancel { flex:1; padding:10px; background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; font-weight:900; color:#64748b; font-size:12px; }
-.cg-btn-confirm { flex:1.5; padding:10px; background:linear-gradient(135deg, #34d399, #10b981); border:2px solid #6ee7b7; border-radius:10px; font-weight:900; color:#fff; box-shadow:0 4px 0 #059669; font-size:12px; }
-.cg-btn-confirm:active { transform:translateY(3px); box-shadow:0 1px 0 #059669; }
+.cg-modal-box { background: #fffbeb; width:100%; max-width:320px; border-radius:24px; border:4px solid #ea580c; box-shadow:0 8px 0 #9a3412; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); overflow:hidden; }
+.cg-modal-hdr { background: linear-gradient(135deg, #fde047, #f59e0b); padding: 16px; text-align: center; color: #7c2d12; font-weight: 900; font-size: 16px; border-bottom: 3px solid rgba(255,255,255,0.5); }
+.cg-modal-bd { padding: 20px; text-align: left; }
+.cg-modal-actions { display:flex; gap:12px; padding:0 20px 20px; }
+.cg-btn-cancel { flex:1; padding:12px; background:#fef08a; border:2px solid #ca8a04; border-radius:14px; font-weight:900; color:#9a3412; font-size:14px; box-shadow:0 4px 0 #ca8a04; cursor:pointer;}
+.cg-btn-cancel:active { transform:translateY(4px); box-shadow:none; }
+.cg-btn-confirm { flex:1.5; padding:12px; background:linear-gradient(180deg, #4ade80, #16a34a); border:none; border-radius:14px; font-weight:900; color:#fff; box-shadow:0 4px 0 #14532d; font-size:14px; cursor:pointer;}
+.cg-btn-confirm:active { transform:translateY(4px); box-shadow:none; }
 @keyframes popIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
 </style>
 
 <div class="wd-page">
-  <!-- HERO BALANCE / CURRENT BANK -->
-  <div class="wd-hero">
-    <div class="wd-hero-dot"></div>
-    <div class="wd-hero__lbl">🏦 Rekening Saat Ini</div>
+  <!-- TOP BANNER -->
+  <div class="wd-top">
+    <div class="wd-top-flex">
+      <a href="/profile" class="wd-back"><i class="ph-bold ph-caret-left"></i></a>
+      <div class="wd-notice">
+        <div class="wd-notice-icon">🏦</div>
+        <div class="wd-notice-txt">Edit Rekening</div>
+      </div>
+    </div>
+    <div class="wd-dog-mascot">🐶💳</div>
+  </div>
+
+  <div class="wd-body">
     
-    <?php if ($has_bank): ?>
-      <div class="wd-hero__val" style="margin-bottom:4px">
-        <?php $user_wl = $channel_logos[strtolower($user['bank_name'] ?? '')] ?? null; ?>
-        <?php if ($user_wl): ?>
-          <img src="/assets/banks/<?= htmlspecialchars($user_wl) ?>" style="height:20px;border-radius:4px;object-fit:contain;background:#fff;padding:2px">
+    <!-- CURRENT BANK / SALDO ROW -->
+    <div class="wd-saldo-row">
+      <div class="wd-saldo-icon">💳</div>
+      <div>
+        <div class="wd-saldo-lbl">Rekening Aktif</div>
+        <?php if ($has_bank): ?>
+          <div class="wd-saldo-val">
+            <?php $user_wl = $channel_logos[strtolower($user['bank_name'] ?? '')] ?? null; ?>
+            <?php if ($user_wl): ?>
+              <img src="/assets/banks/<?= htmlspecialchars($user_wl) ?>" style="height:24px;border-radius:4px;object-fit:contain;background:#fff;padding:2px">
+            <?php endif; ?>
+            <?= htmlspecialchars(mask_account($user['account_number'])) ?>
+          </div>
+          <div style="font-size:12px;font-weight:900;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3);margin-top:2px;">
+            <?= htmlspecialchars($user['account_name']) ?>
+          </div>
+        <?php else: ?>
+          <div class="wd-saldo-val" style="font-size:20px;opacity:0.8;">Belum Ada Rekening</div>
         <?php endif; ?>
-        <?= htmlspecialchars(mask_account($user['account_number'])) ?>
       </div>
-      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7)"><?= htmlspecialchars($user['account_name']) ?></div>
+    </div>
+
+    <!-- FLASH ALERTS -->
+    <?php if ($flash): ?>
+    <div class="wd-alert wd-alert--<?= $flashType === 'error' ? 'err' : 'succ' ?>">
+      <div class="wd-alert-icon"><?= $flashType === 'error' ? '❌' : '✨' ?></div>
+      <div style="flex:1"><?= htmlspecialchars($flash) ?></div>
+    </div>
+    <?php endif; ?>
+
+    <!-- NOTICES & CONDITIONS -->
+    <?php if ($has_pending_bank): ?>
+      <div class="wd-alert wd-alert--warn">
+        <div class="wd-alert-icon">⏳</div>
+        <div style="flex:1">Data rekening baru sedang diverifikasi otomatis. Mohon tunggu.</div>
+      </div>
+    <?php elseif (!$can_edit_bank): ?>
+      <div class="wd-alert wd-alert--err">
+        <div class="wd-alert-icon">🔒</div>
+        <div style="flex:1">
+           <div style="margin-bottom:2px"><strong>Akses Terkunci!</strong></div>
+           <div style="font-size:10px">Level <?= htmlspecialchars($level_name) ?> belum memiliki izin untuk mengubah data rekening.</div>
+        </div>
+        <a href="/upgrade" class="wd-alert-btn">Upgrade</a>
+      </div>
     <?php else: ?>
-      <div style="font-size:18px;font-weight:900;color:#fff;margin-top:6px;opacity:0.6">Belum Ada Rekening</div>
-    <?php endif; ?>
-  </div>
-
-  <!-- FLASH ALERTS -->
-  <?php if ($flash): ?>
-  <div class="wd-alert wd-alert--<?= $flashType === 'error' ? 'err' : 'succ' ?>">
-    <div class="wd-alert-icon"><?= $flashType === 'error' ? '❌' : '✨' ?></div>
-    <div style="flex:1"><?= htmlspecialchars($flash) ?></div>
-  </div>
-  <?php endif; ?>
-
-  <!-- NOTICES & CONDITIONS -->
-  <?php if ($has_pending_bank): ?>
-    <div class="wd-alert wd-alert--warn">
-      <div class="wd-alert-icon">⏳</div>
-      <div style="flex:1">Data rekening baru sedang diverifikasi otomatis. Mohon tunggu.</div>
-    </div>
-  <?php elseif (!$can_edit_bank): ?>
-    <div class="wd-alert wd-alert--err">
-      <div class="wd-alert-icon">🔒</div>
-      <div style="flex:1">
-         <div style="margin-bottom:2px"><strong>Akses Terkunci!</strong></div>
-         <div style="font-size:10px">Level <?= htmlspecialchars($level_name) ?> belum memiliki izin untuk mengubah data rekening.</div>
-      </div>
-      <a href="/upgrade" class="wd-alert-btn">Upgrade</a>
-    </div>
-  <?php else: ?>
-    <!-- NOTICES & CONDITIONS UNTUK SALDO -->
-    <?php if (!$has_enough_balance): ?>
-      <?php
-         $pct = $min_saldo_edit > 0 ? ((float)$user['balance_dep'] / $min_saldo_edit) * 100 : 0;
-         if ($pct > 100) $pct = 100;
-         if ($pct < 0) $pct = 0;
-      ?>
-      <div class="wd-alert wd-alert--err" style="display:block; padding-bottom:16px;">
-        <div style="display:flex; align-items:flex-start; gap:12px;">
-            <div class="wd-alert-icon" style="flex-shrink:0;">💰</div>
-            <div style="flex:1">
-               <div style="margin-bottom:2px"><strong>Saldo Mengendap Kurang!</strong></div>
-               <div style="font-size:10px; line-height:1.4;">Syarat ganti rekening: Harus ada Saldo Beli minimal <?= format_rp($min_saldo_edit) ?> di akun kamu.</div>
-            </div>
-            <a href="/deposit" class="wd-alert-btn" style="background:#3b82f6;border-color:#60a5fa;box-shadow:0 3px 0 #2563eb;flex-shrink:0;">Deposit</a>
-        </div>
-        
-        <!-- Progress Bar -->
-        <div style="background:rgba(0,0,0,0.06); border-radius:10px; height:14px; overflow:hidden; border: 1px solid rgba(0,0,0,0.05); margin-top:14px; position:relative;">
-          <div style="background:linear-gradient(90deg, #ef4444, #f59e0b); height:100%; width:<?= $pct ?>%; transition:width 0.5s;"></div>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:800; color:#ef4444; margin-top:6px; padding:0 2px;">
-           <span>Terkumpul: <?= format_rp((float)$user['balance_dep']) ?></span>
-           <span>Target: <?= format_rp($min_saldo_edit) ?></span>
-        </div>
-      </div>
-    <?php endif; ?>
-
-    <!-- FORM UBAH REKENING -->
-    <div class="wd-card" style="position:relative; overflow:hidden;">
+      
+      <!-- SALDO MENGENDAP ALERT -->
       <?php if (!$has_enough_balance): ?>
-      <!-- Lock Overlay -->
-      <div style="position:absolute; inset:0; background:rgba(255,255,255,0.7); backdrop-filter:blur(3px); z-index:20; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center;">
-          <div style="font-size:38px; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1)); animation: popIn 0.4s ease-out;">🔒</div>
-          <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:8px;">Form Terkunci</div>
-          <div style="font-size:11px; font-weight:700; color:#64748b; margin-top:4px; max-width:80%;">Penuhi target Saldo Mengendap untuk membuka.</div>
-      </div>
+        <?php
+           $pct = $min_saldo_edit > 0 ? ((float)$user['balance_dep'] / $min_saldo_edit) * 100 : 0;
+           if ($pct > 100) $pct = 100;
+           if ($pct < 0) $pct = 0;
+        ?>
+        <div class="wd-alert wd-alert--err" style="display:block; padding-bottom:16px;">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+              <div class="wd-alert-icon" style="flex-shrink:0;">💰</div>
+              <div style="flex:1">
+                 <div style="margin-bottom:2px"><strong>Saldo Mengendap Kurang!</strong></div>
+                 <div style="font-size:10px; line-height:1.4;">Syarat ganti rekening: Harus ada Saldo Beli minimal <?= format_rp($min_saldo_edit) ?> di akun kamu.</div>
+              </div>
+              <a href="/deposit" class="wd-alert-btn" style="background:#3b82f6;border-color:#60a5fa;box-shadow:0 3px 0 #2563eb;flex-shrink:0;">Deposit</a>
+          </div>
+          
+          <!-- Progress Bar -->
+          <div style="background:rgba(0,0,0,0.06); border-radius:10px; height:14px; overflow:hidden; border: 1px solid rgba(0,0,0,0.05); margin-top:14px; position:relative;">
+            <div style="background:linear-gradient(90deg, #ef4444, #f59e0b); height:100%; width:<?= $pct ?>%; transition:width 0.5s;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:900; color:#ef4444; margin-top:6px; padding:0 2px;">
+             <span>Terkumpul: <?= format_rp((float)$user['balance_dep']) ?></span>
+             <span>Target: <?= format_rp($min_saldo_edit) ?></span>
+          </div>
+        </div>
       <?php endif; ?>
 
-      <div class="wd-card-title">✏️ Form Ganti Rekening</div>
-      
-      <form method="POST" id="edit-rek-form">
-        <?= csrf_field() ?>
-        
-        <div class="wd-group">
-          <label class="wd-label">Bank / E-Wallet</label>
-          <select class="custom-logo-select" name="bank_name" required>
-            <option value="" data-logo="">— Pilih Tujuan —</option>
-            <?php if (!empty($banks)): ?>
-            <optgroup label="🏦 Bank">
-              <?php foreach ($banks as $ch): ?>
-              <?php $logoPath = !empty($ch['logo']) ? (str_starts_with($ch['logo'], '/') || str_starts_with($ch['logo'], 'http') ? $ch['logo'] : '/assets/banks/' . $ch['logo']) : ''; ?>
-              <option value="<?= htmlspecialchars($ch['name']) ?>" data-logo="<?= htmlspecialchars($logoPath) ?>" <?= ($user['bank_name'] ?? '') === $ch['name'] ? 'selected' : '' ?>><?= htmlspecialchars($ch['name']) ?></option>
-              <?php endforeach; ?>
-            </optgroup>
-            <?php endif; ?>
-            <?php if (!empty($ewallets)): ?>
-            <optgroup label="📱 E-Wallet">
-              <?php foreach ($ewallets as $ch): ?>
-              <?php $logoPath = !empty($ch['logo']) ? (str_starts_with($ch['logo'], '/') || str_starts_with($ch['logo'], 'http') ? $ch['logo'] : '/assets/banks/' . $ch['logo']) : ''; ?>
-              <option value="<?= htmlspecialchars($ch['name']) ?>" data-logo="<?= htmlspecialchars($logoPath) ?>" <?= ($user['bank_name'] ?? '') === $ch['name'] ? 'selected' : '' ?>><?= htmlspecialchars($ch['name']) ?></option>
-              <?php endforeach; ?>
-            </optgroup>
-            <?php endif; ?>
-          </select>
+      <!-- FORM UBAH REKENING -->
+      <div style="position:relative; z-index:2;">
+        <?php if (!$has_enough_balance): ?>
+        <!-- Lock Overlay -->
+        <div style="position:absolute; inset:0; background:rgba(255,255,255,0.7); backdrop-filter:blur(3px); z-index:20; border-radius:16px; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center;">
+            <div style="font-size:38px; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1)); animation: popIn 0.4s ease-out;">🔒</div>
+            <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:8px;">Form Terkunci</div>
+            <div style="font-size:11px; font-weight:700; color:#64748b; margin-top:4px; max-width:80%;">Penuhi target Saldo Mengendap untuk membuka.</div>
         </div>
-        
-        <div class="wd-group">
-          <label class="wd-label">Nomor Rekening / Akun</label>
-          <input class="wd-input" type="text" name="account_number"
-                 value="<?= htmlspecialchars($user['account_number'] ?? '') ?>"
-                 placeholder="Cth: 08123456789" required>
-        </div>
-        
-        <div class="wd-group" style="margin-bottom:0">
-          <label class="wd-label">Nama Pemilik</label>
-          <input class="wd-input" type="text" name="account_name"
-                 value="<?= htmlspecialchars($user['account_name'] ?? '') ?>"
-                 placeholder="Sesuai buku tabungan" required>
-        </div>
-        
-        <button type="submit" class="wd-submit">💾 Ajukan Perubahan</button>
-      </form>
-    </div>
-  <?php endif; ?>
+        <?php endif; ?>
 
-  <div style="text-align:center;margin-top:20px">
-    <a href="/profile" style="font-size:12px;font-weight:800;color:#64748b;text-decoration:none">← Kembali ke Profil</a>
+        <form method="POST" id="edit-rek-form">
+          <?= csrf_field() ?>
+          
+          <div class="wd-input-grp">
+            <label>Bank / E-Wallet Baru</label>
+            <select class="custom-logo-select" name="bank_name" required>
+              <option value="" data-logo="">— Pilih Tujuan —</option>
+              <?php if (!empty($banks)): ?>
+                <optgroup label="Transfer Bank">
+                  <?php foreach($banks as $b): ?>
+                    <option value="<?= htmlspecialchars($b['name']) ?>" data-logo="<?= htmlspecialchars($b['logo']) ?>">
+                      <?= htmlspecialchars($b['name']) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </optgroup>
+              <?php endif; ?>
+              <?php if (!empty($ewallets)): ?>
+                <optgroup label="E-Wallet">
+                  <?php foreach($ewallets as $e): ?>
+                    <option value="<?= htmlspecialchars($e['name']) ?>" data-logo="<?= htmlspecialchars($e['logo']) ?>">
+                      <?= htmlspecialchars($e['name']) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </optgroup>
+              <?php endif; ?>
+            </select>
+          </div>
+
+          <div class="wd-input-grp">
+            <label>Nomor Rekening / No HP</label>
+            <input type="text" name="account_number" placeholder="Contoh: 08xxxx / 512xxxx" required>
+          </div>
+          
+          <div class="wd-input-grp">
+            <label>Nama Pemilik (Sesuai Rekening)</label>
+            <input type="text" name="account_name" placeholder="Contoh: Budi Santoso" required>
+          </div>
+
+          <?php if ($has_pending_bank): ?>
+             <button type="button" class="wd-submit-btn" disabled>Sedang Diverifikasi</button>
+          <?php elseif (!$can_edit_bank): ?>
+             <button type="button" class="wd-submit-btn" disabled>Akses Terkunci</button>
+          <?php elseif (!$has_enough_balance): ?>
+             <button type="button" class="wd-submit-btn" disabled>Saldo Kurang</button>
+          <?php else: ?>
+             <button type="button" class="wd-submit-btn" onclick="showConfirm()">Ajukan Perubahan</button>
+          <?php endif; ?>
+
+        </form>
+      </div>
+
+    <?php endif; ?>
   </div>
 </div>
 
 <!-- CONFIRM MODAL -->
-<div id="cg-modal">
+<div id="cg-modal" class="cg-modal">
   <div class="cg-modal-box">
-    <div class="cg-modal-hdr">Konfirmasi Rekening</div>
+    <div class="cg-modal-hdr">Konfirmasi Perubahan</div>
     <div class="cg-modal-bd">
-      <div style="font-size:11px;font-weight:800;color:#64748b;margin-bottom:8px">Data yang akan disimpan:</div>
-      <div id="rek-preview" style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:10px;padding:12px;font-size:13px;font-weight:800;color:#0f172a;line-height:1.6;margin-bottom:12px"></div>
-      <div style="font-size:10px;font-weight:700;color:#ef4444;background:#fef2f2;padding:6px;border-radius:6px;text-align:center">Pastikan informasi di atas sudah benar!</div>
+      <div style="font-size:13px;font-weight:800;color:#9a3412;margin-bottom:12px;line-height:1.4">
+        Apakah data rekening baru sudah benar?
+      </div>
+      <div style="font-size:11px;font-weight:700;color:#7c2d12;background:#ffedd5;padding:12px;border-radius:12px;border:1px dashed #fdba74;">
+        Pengajuan yang sudah dikirim akan dicek admin dan tidak bisa diubah sementara waktu.
+      </div>
     </div>
     <div class="cg-modal-actions">
-      <button type="button" class="cg-btn-cancel" onclick="document.getElementById('cg-modal').style.display='none'">Batal</button>
-      <button type="button" class="cg-btn-confirm" onclick="confirmRek()">Ya, Simpan!</button>
+      <button class="cg-btn-cancel" onclick="closeConfirm()">Batal</button>
+      <button class="cg-btn-confirm" onclick="submitForm()">Ya, Kirim!</button>
     </div>
   </div>
 </div>
 
-<script src="/assets/js/bank-select.js"></script>
 <script>
-const rekForm = document.getElementById('edit-rek-form');
-if (rekForm) {
-  rekForm.addEventListener('submit', function(e) {
-    if (this.dataset.confirmed) return;
-    e.preventDefault();
-    const bank    = this.querySelector('[name=bank_name]').value.trim();
-    const accnum  = this.querySelector('[name=account_number]').value.trim();
-    const accname = this.querySelector('[name=account_name]').value.trim();
-    
-    document.getElementById('rek-preview').innerHTML =
-      `<span style="color:#64748b">Bank:</span> ${bank}<br>
-       <span style="color:#64748b">Nomor:</span> ${accnum}<br>
-       <span style="color:#64748b">A/N:</span> ${accname}`;
-       
+// Custom Select Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const selects = document.querySelectorAll('.custom-logo-select');
+    selects.forEach(select => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-select-wrap';
+        select.parentNode.insertBefore(wrapper, select);
+        wrapper.appendChild(select);
+        select.style.display = 'none';
+
+        const trigger = document.createElement('div');
+        trigger.className = 'custom-select-trigger';
+        trigger.innerHTML = '<div class="sel-val">— Pilih Tujuan —</div><i class="ph-bold ph-caret-down"></i>';
+        
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'custom-select-options';
+
+        wrapper.appendChild(trigger);
+        wrapper.appendChild(optionsContainer);
+
+        Array.from(select.children).forEach(child => {
+            if (child.tagName === 'OPTGROUP') {
+                const groupLabel = document.createElement('div');
+                groupLabel.className = 'custom-optgroup';
+                groupLabel.textContent = child.label;
+                optionsContainer.appendChild(groupLabel);
+                
+                Array.from(child.children).forEach(opt => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'custom-option';
+                    optDiv.dataset.value = opt.value;
+                    const logo = opt.dataset.logo;
+                    if (logo) {
+                        optDiv.innerHTML = `<img src="/assets/banks/${logo}" alt="${opt.value}"> ${opt.value}`;
+                    } else {
+                        optDiv.innerHTML = opt.value;
+                    }
+                    optDiv.addEventListener('click', () => {
+                        select.value = opt.value;
+                        trigger.querySelector('.sel-val').innerHTML = optDiv.innerHTML;
+                        optionsContainer.classList.remove('open');
+                        trigger.classList.remove('open');
+                    });
+                    optionsContainer.appendChild(optDiv);
+                });
+            } else {
+                if(child.value === '') return;
+                const optDiv = document.createElement('div');
+                optDiv.className = 'custom-option';
+                optDiv.dataset.value = child.value;
+                const logo = child.dataset.logo;
+                if (logo) {
+                    optDiv.innerHTML = `<img src="/assets/banks/${logo}" alt="${child.value}"> ${child.value}`;
+                } else {
+                    optDiv.innerHTML = child.value;
+                }
+                optDiv.addEventListener('click', () => {
+                    select.value = child.value;
+                    trigger.querySelector('.sel-val').innerHTML = optDiv.innerHTML;
+                    optionsContainer.classList.remove('open');
+                    trigger.classList.remove('open');
+                });
+                optionsContainer.appendChild(optDiv);
+            }
+        });
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = optionsContainer.classList.contains('open');
+            document.querySelectorAll('.custom-select-options').forEach(o => o.classList.remove('open'));
+            document.querySelectorAll('.custom-select-trigger').forEach(t => t.classList.remove('open'));
+            if (!isOpen) {
+                optionsContainer.classList.add('open');
+                trigger.classList.add('open');
+            }
+        });
+    });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.custom-select-options').forEach(o => o.classList.remove('open'));
+        document.querySelectorAll('.custom-select-trigger').forEach(t => t.classList.remove('open'));
+    });
+});
+
+function showConfirm() {
+    const f = document.getElementById('edit-rek-form');
+    if (!f.reportValidity()) return;
     document.getElementById('cg-modal').style.display = 'flex';
-  });
 }
-function confirmRek() {
-  document.getElementById('cg-modal').style.display = 'none';
-  if(rekForm) {
-    rekForm.dataset.confirmed = '1';
-    rekForm.submit();
-  }
+function closeConfirm() {
+    document.getElementById('cg-modal').style.display = 'none';
+}
+function submitForm() {
+    document.getElementById('edit-rek-form').submit();
 }
 </script>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
-
