@@ -86,6 +86,7 @@ $_psvg = [
 /* ══════════════════════════════════════════════
    PROFILE PAGE — COMPACT GAME STYLE
    ══════════════════════════════════════════════ */
+body { background: #f97316 !important; color: #0f172a; }
 .prof-page { padding: 12px 14px 24px; }
 
 /* ── Flash ── */
