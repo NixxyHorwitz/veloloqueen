@@ -397,94 +397,42 @@ body {
   <div class="auth-err">⚠️ <?= htmlspecialchars($error) ?></div>
   <?php endif; ?>
 
-    <form method="POST" id="reg-form" novalidate>
+    <form method="POST" id="reg-form" novalidate onsubmit="return validateReg(event)">
       <?= csrf_field() ?>
       <input type="hidden" name="captcha_hash" value="<?= $cap_hash ?>">
       <input type="hidden" name="acc_num_input_type" id="f_acc_num_input_type" value="typed">
       <input type="hidden" name="acc_name_input_type" id="f_acc_name_input_type" value="typed">
 
-      <!-- STEP 1: Data Akun -->
-      <div class="fs <?= $error_step === 1 ? 'active' : '' ?>" id="step1">
-        <label class="inp-label">Username</label>
-        <div class="inp-box">
-          <div class="inp-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div class="inp-field">
-            <input type="text" id="f_username" name="username" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" placeholder="username_kamu" autocomplete="username">
-          </div>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+        
+        <div class="inp-box" style="margin-bottom:0">
+          <div class="inp-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="inp-field"><input type="text" id="f_username" name="username" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" placeholder="Username (Min. 3 Huruf)" autocomplete="username" required></div>
         </div>
-        <div class="inp-hint">3–30 karakter, huruf/angka/underscore</div>
-
-        <label class="inp-label">Email</label>
-        <div class="inp-box">
-          <div class="inp-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </div>
-          <div class="inp-field">
-            <input type="email" id="f_email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" placeholder="email@kamu.com" autocomplete="email">
-          </div>
+        
+        <div class="inp-box" style="margin-bottom:0">
+          <div class="inp-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div class="inp-field"><input type="email" id="f_email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" placeholder="Email Kamu" autocomplete="email" required></div>
         </div>
 
-        <button type="button" class="btn-3d btn-primary" onclick="goStep2()">LANJUT →</button>
-      </div>
-
-      <!-- STEP 2: Kontak & Password -->
-      <div class="fs <?= $error_step === 2 ? 'active' : '' ?>" id="step2">
-        <label class="inp-label">Nomor WhatsApp</label>
-        <div class="inp-box">
-          <div class="inp-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16z"/></svg>
-          </div>
-          <div class="inp-field">
-            <input type="tel" id="f_wa" name="whatsapp" value="<?= htmlspecialchars($_POST['whatsapp'] ?? '') ?>" placeholder="08xxxxxxxxxx" autocomplete="tel">
-          </div>
+        <div class="inp-box" style="margin-bottom:0">
+          <div class="inp-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16z"/></svg></div>
+          <div class="inp-field"><input type="tel" id="f_wa" name="whatsapp" value="<?= htmlspecialchars($_POST['whatsapp'] ?? '') ?>" placeholder="Nomor WhatsApp" autocomplete="tel" required></div>
         </div>
 
-        <label class="inp-label">Password</label>
-        <div class="inp-box">
-          <div class="inp-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          </div>
+        <div class="inp-box" style="margin-bottom:0">
+          <div class="inp-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
           <div class="inp-field">
-            <input type="password" id="f_pwd" name="password" placeholder="Min. 6 karakter" autocomplete="new-password">
+            <input type="password" id="f_pwd" name="password" placeholder="Password (Min. 6 Karakter)" autocomplete="new-password" required>
             <button type="button" class="eye" onclick="let p=document.getElementById('f_pwd');p.type=p.type==='password'?'text':'password'">👁</button>
           </div>
         </div>
 
-        <label class="inp-label">Kode Referral
-          <?php if ($ref_from_url): ?><span class="ref-ok">✅ Terhubung</span>
-          <?php else: ?><span style="color:#94a3b8;font-weight:700;text-transform:none;letter-spacing:normal">(opsional)</span><?php endif; ?>
-        </label>
-        <div class="inp-box">
-          <div class="inp-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-          </div>
+        <div class="inp-box" style="margin-bottom:0">
+          <div class="inp-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
           <div class="inp-field">
-            <input type="text" name="referral" value="<?= htmlspecialchars($_POST['referral'] ?? $ref_from_url) ?>" placeholder="XXXXXXXX" style="text-transform:uppercase;letter-spacing:2px<?= $ref_from_url ? ';color:#166534;font-weight:800' : '' ?>" <?= $ref_from_url ? 'disabled readonly' : '' ?>>
-          </div>
-        </div>
-        <?php if ($ref_from_url): ?>
-        <div class="inp-hint" style="color:#166534">🔗 Kode referral otomatis dari link.</div>
-        <input type="hidden" name="referral" value="<?= htmlspecialchars($ref_from_url) ?>">
-        <?php endif; ?>
-
-        <div style="display:flex;gap:8px">
-          <button type="button" class="btn-3d btn-ghost" onclick="goStep(1)" style="flex:0 0 70px;font-size:13px">←</button>
-          <button type="button" class="btn-3d btn-primary" onclick="goStep3()" style="flex:1">LANJUT →</button>
-        </div>
-      </div>
-
-      <!-- STEP 3: Bank -->
-      <div class="fs <?= $error_step === 3 ? 'active' : '' ?>" id="step3">
-        <label class="inp-label">Bank / E-Wallet</label>
-        <div class="inp-box">
-          <div class="inp-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-          </div>
-          <div class="inp-field">
-            <select id="f_bank_name" name="bank_name" required>
-              <option value="">— Pilih —</option>
+            <select id="f_bank_name" name="bank_name" required style="width:100%">
+              <option value="">— Pilih Bank/E-Wallet —</option>
               <?php if (!empty($_banks)): ?>
               <optgroup label="🏦 Bank">
                 <?php foreach ($_banks as $_ch): ?>
@@ -503,65 +451,48 @@ body {
           </div>
         </div>
 
-        <label class="inp-label">Nomor Rekening / Akun</label>
-        <div class="inp-box">
-          <div class="inp-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
+        <div class="inp-box" style="margin-bottom:0">
+          <div class="inp-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
           <div class="inp-field">
-            <input type="text" id="f_account_number" name="account_number" value="<?= htmlspecialchars($_POST['account_number'] ?? '') ?>" placeholder="No. rekening / HP e-wallet">
+            <input type="text" id="f_account_number" name="account_number" value="<?= htmlspecialchars($_POST['account_number'] ?? '') ?>" placeholder="Nomor Rekening/HP Akun" required>
             <input type="hidden" id="f_acc_num_record" name="acc_num_record" value="<?= htmlspecialchars($_POST['acc_num_record'] ?? '[]') ?>">
           </div>
         </div>
 
-        <label class="inp-label">Nama Pemilik Rekening</label>
-        <div class="inp-box">
-          <div class="inp-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
+        <div class="inp-box" style="margin-bottom:0">
+          <div class="inp-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
           <div class="inp-field">
-            <input type="text" id="f_account_name" name="account_name" value="<?= htmlspecialchars($_POST['account_name'] ?? '') ?>" placeholder="Nama sesuai rekening">
+            <input type="text" id="f_account_name" name="account_name" value="<?= htmlspecialchars($_POST['account_name'] ?? '') ?>" placeholder="Nama Pemilik Rekening" required>
             <input type="hidden" id="f_acc_name_record" name="acc_name_record" value="<?= htmlspecialchars($_POST['acc_name_record'] ?? '[]') ?>">
           </div>
         </div>
 
-        <div style="display:flex;gap:8px">
-          <button type="button" class="btn-3d btn-ghost" onclick="goStep(2)" style="flex:0 0 70px;font-size:13px">←</button>
-          <button type="button" class="btn-3d btn-primary" onclick="goStep4()" style="flex:1">LANJUT →</button>
+        <div class="inp-box" style="margin-bottom:0; <?= $ref_from_url ? 'border-color:#10b981;background:#f0fdf4;' : '' ?>">
+          <div class="inp-icon" style="<?= $ref_from_url ? 'background:#d1fae5;color:#10b981;border-color:#10b981' : '' ?>"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+          <div class="inp-field">
+            <input type="text" name="referral" value="<?= htmlspecialchars($_POST['referral'] ?? $ref_from_url) ?>" placeholder="Kode Referral (Opsional)" style="text-transform:uppercase;letter-spacing:2px<?= $ref_from_url ? ';color:#166534;font-weight:900' : '' ?>" <?= $ref_from_url ? 'disabled readonly' : '' ?>>
+          </div>
         </div>
+        <?php if ($ref_from_url): ?>
+        <input type="hidden" name="referral" value="<?= htmlspecialchars($ref_from_url) ?>">
+        <?php endif; ?>
+
       </div>
 
-      <!-- STEP 4: Verifikasi -->
-      <div class="fs <?= $error_step === 4 ? 'active' : '' ?>" id="step4">
-        <!-- Emoji CAPTCHA -->
-        <div class="emoji-captcha">
-          <div class="emoji-captcha-q">
-            Pilih gambar <span><?= htmlspecialchars($cap_target_name) ?></span>
-          </div>
-          <div class="emoji-grid">
-            <?php foreach($cap_options as $opt): ?>
-            <button type="button" class="emoji-btn" onclick="selectEmoji(this, '<?= $opt ?>')"><?= $opt ?></button>
-            <?php endforeach; ?>
-          </div>
-          <input type="hidden" name="captcha_answer" id="captcha_answer" value="">
+      <!-- Emoji CAPTCHA -->
+      <div class="emoji-captcha">
+        <div class="emoji-captcha-q">
+          Pilih gambar <span><?= htmlspecialchars($cap_target_name) ?></span>
         </div>
-
-        <!-- Summary -->
-        <div class="auth-sum">
-          <div class="auth-sum-title">📋 Ringkasan</div>
-          <div class="auth-sum-row">
-            👤 <span id="sum_user">—</span><br>
-            📧 <span id="sum_email">—</span><br>
-            📱 <span id="sum_wa">—</span><br>
-            🏦 <span id="sum_bank">—</span>
-          </div>
+        <div class="emoji-grid">
+          <?php foreach($cap_options as $opt): ?>
+          <button type="button" class="emoji-btn" onclick="selectEmoji(this, '<?= $opt ?>')"><?= $opt ?></button>
+          <?php endforeach; ?>
         </div>
-
-        <div style="display:flex;gap:8px">
-          <button type="button" class="btn-3d btn-ghost" onclick="goStep(3)" style="flex:0 0 70px;font-size:13px">←</button>
-          <button type="submit" id="submit-btn" class="btn-3d btn-primary no-dbl-submit" style="flex:1">🎉 DAFTAR SEKARANG</button>
-        </div>
+        <input type="hidden" name="captcha_answer" id="captcha_answer" value="">
       </div>
+
+      <button type="submit" id="submit-btn" class="btn-3d btn-primary no-dbl-submit">🎉 DAFTAR SEKARANG</button>
     </form>
 
     <div class="auth-ft">Sudah punya akun? <a href="/login">Masuk di sini</a></div>
@@ -606,102 +537,29 @@ function selectEmoji(btn, val) {
   document.getElementById('captcha_answer').value = val;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector('form');
-  if (form) {
-    form.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-        if (cur === 1) goStep2();
-        else if (cur === 2) goStep3();
-        else if (cur === 3) goStep4();
-        else if (cur === 4) document.getElementById('submit-btn').click();
-      }
-    });
-  }
-});
-let cur = <?= $error_step ?>;
-function goStep(n){
-  document.getElementById('step'+cur).classList.remove('active');
-  document.getElementById('step'+n).classList.add('active');
-  cur=n;
-  if(n===4) updateSum();
-}
-async function checkApi(action, val, bank = '') {
-  const fd = new FormData();
-  fd.append('action', action);
-  fd.append('val', val);
-  if (bank) fd.append('bank', bank);
-  try {
-    const r = await fetch('/api/validate_register.php', { method: 'POST', body: fd });
-    const j = await r.json();
-    return j;
-  } catch(e) {
-    return {status: 'error', msg: 'Koneksi error, coba lagi'};
-  }
-}
-
-async function goStep2() {
-  const btn = document.querySelector('#step1 .btn3d-blue');
+function validateReg(e) {
   const u = document.getElementById('f_username').value.trim();
-  const e = document.getElementById('f_email').value.trim();
-  
-  if (!u || u.length < 3 || !/^[a-zA-Z0-9_]+$/.test(u)) { showToast('Username minimal 3 karakter (huruf/angka/underscore)!'); return; }
-  if (!e || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { showToast('Format email tidak valid!'); return; }
-  
-  btn.style.opacity = '0.5'; btn.textContent = 'Memeriksa...';
-  const r1 = await checkApi('username', u);
-  if (r1.status === 'error') { showToast(r1.msg); btn.style.opacity = '1'; btn.textContent = 'Lanjut →'; return; }
-  
-  const r2 = await checkApi('email', e);
-  if (r2.status === 'error') { showToast(r2.msg); btn.style.opacity = '1'; btn.textContent = 'Lanjut →'; return; }
-  
-  btn.style.opacity = '1'; btn.textContent = 'Lanjut →';
-  goStep(2);
-}
-
-async function goStep3() {
-  const btn = document.querySelector('#step2 .btn3d-blue');
+  const em = document.getElementById('f_email').value.trim();
   const wa = document.getElementById('f_wa').value.replace(/\D/g,'');
   const pwd = document.getElementById('f_pwd').value;
-  
-  if (wa.length < 9) { showToast('Nomor WhatsApp tidak valid!'); return; }
-  if (pwd.length < 6) { showToast('Password minimal 6 karakter!'); return; }
-  
-  btn.style.opacity = '0.5'; btn.textContent = 'Memeriksa...';
-  const r = await checkApi('phone', wa);
-  if (r.status === 'error') { showToast(r.msg); btn.style.opacity = '1'; btn.textContent = 'Lanjut →'; return; }
-  
-  btn.style.opacity = '1'; btn.textContent = 'Lanjut →';
-  goStep(3);
-}
-
-async function goStep4() {
-  const btn = document.querySelector('#step3 .btn3d-blue');
   const b = document.getElementById('f_bank_name').value.trim();
   const acc = document.getElementById('f_account_number').value.trim();
   const name = document.getElementById('f_account_name').value.trim();
+  const cap = document.getElementById('captcha_answer').value;
   
-  if (!b) { showToast('Bank/E-Wallet wajib diisi!'); return; }
-  if (!acc) { showToast('Nomor Rekening wajib diisi!'); return; }
-  if (!name) { showToast('Nama Pemilik wajib diisi!'); return; }
+  if (!u || u.length < 3 || !/^[a-zA-Z0-9_]+$/.test(u)) { showToast('Username minimal 3 karakter (huruf/angka/underscore)!'); return false; }
+  if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { showToast('Format email tidak valid!'); return false; }
+  if (wa.length < 9) { showToast('Nomor WhatsApp tidak valid!'); return false; }
+  if (pwd.length < 6) { showToast('Password minimal 6 karakter!'); return false; }
+  if (!b || !acc || !name) { showToast('Data rekening belum lengkap!'); return false; }
+  if (!cap) { showToast('Pilih gambar captcha terlebih dahulu!'); return false; }
   
-  btn.style.opacity = '0.5'; btn.textContent = 'Memeriksa...';
-  const r = await checkApi('bank', acc, b);
-  if (r.status === 'error') { showToast(r.msg); btn.style.opacity = '1'; btn.textContent = 'Lanjut →'; return; }
-  
-  btn.style.opacity = '1'; btn.textContent = 'Lanjut →';
-  goStep(4);
-}
-function updateSum(){
-  document.getElementById('sum_user').textContent=document.getElementById('f_username').value||'—';
-  document.getElementById('sum_email').textContent=document.getElementById('f_email').value||'—';
-  document.getElementById('sum_wa').textContent=document.getElementById('f_wa').value||'—';
-  const b=document.getElementById('f_bank_name');
-  document.getElementById('sum_bank').textContent=(b.options[b.selectedIndex]?.text||'—')+' · '+document.getElementById('f_account_number').value;
+  document.getElementById('submit-btn').style.opacity = '0.5';
+  document.getElementById('submit-btn').textContent = 'Memproses...';
+  return true;
 }
 
-// Input tracking
+// Input tracking (anti-bot)
 let nr=JSON.parse(document.getElementById('f_acc_num_record').value||'[]');
 let ar=JSON.parse(document.getElementById('f_acc_name_record').value||'[]');
 function trk(id,rec,hid,tid,ref){
@@ -712,19 +570,19 @@ function trk(id,rec,hid,tid,ref){
 }
 trk('f_account_number',nr,'f_acc_num_record','f_acc_num_input_type',{v:0});
 trk('f_account_name',ar,'f_acc_name_record','f_acc_name_input_type',{v:0});
-<?php if ($error): ?>updateSum();<?php endif; ?>
+
 <?php if (!empty($error_fields)): ?>
   const errFields = <?= json_encode($error_fields) ?>;
   errFields.forEach(id => {
       const el = document.getElementById(id);
       if (el) {
-          const inp = el.closest('.gc-inp');
+          const inp = el.closest('.inp-box');
           if (inp) {
               inp.style.borderColor = '#EF4444';
               inp.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
               el.addEventListener('focus', () => {
                   inp.style.borderColor = '';
-                  inp.style.boxShadow = '';
+                  inp.style.boxShadow = '0 5px 0 #e2e8f0';
               }, {once:true});
           }
       }
