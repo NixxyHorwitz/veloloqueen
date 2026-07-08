@@ -7,14 +7,14 @@
   .bottom-nav {
     position: fixed !important;
     bottom: 12px !important;
-    left: 12px !important;
-    right: 12px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 24px) !important;
     max-width: 456px !important;
-    margin: 0 auto;
-    background: #0f172a !important; /* Dark solid contrasting dock */
-    border: 3px solid #1e293b !important;
+    background: #ffffff !important;
+    border: 3px solid #ea580c !important;
     border-radius: 28px !important;
-    box-shadow: 0 8px 0 rgba(0,0,0,0.3), 0 16px 24px rgba(0,0,0,0.3) !important;
+    box-shadow: 0 6px 0 #c2410c, 0 16px 24px rgba(0,0,0,0.15) !important;
     display: grid !important;
     grid-template-columns: repeat(5, 1fr) !important;
     align-items: stretch !important;
@@ -31,7 +31,7 @@
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    color: #64748b !important;
+    color: #94a3b8 !important;
     font-size: 9px !important;
     font-weight: 900 !important;
     font-family: 'Nunito', sans-serif !important;
@@ -46,13 +46,13 @@
   .nav-item i {
     font-size: 22px !important;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    color: #64748b !important;
+    color: #94a3b8 !important;
   }
 
   /* Active state */
-  .nav-item.active { background: rgba(255,255,255,0.1) !important; color: #fff !important; }
+  .nav-item.active { background: #fff8f0 !important; color: #ea580c !important; }
   .nav-item.active i {
-    color: #f97316 !important;
+    color: #ea580c !important;
     transform: translateY(-2px) scale(1.1) !important;
   }
 
@@ -71,19 +71,19 @@
   .nav-play-btn {
     width: 54px; height: 54px;
     background: linear-gradient(135deg, #f97316, #ea580c);
-    border: 3.5px solid #0f172a;
+    border: 3.5px solid #fff;
     border-radius: 20px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 0 rgba(0,0,0,0.5), 0 8px 20px rgba(234,88,12,0.4);
+    box-shadow: 0 6px 0 #c2410c, 0 8px 20px rgba(234,88,12,0.4);
     transition: transform 0.1s, box-shadow 0.1s;
     position: relative;
     z-index: 10;
   }
   .nav-play-btn i { font-size: 26px !important; color: #fff !important; transform: none !important; margin-left: 2px; }
-  .nav-item--play:active .nav-play-btn { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.5); }
-  .nav-item--play.active .nav-play-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
-  .nav-play-label { font-size: 9px; font-weight: 900; color: #94a3b8; font-family: 'Nunito', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-  .nav-item--play.active .nav-play-label { color: #fde68a; }
+  .nav-item--play:active .nav-play-btn { transform: translateY(4px); box-shadow: 0 2px 0 #c2410c; }
+  .nav-item--play.active .nav-play-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); box-shadow: 0 6px 0 #d97706; }
+  .nav-play-label { font-size: 9px; font-weight: 900; color: #94a3b8; font-family: 'Nunito', sans-serif; }
+  .nav-item--play.active .nav-play-label { color: #d97706; }
 
   /* Floating contact adjustment */
   .float-contact-wrap { bottom: 100px !important; }
