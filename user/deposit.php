@@ -228,7 +228,7 @@ body {
 }
 
 /* ── SALDO ROW / CURRENT BANK ROW ── */
-.wd-bank-card { background: rgba(0, 0, 0, 0.15); border: 2px dashed rgba(255, 255, 255, 0.3); border-radius: 16px; padding: 16px; margin-bottom: 20px; position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
+.wd-bank-card { background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 16px; padding: 16px; margin-bottom: 20px; position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
 .wd-saldo-icon { width: 50px; height: 50px; background: #fffbeb; border: 3px solid #fde047; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 0 #ca8a04; flex-shrink: 0; }
 .wd-saldo-lbl { font-size: 11px; font-weight: 900; color: rgba(255,255,255,0.7); margin-bottom: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
 .wd-saldo-val { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 2px 0 #9a3412, 0 4px 6px rgba(0,0,0,0.3); font-style: italic; letter-spacing: -0.5px; display:flex; align-items:center; gap:8px;}
@@ -238,14 +238,14 @@ body {
 .wd-alert--err { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
 .wd-alert--warn { background: #fffbeb; color: #b45309; border-color: #fcd34d; }
 .wd-alert--succ { background: #f0fdf4; color: #166534; border-color: #86efac; }
-.wd-alert--info { background: #eff6ff; color: #1e40af; border-color: #93c5fd; }
+.wd-alert--info { background: rgba(255,255,255,0.2); color: #fff; border: 2px solid rgba(255,255,255,0.4); }
 .wd-alert-icon { font-size: 18px; flex-shrink: 0; }
 
 /* ── Segmented Tabs ── */
-.dep-tabs { display: flex; background: #ea580c; border-radius: 16px; padding: 4px; margin-bottom: 16px; border: 3px solid #c2410c; position: relative; z-index: 2;}
+.dep-tabs { display: flex; background: rgba(0,0,0,0.1); border-radius: 16px; padding: 4px; margin-bottom: 16px; border: 2px solid rgba(0,0,0,0.05); position: relative; z-index: 2;}
 .dep-tab { flex: 1; text-align: center; padding: 10px; font-size: 12px; font-weight: 900; color: #ffedd5; cursor: pointer; border-radius: 10px; transition: all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px; }
-.dep-tab.active { background: #fffbeb; color: #9a3412; box-shadow: 0 3px 0 #ca8a04; border: 2px solid #fde047; }
-.dep-tab.active i { color: #f59e0b; }
+.dep-tab.active { background: #fff; color: #ea580c; box-shadow: 0 3px 0 rgba(0,0,0,0.1); border: 2px solid transparent; }
+.dep-tab.active i { color: #ea580c; }
 
 /* ── Form Card ── */
 .dep-form-card { display: none; position: relative; z-index: 2;}
@@ -270,7 +270,7 @@ body {
 /* ── Amount Input (Chunky) ── */
 .wd-input-grp { margin-bottom: 14px; position: relative; z-index: 2; }
 .wd-input-grp label { display: block; font-size: 11px; font-weight: 900; color: #fff; text-shadow: 0 1px 0 #c2410c; margin-bottom: 6px; padding-left: 4px; }
-.dep-amount-inner { display: flex; align-items: center; justify-content: flex-start; gap: 8px; background: #fffbeb; border: 3px solid #ea580c; border-radius: 14px; padding: 12px 16px; box-shadow: 0 4px 0 #ca8a04; }
+.dep-amount-inner { display: flex; align-items: center; justify-content: flex-start; gap: 8px; background: #fff; border: 3px solid #ffedd5; border-radius: 14px; padding: 12px 16px; box-shadow: 0 4px 0 rgba(0,0,0,0.05); }
 .dep-amount-prefix { font-size: 16px; font-weight: 900; color: #ea580c; }
 .dep-amount-input {
   width: 100%; background: transparent; border: none;
@@ -283,11 +283,11 @@ body {
 /* ── Amount Grid (Pills) ── */
 .dep-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
 .dep-amt-btn {
-  background: #fffbeb; border: 3px solid #fde047; border-radius: 12px;
+  background: #fff; border: 3px solid #ffedd5; border-radius: 12px;
   padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.1s; 
-  box-shadow: 0 4px 0 #ca8a04; outline: none;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.05); outline: none;
 }
-.dep-amt-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #ca8a04; }
+.dep-amt-btn:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.05); }
 .dep-amt-btn.active { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-color: #60a5fa; box-shadow: 0 4px 0 #1e3a8a; }
 .dep-amt-btn.active:active { transform: translateY(4px); box-shadow: 0 0 0 #1e3a8a; }
 .dep-amt-val { font-size: 13px; font-weight: 900; color: #9a3412; letter-spacing: -0.5px; }
@@ -297,9 +297,9 @@ body {
 .dep-file-wrap { margin-bottom: 16px; }
 .dep-file-lbl { font-size: 11px; font-weight: 900; color: #fff; text-shadow: 0 1px 0 #c2410c; margin-bottom: 6px; padding-left: 4px; display: block; text-align: left; }
 .dep-file {
-  width: 100%; background: #fffbeb;
-  border: 3px dashed #ea580c; border-radius: 14px;
-  padding: 12px; font-size: 11px; font-weight: 800; color: #9a3412;
+  width: 100%; background: #fff;
+  border: 3px dashed #ffedd5; border-radius: 14px;
+  padding: 12px; font-size: 11px; font-weight: 800; color: #ea580c;
   cursor: pointer; box-sizing: border-box; text-align: center;
 }
 .dep-file::file-selector-button { background: #fde047; border: 2px solid #ca8a04; border-radius: 8px; padding: 6px 10px; margin-right: 10px; font-weight: 900; color: #9a3412; cursor: pointer; transition: background 0.2s; box-shadow: 0 2px 0 #ca8a04; }
@@ -436,7 +436,7 @@ body {
         <?php endif; ?>
 
         <div class="wd-alert wd-alert--info" style="margin-bottom:16px;">
-          <div class="wd-alert-icon">⚡</div>
+          <div class="wd-alert-icon"><i class="ph-fill ph-lightning" style="color:#fff"></i></div>
           <div style="flex:1;">Klik Lanjut untuk bayar instan pakai QRIS.</div>
         </div>
         <button type="submit" class="wd-submit-btn blue-btn no-dbl-submit">
