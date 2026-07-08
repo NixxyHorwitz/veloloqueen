@@ -475,79 +475,107 @@ body { background: #fff8f0 !important; }
     <input type="hidden" name="membership_id" id="chosen-id" value="">
     <input type="hidden" name="voucher_code" id="applied-voucher-code" value="">
     
-    <div style="display:flex;flex-direction:column;">
-      <?php 
-      foreach ($memberships as $i => $m):
-        if ((float)$m['price'] == 0) continue;
-        $can_afford = (float)$user['balance_dep'] >= (float)$m['price'];
-        
-        $m_class = "m-card--" . ($i % 5);
-        $bg_color = ['#f8fafc','#f0f9ff','#fefce8','#faf5ff','#fef2f2'][$i % 5];
-        $txt_color = ['#0f172a','#0369a1','#b45309','#6b21a8','#b91c1c'][$i % 5];
-        
-        $is_gold = ($i === 2);
-        $is_mythic = ($i === 3);
-      ?>
-      <div class="m-card <?= $m_class ?>" <?= $is_mythic ? 'style="border-color:#ca8a04; box-shadow:0 8px 0 #a16207; transform:scale(1.02); margin-top:16px; margin-bottom:20px; background:#fefce8; z-index:10;"' : '' ?>>
-        
-        <?php if ($is_gold): ?>
-        <div class="m-badge-pop">🔥 TERPOPULER</div>
-        <?php endif; ?>
+    <div class="sh" style="margin-bottom:10px; margin-top:8px;">
+      <div class="sh__title">🔥 Pilih Rank Kamu</div>
+    </div>
 
-        <?php if ($is_mythic): ?>
-        <div class="m-badge-pop" style="background:linear-gradient(135deg, #eab308, #ca8a04); border-color:#fff; box-shadow:0 3px 0 #854d0e; font-size:12px; padding:6px 14px; top:-16px; right:-12px; transform:rotate(6deg);">👑 BEST DEAL!</div>
-        <?php endif; ?>
+    <div class="bento-grid" style="margin-bottom:24px;">
+      <?php 
+      // Ambil paket berbayar
+      $paid = array_filter($memberships, function($m) { return (float)$m['price'] > 0; });
+      // Reset keys agar 0, 1, 2 = Juragan, Sultan, Konglomerat
+      $paid = array_values($paid);
+      
+      $mythic = $paid[2] ?? null; // Konglomerat (Highest)
+      $gold   = $paid[1] ?? null; // Sultan (Mid)
+      $silver = $paid[0] ?? null; // Juragan (Entry)
+      
+      // Render Mythic (Konglomerat) as bento-big
+      if ($mythic):
+        $m = $mythic;
+        $can_afford = (float)$user['balance_dep'] >= (float)$m['price'];
+      ?>
+      <div class="bento-big" style="background:linear-gradient(135deg, #fef08a, #fde047); border:3px solid #0f172a; box-shadow:0 8px 0 #0f172a; position:relative; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; padding:16px; text-align:left; transition:transform 0.1s;" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)" onactive="this.style.transform='translateY(4px)'; this.style.boxShadow='0 4px 0 #0f172a'">
+        <div style="position:absolute; top:-12px; right:-12px; background:linear-gradient(135deg, #ef4444, #b91c1c); color:#fff; font-size:10px; font-weight:900; padding:6px 12px; border-radius:12px; border:2.5px solid #fff; box-shadow:0 4px 0 #7f1d1d; transform:rotate(8deg); z-index:5;">👑 BEST DEAL!</div>
         
-        <?php if ((float)$m['original_price'] > 0 && !$is_mythic): ?>
-        <div class="m-badge-pro">🎉 PROMO DISKON!</div>
-        <?php endif; ?>
-        
-        <div class="m-hdr">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="m-ico-box" style="background:<?= $bg_color ?>;color:<?= $txt_color ?>;border-color:<?= $txt_color ?>">
-              <?= htmlspecialchars($m['icon'] ?: '⭐') ?>
-            </div>
+        <div style="margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <div style="width:38px; height:38px; background:#fff; border-radius:10px; border:2.5px solid #0f172a; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 3px 0 #0f172a; flex-shrink:0;"><?= htmlspecialchars($m['icon'] ?: '💎') ?></div>
             <div>
-              <div class="m-name" style="color:<?= $txt_color ?>; <?= $is_mythic ? 'font-size:18px; color:#b45309;' : '' ?>"><?= htmlspecialchars($m['name']) ?></div>
-              <div class="m-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
+              <div style="font-size:16px; font-weight:900; color:#0f172a; line-height:1.1;"><?= htmlspecialchars($m['name']) ?></div>
+              <div style="font-size:11px; font-weight:800; color:#b45309;"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
             </div>
           </div>
-          <div class="m-price-box">
-            <?php if ((float)$m['original_price'] > 0): ?>
-            <div class="m-price-old"><?= format_rp((float)$m['original_price']) ?></div>
-            <?php endif; ?>
-            <div class="m-price" style="color:<?= $txt_color ?>; <?= $is_mythic ? 'font-size:22px; color:#b45309;' : '' ?>"><?= format_rp((float)$m['price']) ?></div>
-          </div>
-        </div>
-        
-        <div class="m-specs" <?= $is_mythic ? 'style="background:#fef9c3; border-color:#fde047;"' : '' ?>>
-          <div><i class="ph-bold ph-video-camera" style="color:#0ea5e9"></i> <?= $m['watch_limit'] ?>× Tonton/hari</div>
-          <div><i class="ph-bold ph-trend-up" style="color:#10b981"></i> Maks WD <?= (float)$m['max_wd'] > 0 ? format_rp((float)$m['max_wd']) : '<span style="color:#10b981;">Bebas</span>' ?></div>
           
-          <?php if ($m['description']): ?>
-            <div class="m-desc" <?= $is_mythic ? 'style="border-top-color:#fde047;"' : '' ?>>
-              <?php 
-              $lines = explode("\n", $m['description']);
-              foreach ($lines as $line) {
-                  $line = trim($line);
-                  if (empty($line)) continue;
-                  $line = ltrim($line, '- ');
-                  echo '<div style="display:flex; gap:6px; margin-bottom:4px; align-items:flex-start;"><i class="ph-bold ph-check" style="color:#10b981; margin-top:2px;"></i><span>' . htmlspecialchars($line) . '</span></div>';
-              }
-              ?>
-            </div>
-          <?php endif; ?>
+          <div style="font-size:10px; font-weight:800; color:#78350f; background:rgba(255,255,255,0.4); border-radius:10px; padding:6px 8px; border: 2px dashed #ca8a04;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;"><i class="ph-bold ph-video-camera" style="color:#0ea5e9; font-size:14px;"></i> <?= $m['watch_limit'] ?> Video/hari</div>
+            <div style="display:flex; align-items:center; gap:6px;"><i class="ph-bold ph-trend-up" style="color:#10b981; font-size:14px;"></i> Maks WD Bebas</div>
+          </div>
         </div>
         
-        <div class="m-actions">
-          <button type="button" class="m-btn <?= $can_afford ? 'm-btn--buy' : 'm-btn--disabled' ?>"
-            <?= $is_mythic && $can_afford ? 'style="background:linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 0 #b45309; text-shadow:0 1px 2px rgba(0,0,0,0.3); font-size:14px; padding:14px;"' : '' ?>
-            onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
-            <i class="ph-bold ph-rocket-launch" style="font-size:16px"></i> <?= $can_afford ? 'Upgrade Sekarang' : 'Saldo Kurang' ?>
-          </button>
+        <div>
+          <div style="text-decoration:line-through; font-size:11px; color:#b45309; font-weight:800; text-align:right; margin-bottom:-4px;"><?= format_rp((float)$m['original_price']) ?></div>
+          <div style="font-size:22px; font-weight:900; color:#0f172a; text-align:right; margin-bottom:10px; letter-spacing:-1px;"><?= format_rp((float)$m['price']) ?></div>
+          <div style="background:#0f172a; color:#fff; text-align:center; padding:10px; border-radius:12px; font-weight:900; font-size:12px; box-shadow:0 4px 0 rgba(0,0,0,0.3);"><?= $can_afford ? 'Gas Upgrade!' : 'Saldo Kurang' ?></div>
         </div>
       </div>
-      <?php endforeach; ?>
+      <?php endif; ?>
+      
+      <!-- GOLD (SULTAN) as WIDE -->
+      <?php 
+      if ($gold):
+        $m = $gold; 
+        $can_afford = (float)$user['balance_dep'] >= (float)$m['price'];
+      ?>
+      <div class="bento-wide" style="background:#fff; border:3px solid #0f172a; box-shadow:0 6px 0 #0f172a; position:relative; cursor:pointer; align-items:center;" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
+        <div style="position:absolute; top:-8px; left:-8px; background:#f97316; color:#fff; font-size:8px; font-weight:900; padding:4px 8px; border-radius:8px; border:2px solid #0f172a; box-shadow:0 3px 0 #0f172a; transform:rotate(-5deg); z-index:5;">🔥 POPULER</div>
+        
+        <div style="width:34px; height:34px; background:#f0f9ff; border-radius:10px; border:2px solid #0f172a; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; box-shadow:0 2px 0 #0f172a; margin-right:4px;">
+            <?= htmlspecialchars($m['icon'] ?: '⭐') ?>
+        </div>
+        
+        <div class="bento-wide__txt" style="flex:1;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div class="bento-wide__label" style="font-size:13px; color:#0f172a; line-height:1.2;"><?= htmlspecialchars($m['name']) ?></div>
+              <div class="bento-wide__sub" style="font-size:10px; color:#64748b; margin-top:2px;"><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>x • <?= $m['duration_days'] ?> Hr</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="text-decoration:line-through; font-size:10px; color:#94a3b8; font-weight:800; margin-bottom:-2px;"><?= format_rp((float)$m['original_price']) ?></div>
+              <div style="font-size:13px; font-weight:900; color:#0f172a;"><?= format_rp((float)$m['price']) ?></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <?php endif; ?>
+      
+      <!-- SILVER (JURAGAN) as WIDE -->
+      <?php 
+      if ($silver):
+        $m = $silver; 
+        $can_afford = (float)$user['balance_dep'] >= (float)$m['price'];
+      ?>
+      <div class="bento-wide" style="background:#f8fafc; border:3px solid #0f172a; box-shadow:0 6px 0 #0f172a; position:relative; cursor:pointer; align-items:center;" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
+        
+        <div style="width:34px; height:34px; background:#e2e8f0; border-radius:10px; border:2px solid #0f172a; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; box-shadow:0 2px 0 #0f172a; margin-right:4px;">
+            <?= htmlspecialchars($m['icon'] ?: '🏅') ?>
+        </div>
+        
+        <div class="bento-wide__txt" style="flex:1;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div class="bento-wide__label" style="font-size:13px; color:#0f172a; line-height:1.2;"><?= htmlspecialchars($m['name']) ?></div>
+              <div class="bento-wide__sub" style="font-size:10px; color:#64748b; margin-top:2px;"><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>x • <?= $m['duration_days'] ?> Hr</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="text-decoration:line-through; font-size:10px; color:#94a3b8; font-weight:800; margin-bottom:-2px;"><?= format_rp((float)$m['original_price']) ?></div>
+              <div style="font-size:13px; font-weight:900; color:#0f172a;"><?= format_rp((float)$m['price']) ?></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <?php endif; ?>
+      
     </div>
   </form>
 
