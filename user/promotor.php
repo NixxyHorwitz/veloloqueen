@@ -296,12 +296,15 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
 
   <!-- TAB 1: RIWAYAT TARGET -->
   <div id="tab-stats" class="p-content active">
-          <div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:12px; border:2.5px dashed rgba(255,255,255,0.4);">
+    <?php if (empty($history_logs)): ?>
+      <div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:12px; border:2.5px dashed rgba(255,255,255,0.4);">
         <i class="ph-bold ph-calendar-blank" style="font-size:32px; color:#fff; opacity:0.8;"></i>
         <div style="font-size:11px; font-weight:800; color:#fff; margin-top:8px;">Belum ada riwayat harian.</div>
       </div>
-          <div class="c-list">
-                <div class="c-item">
+    <?php else: ?>
+      <div class="c-list">
+        <?php foreach ($history_logs as $log): ?>
+        <div class="c-item">
           <div class="c-ico blue"><i class="ph-bold ph-calendar-check"></i></div>
           <div class="c-body">
             <div class="c-title"><?= date('d M Y', strtotime($log['date'])) ?></div>
@@ -314,15 +317,19 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
             <div class="c-badge <?= $log['is_paid'] ? 'success' : 'warn' ?>"><?= $log['is_paid'] ? 'DIBAYAR' : 'PROSES' ?></div>
           </div>
         </div>
-              </div>
+        <?php endforeach; ?>
+      </div>
       
       <!-- Pagination -->
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <?php if ($total_pages > 1): ?>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <a href="?page=<?= max(1, $page-1) ?>" style="padding:6px 12px; background:#fff; border:2px solid #1e3a8a; border-radius:8px; font-size:10px; font-weight:900; color:#1e3a8a; text-decoration:none; <?= $page<=1 ? 'opacity:0.5;pointer-events:none;' : '' ?>">← Prev</a>
         <span style="font-size:11px; font-weight:900; color:#fff;">Hal <?= $page ?>/<?= $total_pages ?></span>
         <a href="?page=<?= min($total_pages, $page+1) ?>" style="padding:6px 12px; background:#fff; border:2px solid #1e3a8a; border-radius:8px; font-size:10px; font-weight:900; color:#1e3a8a; text-decoration:none; <?= $page>=$total_pages ? 'opacity:0.5;pointer-events:none;' : '' ?>">Next →</a>
       </div>
-            </div>
+      <?php endif; ?>
+    <?php endif; ?>
+  </div>
 
   <!-- TAB 2: GRAFIK -->
   <div id="tab-chart" class="p-content">
@@ -338,12 +345,15 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
 
   <!-- TAB 3: DOWNLINE -->
   <div id="tab-dl" class="p-content">
-          <div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:12px; border:2.5px dashed rgba(255,255,255,0.4);">
+    <?php if (empty($downlines)): ?>
+      <div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:12px; border:2.5px dashed rgba(255,255,255,0.4);">
         <i class="ph-bold ph-users" style="font-size:32px; color:#fff; opacity:0.8;"></i>
         <div style="font-size:11px; font-weight:800; color:#fff; margin-top:8px;">Belum ada member yang mendaftar.</div>
       </div>
-          <div class="c-list">
-                <div class="c-item dl-item-row" style="<?= $idx >= 5 ? 'display:none' : '' ?>">
+    <?php else: ?>
+      <div class="c-list">
+        <?php foreach ($downlines as $idx => $dl): ?>
+        <div class="c-item dl-item-row" style="<?= $idx >= 5 ? 'display:none' : '' ?>">
           <div class="c-ico pink"><i class="ph-bold ph-user"></i></div>
           <div class="c-body">
             <div class="c-title"><?= htmlspecialchars($dl['username']) ?></div>
@@ -354,18 +364,24 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
             <div class="c-badge free" style="margin-top:2px;"><?= htmlspecialchars($dl['membership_name'] ?: 'Free') ?></div>
           </div>
         </div>
-              </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <?php endforeach; ?>
+      </div>
+      <?php if (count($downlines) > 5): ?>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <button onclick="dlPrev()" id="dl-btn-prev" style="padding:6px 12px; background:#fff; border:2px solid #1e3a8a; border-radius:8px; font-size:10px; font-weight:900; color:#1e3a8a; opacity:0.5; pointer-events:none; cursor:pointer;">← Prev</button>
         <span id="dl-page-info" style="font-size:11px; font-weight:900; color:#fff;">1/<?= ceil(count($downlines) / 5) ?></span>
         <button onclick="dlNext()" id="dl-btn-next" style="padding:6px 12px; background:#fff; border:2px solid #1e3a8a; border-radius:8px; font-size:10px; font-weight:900; color:#1e3a8a; cursor:pointer;">Next →</button>
       </div>
-            </div>
+      <?php endif; ?>
+    <?php endif; ?>
+  </div>
 
   <!-- TAB 4: FAKE WD -->
   <div id="tab-fwd" class="p-content">
-        <div class="f-alert <?= $fwd_flashType ?>"><?= htmlspecialchars($fwd_flash) ?></div>
-    
+    <?php if ($fwd_flash): ?>
+    <div class="f-alert <?= $fwd_flashType ?>"><?= htmlspecialchars($fwd_flash) ?></div>
+    <?php endif; ?>
+
     <!-- Form Input -->
     <div class="c-item yellow" style="display:block; padding:14px; margin-bottom:14px;">
       <form method="POST" id="fwd-form">
@@ -374,12 +390,15 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
 
         <div style="background:#fffbeb; border:2px solid #fcd34d; border-radius:8px; padding:8px 10px; margin-bottom:12px;">
           <div style="font-size:9px; font-weight:900; color:#b45309; text-transform:uppercase; margin-bottom:2px;">Rekening Pencairan</div>
-                    <div style="font-size:11px; font-weight:800; color:#78350f;">
+          <?php if (!empty($user['bank_name'])): ?>
+          <div style="font-size:11px; font-weight:800; color:#78350f;">
             <?= htmlspecialchars($user['bank_name']) ?> · <?= htmlspecialchars(mask_account($user['account_number'] ?? '')) ?><br>
             a/n <?= htmlspecialchars($user['account_name']) ?>
           </div>
-                    <div style="font-size:10px; font-weight:800; color:#ea580c;">⚠️ Belum ada rekening. <a href="/edit-rekening" style="color:#c2410c;">Isi sekarang</a>.</div>
-                  </div>
+          <?php else: ?>
+          <div style="font-size:10px; font-weight:800; color:#ea580c;">⚠️ Belum ada rekening. <a href="/edit-rekening" style="color:#c2410c;">Isi sekarang</a>.</div>
+          <?php endif; ?>
+        </div>
 
         <div class="f-group">
           <label class="f-label" style="color:#9a3412;">Jumlah WD (Rp)</label>
@@ -406,12 +425,18 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
     </div>
 
     <!-- Fake WD List -->
-        <div class="sec-title"><i class="ph-bold ph-clock-counter-clockwise"></i> Riwayat WD Fake</div>
+    <?php if (!empty($fake_wds)): ?>
+    <div class="sec-title"><i class="ph-bold ph-clock-counter-clockwise"></i> Riwayat WD Fake</div>
     <div class="c-list">
-                  <div class="c-item yellow">
-                <div class="c-ico" style="border:none; box-shadow:none;"><img src="/assets/banks/<?= htmlspecialchars($wl) ?>" style="width:100%;height:100%;object-fit:contain;border-radius:6px;"></div>
-                <div class="c-ico yellow"><i class="ph-bold ph-money"></i></div>
-                <div class="c-body">
+      <?php foreach ($fake_wds as $fw): ?>
+      <?php $wl = $channel_logos[strtolower($fw['bank_name'])] ?? null; ?>
+      <div class="c-item yellow">
+        <?php if ($wl): ?>
+        <div class="c-ico" style="border:none; box-shadow:none;"><img src="/assets/banks/<?= htmlspecialchars($wl) ?>" style="width:100%;height:100%;object-fit:contain;border-radius:6px;"></div>
+        <?php else: ?>
+        <div class="c-ico yellow"><i class="ph-bold ph-money"></i></div>
+        <?php endif; ?>
+        <div class="c-body">
           <div class="c-title" style="color:#9a3412;"><?= format_rp((float)$fw['amount']) ?></div>
           <div class="c-sub"><?= htmlspecialchars($fw['bank_name']) ?> · <?= date('d M H:i', strtotime($fw['created_at'])) ?></div>
         </div>
@@ -419,8 +444,10 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
           <div class="c-badge <?= $fw['status'] === 'approved' ? 'success' : 'warn' ?>"><?= ucfirst($fw['status']) ?></div>
         </div>
       </div>
-          </div>
-      </div>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+  </div>
 
 </div>
 
@@ -514,3 +541,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<?php require dirname(__DIR__) . '/partials/footer.php'; ?>
