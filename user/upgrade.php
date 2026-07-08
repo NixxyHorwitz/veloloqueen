@@ -298,8 +298,33 @@ body { background: #fff8f0 !important; }
   align-items: flex-start; justify-content: flex-end;
   padding: 14px;
   min-height: 120px;
-  position: relative; overflow: hidden;
+  position: relative;
   border: 3px solid rgba(255,255,255,0.25);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+  transition: transform 0.1s;
+}
+.bento-big:active { transform: translateY(4px); box-shadow: none !important; }
+
+/* Small item: 1 col × 1 row */
+.bento-sm {
+  border-radius: 18px;
+  text-decoration: none;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5px;
+  padding: 10px 4px;
+  border: 2.5px solid rgba(255,255,255,0.22);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.18);
+  transition: transform 0.1s;
+  min-height: 76px;
+}
+.bento-sm:active { transform: translateY(3px); box-shadow: none !important; }
+.bento-sm i { font-size: 24px; color: #fff; }
+.bento-sm__label {
+  font-size: 11px; font-weight: 900; color: #fff;
+  text-align: center; line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
   box-shadow: 0 6px 0 rgba(0,0,0,0.2);
   transition: transform 0.1s;
 }
@@ -464,24 +489,22 @@ body { background: #fff8f0 !important; }
         $m = $gold; 
         $can_afford = (float)$user['balance_dep'] >= (float)$m['price'];
       ?>
-      <div class="bento-wide" style="background:#fff; border:3px solid #0f172a; box-shadow:0 6px 0 #0f172a; position:relative; cursor:pointer; align-items:center;" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
-        <div style="position:absolute; top:-8px; left:-8px; background:#f97316; color:#fff; font-size:8px; font-weight:900; padding:4px 8px; border-radius:8px; border:2px solid #0f172a; box-shadow:0 3px 0 #0f172a; transform:rotate(-5deg); z-index:5;">🔥 POPULER</div>
+      <div class="bento-wide" style="background:#fff; border:3px solid #0f172a; box-shadow:0 6px 0 #0f172a; position:relative; cursor:pointer; flex-direction:column; align-items:flex-start; padding:12px; min-height:100px;" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
+        <div style="position:absolute; top:-10px; right:-8px; background:#f97316; color:#fff; font-size:9px; font-weight:900; padding:4px 8px; border-radius:8px; border:2.5px solid #fff; box-shadow:0 3px 0 #c2410c; transform:rotate(5deg); z-index:5;">🔥 POPULER</div>
         
-        <div style="width:34px; height:34px; background:#f0f9ff; border-radius:10px; border:2px solid #0f172a; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; box-shadow:0 2px 0 #0f172a; margin-right:4px;">
-            <?= htmlspecialchars($m['icon'] ?: '⭐') ?>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+          <div style="width:32px; height:32px; background:#f0f9ff; border-radius:8px; border:2px solid #0f172a; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 2px 0 #0f172a;">
+              <?= htmlspecialchars($m['icon'] ?: '⭐') ?>
+          </div>
+          <div>
+            <div class="bento-wide__label" style="font-size:14px; color:#0f172a; line-height:1.1;"><?= htmlspecialchars($m['name']) ?></div>
+            <div class="bento-wide__sub" style="font-size:10px; color:#64748b; margin-top:2px;"><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>x • <?= $m['duration_days'] ?> Hr</div>
+          </div>
         </div>
         
-        <div class="bento-wide__txt" style="flex:1;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <div>
-              <div class="bento-wide__label" style="font-size:13px; color:#0f172a; line-height:1.2;"><?= htmlspecialchars($m['name']) ?></div>
-              <div class="bento-wide__sub" style="font-size:10px; color:#64748b; margin-top:2px;"><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>x • <?= $m['duration_days'] ?> Hr</div>
-            </div>
-            <div style="text-align:right;">
-              <div style="text-decoration:line-through; font-size:10px; color:#94a3b8; font-weight:800; margin-bottom:-2px;"><?= format_rp((float)$m['original_price']) ?></div>
-              <div style="font-size:13px; font-weight:900; color:#0f172a;"><?= format_rp((float)$m['price']) ?></div>
-            </div>
-          </div>
+        <div style="margin-top:auto;">
+          <div style="text-decoration:line-through; font-size:10px; color:#94a3b8; font-weight:800; margin-bottom:-2px;"><?= format_rp((float)$m['original_price']) ?></div>
+          <div style="font-size:16px; font-weight:900; color:#0f172a; letter-spacing:-0.5px;"><?= format_rp((float)$m['price']) ?></div>
         </div>
       </div>
       <?php endif; ?>
@@ -492,23 +515,21 @@ body { background: #fff8f0 !important; }
         $m = $silver; 
         $can_afford = (float)$user['balance_dep'] >= (float)$m['price'];
       ?>
-      <div class="bento-wide" style="background:#f8fafc; border:3px solid #0f172a; box-shadow:0 6px 0 #0f172a; position:relative; cursor:pointer; align-items:center;" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
+      <div class="bento-wide" style="background:#f8fafc; border:3px solid #0f172a; box-shadow:0 6px 0 #0f172a; position:relative; cursor:pointer; flex-direction:column; align-items:flex-start; padding:12px; min-height:100px;" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
         
-        <div style="width:34px; height:34px; background:#e2e8f0; border-radius:10px; border:2px solid #0f172a; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; box-shadow:0 2px 0 #0f172a; margin-right:4px;">
-            <?= htmlspecialchars($m['icon'] ?: '🏅') ?>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+          <div style="width:32px; height:32px; background:#e2e8f0; border-radius:8px; border:2px solid #0f172a; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 2px 0 #0f172a;">
+              <?= htmlspecialchars($m['icon'] ?: '🏅') ?>
+          </div>
+          <div>
+            <div class="bento-wide__label" style="font-size:14px; color:#0f172a; line-height:1.1;"><?= htmlspecialchars($m['name']) ?></div>
+            <div class="bento-wide__sub" style="font-size:10px; color:#64748b; margin-top:2px;"><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>x • <?= $m['duration_days'] ?> Hr</div>
+          </div>
         </div>
         
-        <div class="bento-wide__txt" style="flex:1;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <div>
-              <div class="bento-wide__label" style="font-size:13px; color:#0f172a; line-height:1.2;"><?= htmlspecialchars($m['name']) ?></div>
-              <div class="bento-wide__sub" style="font-size:10px; color:#64748b; margin-top:2px;"><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>x • <?= $m['duration_days'] ?> Hr</div>
-            </div>
-            <div style="text-align:right;">
-              <div style="text-decoration:line-through; font-size:10px; color:#94a3b8; font-weight:800; margin-bottom:-2px;"><?= format_rp((float)$m['original_price']) ?></div>
-              <div style="font-size:13px; font-weight:900; color:#0f172a;"><?= format_rp((float)$m['price']) ?></div>
-            </div>
-          </div>
+        <div style="margin-top:auto;">
+          <div style="text-decoration:line-through; font-size:10px; color:#94a3b8; font-weight:800; margin-bottom:-2px;"><?= format_rp((float)$m['original_price']) ?></div>
+          <div style="font-size:16px; font-weight:900; color:#0f172a; letter-spacing:-0.5px;"><?= format_rp((float)$m['price']) ?></div>
         </div>
       </div>
       <?php endif; ?>
