@@ -185,10 +185,10 @@ body {
 }
 
 /* ── SALDO ROW / CURRENT BANK ROW ── */
-.wd-saldo-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; position: relative; z-index: 2; }
-.wd-saldo-icon { width: 50px; height: 50px; background: #fffbeb; border: 3px solid #fde047; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 0 #ca8a04; }
-.wd-saldo-lbl { font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 2px 0 #c2410c; margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
-.wd-saldo-val { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 3px 0 #9a3412, 0 4px 6px rgba(0,0,0,0.3); font-style: italic; letter-spacing: -0.5px; display:flex; align-items:center; gap:8px;}
+.wd-bank-card { background: rgba(0, 0, 0, 0.15); border: 2px dashed rgba(255, 255, 255, 0.3); border-radius: 16px; padding: 16px; margin-bottom: 20px; position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
+.wd-saldo-icon { width: 50px; height: 50px; background: #fffbeb; border: 3px solid #fde047; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 0 #ca8a04; flex-shrink: 0; }
+.wd-saldo-lbl { font-size: 11px; font-weight: 900; color: rgba(255,255,255,0.7); margin-bottom: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+.wd-saldo-val { font-size: 22px; font-weight: 900; color: #fff; text-shadow: 0 2px 0 #9a3412, 0 4px 6px rgba(0,0,0,0.3); font-style: italic; letter-spacing: -0.5px; display:flex; align-items:center; gap:8px;}
 
 /* ── ALERTS ── */
 .wd-alert { padding: 10px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; display: flex; gap: 8px; align-items: center; margin-bottom: 12px; border: 2px solid; line-height: 1.3; position: relative; z-index: 2; }
@@ -291,7 +291,7 @@ body {
   <div class="wd-body">
     
     <!-- CURRENT BANK / SALDO ROW -->
-    <div class="wd-saldo-row">
+    <div class="wd-bank-card">
       <div class="wd-saldo-icon">💳</div>
       <div>
         <div class="wd-saldo-lbl">Rekening Aktif</div>
