@@ -237,7 +237,7 @@ switch ($action) {
             ['text' => "🗑️ Hapus Pesan Ini", 'callback_data' => "del_msg:{$sessId}"]
         ];
 
-        $lvl = 'Free';
+        $lvl = get_free_tier_name($pdo);
         $balance_wd = 0.0;
         $balance_dep = 0.0;
         if ($userId) {
@@ -245,7 +245,7 @@ switch ($action) {
             $uStmt->execute([$userId]);
             $uInfo = $uStmt->fetch();
             if ($uInfo) {
-                $lvl = $uInfo['membership_name'] ?: 'Free';
+                $lvl = $uInfo['membership_name'] ?: get_free_tier_name($pdo);
                 $balance_wd = (float)$uInfo['balance_wd'];
                 $balance_dep = (float)$uInfo['balance_dep'];
             }
@@ -583,7 +583,7 @@ switch ($action) {
                 $uInfo = $uStmt->fetch();
                 
                 if ($uInfo) {
-                    $lvl = $uInfo['membership_name'] ?: 'Free';
+                    $lvl = $uInfo['membership_name'] ?: get_free_tier_name($pdo);
                     $txt = "👤 <b>Info User: {$uInfo['username']}</b>\n"
                          . "Level: {$lvl}\n"
                          . "WD: Rp" . number_format((float)$uInfo['balance_wd'], 0, ',', '.') . "\n"
@@ -751,7 +751,7 @@ switch ($action) {
                 
                 $pmText = "✏️ <b>Edit User & Saldo</b>\n";
                 if ($euInfo) {
-                    $lvlName = $euInfo['mem_name'] ?: 'Free';
+                    $lvlName = $euInfo['mem_name'] ?: get_free_tier_name($pdo);
                     $pmText .= "👤 Username: <b>{$euInfo['username']}</b>\n";
                     $pmText .= "🏅 Level: {$lvlName}\n";
                     $pmText .= "💰 Saldo Penarikan: Rp" . number_format((float)$euInfo['balance_wd'], 0, ',', '.') . "\n";

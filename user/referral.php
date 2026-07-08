@@ -25,7 +25,7 @@ $history = $hist->fetchAll();
 // Referred users list
 $refs = $pdo->prepare(
   "SELECT u.username, u.created_at, 
-          COALESCE(m.name, 'Free') as membership_name,
+          COALESCE(m.name, ''' . get_free_tier_name($pdo) . ''') as membership_name,
           COALESCE((SELECT SUM(amount) FROM deposits WHERE user_id = u.id AND status = 'confirmed'), 0) as total_deposit,
           COALESCE((SELECT SUM(amount) FROM referral_commissions WHERE user_id = ? AND from_user_id = u.id), 0) as commission_earned
    FROM users u

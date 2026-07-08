@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mb-3">
                 <label>Paket Membership</label>
                 <select name="membership_id" class="form-control">
-                    <option value="">Free (Tidak ada)</option>
+                    <option value=""><?= htmlspecialchars(get_free_tier_name($pdo)) ?> (Tidak ada)</option>
                     <?php foreach($memberships as $m): ?>
                     <option value="<?= $m['id'] ?>" <?= $u['membership_id']==$m['id']?'selected':'' ?>><?= htmlspecialchars($m['name']) ?></option>
                     <?php endforeach; ?>

@@ -203,7 +203,7 @@ require __DIR__ . '/partials/header.php';
           <td data-label="Paket">
             <?php if ($u['membership_name'] && $u['membership_expires_at'] && strtotime($u['membership_expires_at'])>time()): ?>
             <span class="badge b-success" style="border-radius:6px;font-size:11px"><?= htmlspecialchars($u['membership_name']) ?></span>
-            <?php else: ?><span class="badge b-neutral" style="border-radius:6px;font-size:11px">Free</span><?php endif; ?>
+            <?php else: ?><span class="badge b-neutral" style="border-radius:6px;font-size:11px"><?= htmlspecialchars(get_free_tier_name($pdo)) ?></span><?php endif; ?>
           </td>
           <td data-label="Referral" style="font-size:12px;letter-spacing:1px;color:#888"><?= $u['referral_code'] ?></td>
           <td data-label="Status">
@@ -368,7 +368,7 @@ require __DIR__ . '/partials/header.php';
           <div class="c-form-group mb-3">
             <label class="c-label">Paket Membership</label>
             <select name="membership_id" id="eu-mem-id" class="c-form-control">
-              <option value="">Free (Tidak ada)</option>
+              <option value=""><?= htmlspecialchars(get_free_tier_name($pdo)) ?> (Tidak ada)</option>
               <?php foreach ($memberships as $m): ?>
               <option value="<?= $m['id'] ?>"><?= htmlspecialchars($m['name']) ?></option>
               <?php endforeach; ?>
@@ -447,7 +447,7 @@ require __DIR__ . '/partials/header.php';
       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
     </div>
     <div class="modal-body text-center">
-      <p style="font-size:13px;color:#ccc;margin-bottom:16px;">Pilih jenis refund untuk mengembalikan level ke Free dan saldo dikembalikan ke Deposit.</p>
+      <p style="font-size:13px;color:#ccc;margin-bottom:16px;">Pilih jenis refund untuk mengembalikan level ke <?= htmlspecialchars(get_free_tier_name($pdo)) ?> dan saldo dikembalikan ke Deposit.</p>
       <form method="POST" class="mb-2">
         <?= csrf_field() ?><input type="hidden" name="action" value="refund_level"><input type="hidden" name="user_id" id="ref-uid-1"><input type="hidden" name="cut" value="0">
         <button type="submit" class="btn w-100 mb-2" style="background:var(--success);color:#fff;font-weight:700;font-size:13px;">✅ Refund 100% (Utuh)</button>

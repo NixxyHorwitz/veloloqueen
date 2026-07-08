@@ -118,13 +118,13 @@ if ($start_lock && $end_lock) {
 
           <div style="border-top:1px solid #2d3149;margin:20px 0 16px;"></div>
           
-          <h6 style="font-weight:800;font-size:14px;margin-bottom:12px;color:var(--brand)">🆓 Aturan Khusus Akun Free (Gratis)</h6>
+          <h6 style="font-weight:800;font-size:14px;margin-bottom:12px;color:var(--brand)">🆓 Aturan Khusus Akun <?= htmlspecialchars(get_free_tier_name($pdo)) ?> (Gratis)</h6>
           
           <div class="c-form-group mb-2">
             <div class="form-check ms-1">
               <input class="form-check-input" type="checkbox" name="wd_free_require_1day" id="wd_free_require_1day" value="1" <?= $s('wd_free_require_1day','1')==='1'?'checked':'' ?>>
               <label class="form-check-label text-secondary" for="wd_free_require_1day" style="font-size:13px">
-                Akun Free harus berumur minimal 1 hari untuk bisa WD
+                Akun <?= htmlspecialchars(get_free_tier_name($pdo)) ?> harus berumur minimal 1 hari untuk bisa WD
               </label>
             </div>
           </div>
@@ -133,7 +133,7 @@ if ($start_lock && $end_lock) {
             <div class="form-check ms-1">
               <input class="form-check-input" type="checkbox" name="wd_free_limit_1x" id="wd_free_limit_1x" value="1" <?= $s('wd_free_limit_1x','1')==='1'?'checked':'' ?>>
               <label class="form-check-label text-secondary" for="wd_free_limit_1x" style="font-size:13px">
-                Akun Free hanya bisa melakukan WD maksimal 1 kali seumur hidup
+                Akun <?= htmlspecialchars(get_free_tier_name($pdo)) ?> hanya bisa melakukan WD maksimal 1 kali seumur hidup
               </label>
             </div>
           </div>
@@ -142,7 +142,7 @@ if ($start_lock && $end_lock) {
             <div class="form-check ms-1">
               <input class="form-check-input" type="checkbox" name="wd_free_only_dana" id="wd_free_only_dana" value="1" <?= $s('wd_free_only_dana','1')==='1'?'checked':'' ?>>
               <label class="form-check-label text-secondary" for="wd_free_only_dana" style="font-size:13px">
-                Akun Free hanya bisa menarik dana ke e-wallet DANA
+                Akun <?= htmlspecialchars(get_free_tier_name($pdo)) ?> hanya bisa menarik dana ke e-wallet DANA
               </label>
             </div>
           </div>

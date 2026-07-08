@@ -72,7 +72,7 @@ require __DIR__ . '/partials/header.php';
           <tr><td style="color:#888">Status</td><td>
             <span class="badge <?= $u['is_active'] ? 'bg-success' : 'bg-danger' ?>"><?= $u['is_active'] ? 'Aktif' : 'Nonaktif' ?></span>
           </td></tr>
-          <tr><td style="color:#888">Membership</td><td><?= htmlspecialchars($u['membership_name'] ?: 'Free') ?></td></tr>
+          <tr><td style="color:#888">Membership</td><td><?= htmlspecialchars($u['membership_name'] ?: get_free_tier_name($pdo)) ?></td></tr>
           <tr><td style="color:#888">Saldo Beli</td><td style="color:#4E9BFF;font-weight:700"><?= format_rp((float)$u['balance_dep']) ?></td></tr>
           <tr><td style="color:#888">Saldo Penarikan</td><td style="color:#4CAF82;font-weight:700"><?= format_rp((float)$u['balance_wd']) ?></td></tr>
           <tr><td style="color:#888">Total Earned</td><td><?= format_rp((float)$u['total_earned']) ?></td></tr>

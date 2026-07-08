@@ -369,6 +369,14 @@ function user_watch_today(PDO $pdo, array $user): int {
     return (int)$s->fetchColumn();
 }
 
+function get_free_tier_name(PDO $pdo): string {
+    static $free_name = null;
+    if ($free_name === null) {
+        $free_name = $pdo->query('SELECT name FROM memberships WHERE price = 0 AND is_active = 1 ORDER BY sort_order ASC LIMIT 1')->fetchColumn() ?: 'Free';
+    }
+    return $free_name;
+}
+
 /** Get user membership sort_order level (0 = Free) */
 function user_membership_level(PDO $pdo, array $user): int {
     if ($user['membership_id'] && $user['membership_expires_at']

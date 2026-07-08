@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->beginTransaction();
                 // Hapus history order yang terkait
                 $pdo->prepare("DELETE FROM upgrade_orders WHERE membership_id=?")->execute([$id]);
-                // Reset user yang menggunakan paket ini ke paket Free (id=1)
+                // Reset user yang menggunakan paket ini ke paket <?= htmlspecialchars(get_free_tier_name($pdo)) ?> (id=1)
                 $pdo->prepare("UPDATE users SET membership_id=1, membership_expires_at=NULL WHERE membership_id=?")->execute([$id]);
                 // Hapus paket
                 $pdo->prepare("DELETE FROM memberships WHERE id=? AND price>0")->execute([$id]);
@@ -189,7 +189,7 @@ require __DIR__ . '/partials/header.php';
       <div class="form-check mt-3">
         <input class="form-check-input" type="checkbox" name="force" id="dp-force" value="1">
         <label class="form-check-label text-warning" for="dp-force" style="font-size:12px;line-height:1.4">
-          Hapus Paksa: Centang ini jika gagal dihapus karena masih ada user/riwayat order. <br><small class="text-muted">(User akan dikembalikan ke paket Free, riwayat order paket ini akan dihapus permanen)</small>
+          Hapus Paksa: Centang ini jika gagal dihapus karena masih ada user/riwayat order. <br><small class="text-muted">(User akan dikembalikan ke paket <?= htmlspecialchars(get_free_tier_name($pdo)) ?>, riwayat order paket ini akan dihapus permanen)</small>
         </label>
       </div>
     </div>

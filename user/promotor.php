@@ -523,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <?= (int)$dl['dep_count'] ?>x Deposit
           </div>
           <div style="font-size:10px;font-weight:800;color:#666;margin-top:2px">
-            <?= htmlspecialchars($dl['membership_name'] ?: 'Free') ?>
+            <?= htmlspecialchars($dl['membership_name'] ?: get_free_tier_name($pdo)) ?>
           </div>
         </div>
       </div>
