@@ -280,6 +280,48 @@ require dirname(__DIR__) . '/partials/header.php';
 body { background: #fff8f0 !important; }
 .up-page { padding: 0 0 20px; }
 
+/* ══ BENTO GRID ══ */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto auto auto;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+/* Big item: spans 2 cols × 2 rows */
+.bento-big {
+  grid-column: span 2;
+  grid-row: span 2;
+  border-radius: 22px;
+  text-decoration: none;
+  display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: flex-end;
+  padding: 14px;
+  min-height: 120px;
+  position: relative; overflow: hidden;
+  border: 3px solid rgba(255,255,255,0.25);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+  transition: transform 0.1s;
+}
+.bento-big:active { transform: translateY(4px); box-shadow: none !important; }
+
+/* Wide item: spans 2 cols */
+.bento-wide {
+  grid-column: span 2;
+  border-radius: 18px;
+  text-decoration: none;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border: 2.5px solid rgba(255,255,255,0.22);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.18);
+  transition: transform 0.1s;
+}
+.bento-wide:active { transform: translateY(3px); box-shadow: none !important; }
+.bento-wide__txt { }
+.bento-wide__label { font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.bento-wide__sub { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.75); }
+
+
 /* ── Hero Banner ── */
 .up-hero {
   background: linear-gradient(135deg, #0ea5e9, #0284c7);
