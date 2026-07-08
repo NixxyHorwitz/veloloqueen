@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtPending->execute([$user['id']]);
         
         if ($stmtPending->fetchColumn()) {
-            $flash = 'âŒ Permintaan pengembalian dana kamu sebelumnya masih dalam proses verifikasi otomatis.'; $flashType = 'error';
+            $flash = 'Ã¢ÂÅ’ Permintaan pengembalian dana kamu sebelumnya masih dalam proses verifikasi otomatis.'; $flashType = 'error';
         } else {
             $s = $pdo->prepare("SELECT m.id as membership_id, m.name, m.price, u.refund_cut_percent, u.is_refund_enabled FROM users u LEFT JOIN memberships m ON u.membership_id = m.id WHERE u.id=?");
             $s->execute([$user['id']]);
@@ -110,9 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mName = $uInfo['name'] ?? null;
             
             if (!$mName) {
-                $flash = 'âŒ Kamu tidak memiliki paket aktif.'; $flashType = 'error';
+                $flash = 'Ã¢ÂÅ’ Kamu tidak memiliki paket aktif.'; $flashType = 'error';
             } elseif (!$uInfo['is_refund_enabled']) {
-                $flash = 'âŒ Akses refund kamu telah dinonaktifkan.'; $flashType = 'error';
+                $flash = 'Ã¢ÂÅ’ Akses refund kamu telah dinonaktifkan.'; $flashType = 'error';
             } else {
                 $pdo->prepare("INSERT INTO admin_requests (user_id, type) VALUES (?, 'refund_level')")->execute([$user['id']]);
                 $req_id = $pdo->lastInsertId();
@@ -126,19 +126,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $cutAmount = ($basePrice * $pct) / 100;
                 $afterCut = $basePrice - $cutAmount;
                 
-                $msg  = "ðŸ’° <b>REQUEST REFUND LEVEL</b>\n\n";
-                $msg .= "ðŸ‘¤ User: <code>{$user['username']}</code>\n";
-                $msg .= "ðŸ† Level: <b>{$mName}</b>\n";
-                $msg .= "ðŸ’µ Harga Awal: <b>" . format_rp($basePrice) . "</b>\n";
-                $msg .= "âœ‚ï¸ Setelah Dipotong ({$pct}%): <b>" . format_rp($afterCut) . "</b>\n\n";
-                $msg .= "âš ï¸ <i>Refund ini akan membatalkan level user dan mengembalikan saldo dengan potongan {$pct}% (jika di-Approve).</i>\n";
+                $msg  = "Ã°Å¸â€™Â° <b>REQUEST REFUND LEVEL</b>\n\n";
+                $msg .= "Ã°Å¸â€˜Â¤ User: <code>{$user['username']}</code>\n";
+                $msg .= "Ã°Å¸Ââ€  Level: <b>{$mName}</b>\n";
+                $msg .= "Ã°Å¸â€™Âµ Harga Awal: <b>" . format_rp($basePrice) . "</b>\n";
+                $msg .= "Ã¢Å“â€šÃ¯Â¸Â Setelah Dipotong ({$pct}%): <b>" . format_rp($afterCut) . "</b>\n\n";
+                $msg .= "Ã¢Å¡Â Ã¯Â¸Â <i>Refund ini akan membatalkan level user dan mengembalikan saldo dengan potongan {$pct}% (jika di-Approve).</i>\n";
                 $kb = [
-                    [['text'=>'âœ… Approve Refund', 'callback_data'=>'req_approve_'.$req_id], ['text'=>'âŒ Reject', 'callback_data'=>'req_reject_'.$req_id]],
-                    [['text'=>"âš™ï¸ Ubah Potongan ({$pct}%)", 'callback_data'=>'edit_refcut_'.$user['id']], ['text'=>'ðŸ”’ Cabut Akses Refund', 'callback_data'=>'toggle_ref_'.$user['id']]]
+                    [['text'=>'Ã¢Å“â€¦ Approve Refund', 'callback_data'=>'req_approve_'.$req_id], ['text'=>'Ã¢ÂÅ’ Reject', 'callback_data'=>'req_reject_'.$req_id]],
+                    [['text'=>"Ã¢Å¡â„¢Ã¯Â¸Â Ubah Potongan ({$pct}%)", 'callback_data'=>'edit_refcut_'.$user['id']], ['text'=>'Ã°Å¸â€â€™ Cabut Akses Refund', 'callback_data'=>'toggle_ref_'.$user['id']]]
                 ];
                 send_telegram_notif($pdo, $msg, $kb, 'permintaan');
                 
-                $flash = 'âœ… Permintaan pengembalian dana kamu telah masuk dan sedang diverifikasi oleh sistem secara otomatis.';
+                $flash = 'Ã¢Å“â€¦ Permintaan pengembalian dana kamu telah masuk dan sedang diverifikasi oleh sistem secara otomatis.';
             }
         }
         goto end_post;
@@ -243,15 +243,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pdo->commit();
                     
                     $us = $pdo->prepare("SELECT * FROM users WHERE id=?"); $us->execute([$user['id']]); $user = $us->fetch();
-                    $flash = 'ðŸŽ‰ Hore! Upgrade ke ' . htmlspecialchars($chosen['name']) . ' berhasil! Berlaku s/d ' . date('d M Y', strtotime($new_expires)) . ' ya.';
+                    $flash = 'Ã°Å¸Å½â€° Hore! Upgrade ke ' . htmlspecialchars($chosen['name']) . ' berhasil! Berlaku s/d ' . date('d M Y', strtotime($new_expires)) . ' ya.';
                     $active_membership = $chosen;
                     $can_refund = true; // just upgraded, well within 12 hours
                     
-                    $msgNotif = "ðŸŽ‰ <b>MEMBER UPGRADE LEVEL</b>\n\n";
-                    $msgNotif .= "ðŸ‘¤ User: <code>{$user['username']}</code>\n";
-                    $msgNotif .= "ðŸ† Level Baru: <b>{$chosen['name']}</b>\n";
-                    $msgNotif .= "ðŸ’° Harga: " . format_rp((float)$final_price) . "\n";
-                    $msgNotif .= "ðŸ• Waktu: " . date('d M Y H:i:s');
+                    $msgNotif = "Ã°Å¸Å½â€° <b>MEMBER UPGRADE LEVEL</b>\n\n";
+                    $msgNotif .= "Ã°Å¸â€˜Â¤ User: <code>{$user['username']}</code>\n";
+                    $msgNotif .= "Ã°Å¸Ââ€  Level Baru: <b>{$chosen['name']}</b>\n";
+                    $msgNotif .= "Ã°Å¸â€™Â° Harga: " . format_rp((float)$final_price) . "\n";
+                    $msgNotif .= "Ã°Å¸â€¢Â Waktu: " . date('d M Y H:i:s');
                     send_telegram_notif($pdo, $msgNotif, [], 'log');
                 } else {
                     $pdo->rollBack();
@@ -272,9 +272,9 @@ end_post:
 
 // Auto-rename ranks to Game/RPG theme if they don't match yet
 $rankMap = [
-  0 => ['name' => 'Pejuang',   'icon' => 'âš”ï¸'],
-  1 => ['name' => 'Jagoan',    'icon' => 'ðŸ†'],
-  2 => ['name' => 'Legenda',   'icon' => 'ðŸŒŸ'],
+  0 => ['name' => 'Pejuang',   'icon' => '&#9876;'],
+  1 => ['name' => 'Jagoan',    'icon' => '&#127942;'],
+  2 => ['name' => 'Legenda',   'icon' => '&#127775;'],
 ];
 $paid_ids = array_values(array_filter($memberships, fn($m) => (float)$m['price'] > 0));
 foreach ($paid_ids as $idx => $m) {
@@ -292,16 +292,12 @@ $activePage = 'upgrade';
 require dirname(__DIR__) . '/partials/header.php';
 ?>
 <style>
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   UPGRADE PAGE â€” GAME UI (Home Match)
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-
-/* Override global app.css background */
+/* UPGRADE PAGE - GAME UI matching home.php */
 html body { background: #f97316 !important; background-image: none !important; }
 
-/* â”€â”€â”€ HERO â”€â”€â”€ */
+/* HERO - same orange as home */
 .up-hero {
-  background: linear-gradient(160deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%);
+  background: linear-gradient(160deg, #fbbf24 0%, #f97316 55%, #ea580c 100%);
   padding: 14px 14px 0; position: relative; overflow: hidden;
 }
 .up-hero::before {
@@ -333,136 +329,87 @@ html body { background: #f97316 !important; background-image: none !important; }
   margin-bottom:4px;
 }
 .up-hero-sub {
-  font-size:12px; font-weight:700; color:rgba(255,255,255,0.8); margin-bottom:14px;
+  font-size:12px; font-weight:700; color:rgba(255,255,255,0.82); margin-bottom:14px;
 }
 .up-hero-wave { display:block; width:100%; height:28px; margin-bottom:-2px; }
 
-/* â”€â”€â”€ BODY AREA â”€â”€â”€ */
+/* BODY */
 .up-body { background:#fff8f0; padding:16px 14px calc(var(--nav-h,72px) + 24px); }
 
-/* â”€â”€â”€ SECTION HEADER â”€â”€â”€ */
+/* SECTION HEADER */
 .sh2 { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
 .sh2__title { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:900; color:#0f172a; }
 
-/* â”€â”€â”€ BASE CARD â”€â”€â”€ */
-.gc {
-  background:#fff; border:3px solid #0f172a; border-radius:22px;
-  padding:14px; margin-bottom:14px; box-shadow:0 6px 0 #0f172a;
-}
-.gc--green  { border-color:#064e3b; box-shadow:0 6px 0 #064e3b; background:#f0fdf4; }
-.gc--red    { border-color:#b91c1c; box-shadow:0 4px 0 #7f1d1d; background:#fef2f2; }
+/* BASE CARD */
+.gc { background:#fff; border:3px solid #0f172a; border-radius:22px; padding:14px; margin-bottom:14px; box-shadow:0 6px 0 #0f172a; }
+.gc--green { border-color:#064e3b; box-shadow:0 6px 0 #064e3b; background:#f0fdf4; }
+.gc--red   { border-color:#b91c1c; box-shadow:0 4px 0 #7f1d1d; background:#fef2f2; }
 
-/* â”€â”€â”€ SALDO TILE â”€â”€â”€ */
+/* SALDO TILE */
 .saldo-tile {
   background:#fff; border:3px solid #1e3a8a; border-radius:20px;
   padding:14px 12px; box-shadow:0 6px 0 #1e3a8a;
   position:relative; overflow:hidden; margin-bottom:10px;
 }
-.saldo-tile__deco {
-  position:absolute; bottom:-12px; right:-10px; font-size:56px; opacity:0.06; pointer-events:none;
-}
+.saldo-tile__deco { position:absolute; bottom:-12px; right:-8px; font-size:52px; opacity:0.07; pointer-events:none; }
 .saldo-tile__lbl { font-size:10px; font-weight:800; color:#64748b; margin-bottom:4px; display:flex; align-items:center; gap:4px; }
 .saldo-tile__val { font-size:22px; font-weight:900; color:#0f172a; letter-spacing:-0.5px; margin-bottom:8px; }
-.saldo-tile__tag {
-  display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:900;
-  background:#dbeafe; color:#1e40af; border:2px solid #93c5fd; padding:4px 12px; border-radius:20px;
-}
+.saldo-tile__tag { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:900; background:#dbeafe; color:#1e40af; border:2px solid #93c5fd; padding:4px 12px; border-radius:20px; }
 
-/* â”€â”€â”€ QUICK ACTION BUTTONS â”€â”€â”€ */
+/* QUICK BUTTONS */
 .qa-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
-.qa-btn {
-  display:flex; align-items:center; justify-content:center; gap:8px;
-  border-radius:16px; padding:13px 10px; font-size:12px; font-weight:900;
-  text-decoration:none; border:3px solid; transition:transform 0.1s; cursor:pointer;
-}
+.qa-btn { display:flex; align-items:center; justify-content:center; gap:8px; border-radius:16px; padding:13px 10px; font-size:12px; font-weight:900; text-decoration:none; border:3px solid; transition:transform 0.1s; }
 .qa-btn:active { transform:translateY(4px); }
 .qa-btn--green { background:#dcfce7; color:#064e3b; border-color:#064e3b; box-shadow:0 5px 0 #064e3b; }
-.qa-btn--pink  { background:#fce7f3; color:#9d174d; border-color:#9d174d; box-shadow:0 5px 0 #9d174d; }
 .qa-btn--green:active { box-shadow:0 1px 0 #064e3b; }
+.qa-btn--pink  { background:#fce7f3; color:#9d174d; border-color:#9d174d; box-shadow:0 5px 0 #9d174d; }
 .qa-btn--pink:active  { box-shadow:0 1px 0 #9d174d; }
 
-/* â”€â”€â”€ LEVEL CARDS â”€â”€â”€ */
-.lvl {
-  background:#fff; border:3px solid #0f172a; border-radius:24px;
-  box-shadow:0 7px 0 #0f172a; padding:18px 16px; margin-bottom:16px;
-  position:relative; overflow:visible; cursor:pointer; transition:transform 0.12s;
-}
+/* LEVEL CARDS */
+.lvl { background:#fff; border:3px solid #0f172a; border-radius:24px; box-shadow:0 7px 0 #0f172a; padding:18px 16px; margin-bottom:16px; position:relative; overflow:visible; cursor:pointer; transition:transform 0.12s; }
 .lvl:active { transform:translateY(5px); box-shadow:0 2px 0 #0f172a; }
-
 .lvl--legend { background:linear-gradient(135deg,#fef9c3,#fef08a); border-color:#d97706; box-shadow:0 7px 0 #92400e; }
 .lvl--legend:active { box-shadow:0 2px 0 #92400e; }
-
 .lvl--jagoan { background:#fff; border-color:#0ea5e9; box-shadow:0 7px 0 #0369a1; }
 .lvl--jagoan:active { box-shadow:0 2px 0 #0369a1; }
-
 .lvl--pejuang { background:#f8fafc; border-color:#475569; box-shadow:0 7px 0 #1e293b; }
 .lvl--pejuang:active { box-shadow:0 2px 0 #1e293b; }
 
-/* Badge sticker on card */
-.lvl-sticker {
-  position:absolute; top:-13px; right:14px;
-  font-size:10px; font-weight:900; padding:5px 12px; border-radius:20px;
-  border:2.5px solid #fff; z-index:6; white-space:nowrap;
-}
-.lvl-sticker--red  { background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; box-shadow:0 3px 0 #7f1d1d; transform:rotate(2deg); }
-.lvl-sticker--org  { background:linear-gradient(135deg,#f97316,#ea580c); color:#fff; box-shadow:0 3px 0 #9a3412; transform:rotate(-2deg); }
+.lvl-sticker { position:absolute; top:-13px; right:14px; font-size:10px; font-weight:900; padding:5px 12px; border-radius:20px; border:2.5px solid #fff; z-index:6; white-space:nowrap; }
+.lvl-sticker--red { background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; box-shadow:0 3px 0 #7f1d1d; transform:rotate(2deg); }
+.lvl-sticker--org { background:linear-gradient(135deg,#f97316,#ea580c); color:#fff; box-shadow:0 3px 0 #9a3412; transform:rotate(-2deg); }
 
-/* Card header row */
 .lvl-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
-.lvl-icon {
-  width:52px; height:52px; border-radius:16px; border:2.5px solid #0f172a;
-  display:flex; align-items:center; justify-content:center; font-size:26px;
-  box-shadow:0 4px 0 #0f172a; flex-shrink:0; background:#fff;
-}
+.lvl-icon { width:52px; height:52px; border-radius:16px; border:2.5px solid #0f172a; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 4px 0 #0f172a; flex-shrink:0; background:#fff; }
 .lvl-meta { padding-left:12px; flex:1; }
 .lvl-name { font-size:19px; font-weight:900; color:#0f172a; line-height:1.1; }
 .lvl-dur  { font-size:11px; font-weight:700; color:#64748b; margin-top:3px; display:flex; align-items:center; gap:4px; }
-.lvl-price-block { text-align:right; }
+.lvl-price-block { text-align:right; flex-shrink:0; }
 .lvl-price-old { font-size:11px; font-weight:800; color:#94a3b8; text-decoration:line-through; margin-bottom:1px; }
-.lvl-price { font-size:22px; font-weight:900; color:#0f172a; letter-spacing:-0.5px; line-height:1.1; }
+.lvl-price { font-size:20px; font-weight:900; color:#0f172a; letter-spacing:-0.5px; line-height:1.1; }
 .lvl--jagoan .lvl-price { color:#0284c7; }
 .lvl--legend .lvl-price { color:#92400e; }
 
-/* Spec grid */
 .lvl-specs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
-.lvl-spec {
-  background:rgba(255,255,255,0.65); border:2px solid rgba(15,23,42,0.35);
-  border-radius:12px; padding:8px 10px; font-size:11px; font-weight:800;
-  color:#0f172a; display:flex; align-items:center; gap:6px;
-  box-shadow:0 2px 0 rgba(15,23,42,0.2);
-}
+.lvl-spec { background:rgba(255,255,255,0.65); border:2px solid rgba(15,23,42,0.3); border-radius:12px; padding:8px 10px; font-size:11px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px; box-shadow:0 2px 0 rgba(15,23,42,0.15); }
 .lvl-spec--full { grid-column:1/-1; }
-.lvl--legend .lvl-spec { background:rgba(255,255,255,0.5); border-color:rgba(146,64,14,0.3); }
+.lvl--legend .lvl-spec { background:rgba(255,255,255,0.5); border-color:rgba(146,64,14,0.25); }
 
-/* CTA button */
-.lvl-cta {
-  display:block; width:100%; padding:13px; border-radius:14px;
-  font-size:14px; font-weight:900; text-align:center; cursor:pointer;
-  border:3px solid rgba(255,255,255,0.7);
-  text-shadow:0 1px 2px rgba(0,0,0,0.2); transition:transform 0.1s;
-}
+.lvl-cta { display:block; width:100%; padding:13px; border-radius:14px; font-size:14px; font-weight:900; text-align:center; cursor:pointer; border:3px solid rgba(255,255,255,0.7); text-shadow:0 1px 2px rgba(0,0,0,0.2); transition:transform 0.1s; }
 .lvl-cta:active { transform:translateY(3px); box-shadow:none !important; }
-.lvl-cta--legend  { background:linear-gradient(135deg,#a855f7,#7c3aed); color:#fff; box-shadow:0 5px 0 #5b21b6; }
+.lvl-cta--legend  { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; box-shadow:0 5px 0 #92400e; }
 .lvl-cta--jagoan  { background:linear-gradient(135deg,#0ea5e9,#0284c7); color:#fff; box-shadow:0 5px 0 #075985; }
 .lvl-cta--pejuang { background:linear-gradient(135deg,#475569,#334155); color:#fff; box-shadow:0 5px 0 #0f172a; }
 .lvl-cta--disabled { background:#cbd5e1 !important; border-color:#e2e8f0 !important; box-shadow:0 3px 0 #94a3b8 !important; color:#64748b; text-shadow:none; cursor:not-allowed; }
 
-/* â”€â”€â”€ INFO / STEP CARD â”€â”€â”€ */
+/* INFO CARD */
 .step-row { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
-.step-num {
-  width:30px; height:30px; border-radius:10px; border:2.5px solid #0f172a;
-  box-shadow:0 3px 0 #0f172a; display:flex; align-items:center; justify-content:center;
-  font-size:13px; font-weight:900; color:#0f172a; flex-shrink:0;
-}
+.step-num { width:30px; height:30px; border-radius:10px; border:2.5px solid #0f172a; box-shadow:0 3px 0 #0f172a; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; color:#0f172a; flex-shrink:0; }
 .step-txt { font-size:12px; font-weight:800; color:#334155; line-height:1.45; padding-top:5px; }
-
 .ben-grid { display:flex; flex-wrap:wrap; gap:8px; }
-.ben-pill {
-  font-size:11px; font-weight:900; color:#0f172a; padding:8px 12px;
-  border-radius:14px; border:2.5px solid #0f172a; box-shadow:0 3px 0 #0f172a;
-}
+.ben-pill { font-size:11px; font-weight:900; color:#0f172a; padding:8px 12px; border-radius:14px; border:2.5px solid #0f172a; box-shadow:0 3px 0 #0f172a; }
 
-/* â”€â”€â”€ MODAL â”€â”€â”€ */
+/* MODAL */
 .cg-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.6); align-items:center; justify-content:center; backdrop-filter:blur(3px); padding:20px; }
 .cg-modal-card { background:#fff; border-radius:24px; border:3px solid #0f172a; width:100%; max-width:380px; box-shadow:0 8px 0 #0f172a; animation:popIn .3s cubic-bezier(.175,.885,.32,1.275); padding:24px; }
 @keyframes popIn { 0%{transform:scale(0.8);opacity:0} 100%{transform:scale(1);opacity:1} }
@@ -482,20 +429,20 @@ html body { background: #f97316 !important; background-image: none !important; }
 .cg-btn--confirm { background:linear-gradient(135deg,#10b981,#059669); color:#fff; border-color:#fff; box-shadow:0 4px 0 #047857; text-shadow:0 1px 1px rgba(0,0,0,0.2); }
 </style>
 
-<!-- â•â•â•â•â•â• HERO â•â•â•â•â•â• -->
+<!-- HERO -->
 <div class="up-hero">
   <div class="up-hero-top">
     <span class="up-hero-badge"><i class="ph-bold ph-crown"></i> Level Up</span>
     <a href="/home" class="up-hero-back"><i class="ph-bold ph-arrow-left" style="font-size:16px;"></i></a>
   </div>
-  <div class="up-hero-title">âš”ï¸ Pilih Rankmu<br>&amp; Gas Cuan!</div>
-  <div class="up-hero-sub">Limit makin besar Â· Cuan makin deras Â· Upgrade sekarang</div>
+  <div class="up-hero-title"><i class="ph-bold ph-sword" style="font-size:24px;"></i> Pilih Rankmu<br>&amp; Gas Cuan!</div>
+  <div class="up-hero-sub">Limit makin besar &middot; Cuan makin deras &middot; Upgrade sekarang</div>
   <svg class="up-hero-wave" viewBox="0 0 375 28" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M0 28 C80 6, 220 24, 375 8 L375 28 Z" fill="#fff8f0"/>
   </svg>
 </div>
 
-<!-- â•â•â•â•â•â• BODY â•â•â•â•â•â• -->
+<!-- BODY -->
 <div class="up-body">
 
   <?php if ($flash): ?>
@@ -506,14 +453,13 @@ html body { background: #f97316 !important; background-image: none !important; }
   <?php endif; ?>
 
   <?php if ($active_membership): ?>
-  <!-- PAKET AKTIF -->
   <div class="gc gc--green" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:900;color:#065f46;margin-bottom:8px;">
       <i class="ph-fill ph-shield-star" style="color:#16a34a;font-size:16px;"></i> Rank Aktif Sekarang
     </div>
-    <div style="font-size:20px;font-weight:900;color:#0f172a;margin-bottom:8px;"><?= htmlspecialchars($active_membership['icon'] ?? '') ?> <?= htmlspecialchars($active_membership['name']) ?></div>
+    <div style="font-size:20px;font-weight:900;color:#0f172a;margin-bottom:8px;"><?= htmlspecialchars($active_membership['name']) ?></div>
     <div style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;border:2px solid #16a34a;border-radius:12px;padding:5px 12px;font-size:11px;font-weight:900;color:#14532d;box-shadow:0 2px 0 #14532d;margin-bottom:<?= $can_refund ? '12' : '0' ?>px;">
-      <i class="ph-bold ph-video-camera"></i> <?= $active_membership['watch_limit'] ?>Ã— /hari &bull; s/d <?= date('d M Y', strtotime($user['membership_expires_at'])) ?>
+      <i class="ph-bold ph-video-camera"></i> <?= $active_membership['watch_limit'] ?>&times; /hari &bull; s/d <?= date('d M Y', strtotime($user['membership_expires_at'])) ?>
     </div>
     <?php if ($can_refund): ?>
     <button type="button" onclick="document.getElementById('refund-modal').style.display='flex'" style="width:100%;background:#fff;border:2.5px solid #ef4444;color:#ef4444;border-radius:12px;padding:10px;font-size:12px;font-weight:900;box-shadow:0 3px 0 #ef4444;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;">
@@ -523,10 +469,10 @@ html body { background: #f97316 !important; background-image: none !important; }
   </div>
   <?php endif; ?>
 
-  <!-- â”€â”€ SALDO BELI â”€â”€ -->
-  <div class="sh2"><div class="sh2__title">ðŸ’³ Saldo Beli</div></div>
+  <!-- SALDO BELI -->
+  <div class="sh2"><div class="sh2__title"><i class="ph-fill ph-wallet" style="color:#ea580c;"></i> Saldo Beli</div></div>
   <div class="saldo-tile">
-    <div class="saldo-tile__deco">ðŸ’°</div>
+    <div class="saldo-tile__deco"><i class="ph-fill ph-coins"></i></div>
     <div class="saldo-tile__lbl"><i class="ph-fill ph-wallet" style="color:#1e40af;font-size:14px;"></i> Saldo Beli (Khusus Upgrade)</div>
     <div class="saldo-tile__val"><?= format_rp((float)$user['balance_dep']) ?></div>
     <div class="saldo-tile__tag"><i class="ph-bold ph-info"></i> Hanya untuk beli paket, tidak bisa ditarik</div>
@@ -540,8 +486,8 @@ html body { background: #f97316 !important; background-image: none !important; }
     </a>
   </div>
 
-  <!-- â”€â”€ PILIH RANK â”€â”€ -->
-  <div class="sh2" style="margin-bottom:16px;"><div class="sh2__title">ðŸ”¥ Pilih Rankmu</div></div>
+  <!-- PILIH RANK -->
+  <div class="sh2" style="margin-bottom:16px;"><div class="sh2__title"><i class="ph-fill ph-flame" style="color:#ea580c;"></i> Pilih Rankmu</div></div>
 
   <form method="POST" id="upgrade-form">
     <?= csrf_field() ?>
@@ -549,8 +495,7 @@ html body { background: #f97316 !important; background-image: none !important; }
     <input type="hidden" name="voucher_code" id="applied-voucher-code" value="">
 
     <?php
-    $paid   = array_values(array_filter($memberships, fn($m) => (float)$m['price'] > 0));
-    // Sort by price desc so Legenda first
+    $paid    = array_values(array_filter($memberships, fn($m) => (float)$m['price'] > 0));
     usort($paid, fn($a,$b) => (float)$b['price'] <=> (float)$a['price']);
     $legend  = $paid[0] ?? null;
     $jagoan  = $paid[1] ?? null;
@@ -559,9 +504,9 @@ html body { background: #f97316 !important; background-image: none !important; }
 
     <?php if ($legend): $m = $legend; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
     <div class="lvl lvl--legend" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
-      <div class="lvl-sticker lvl-sticker--red">ðŸ‘‘ BEST DEAL!</div>
+      <div class="lvl-sticker lvl-sticker--red"><i class="ph-fill ph-crown"></i> BEST DEAL!</div>
       <div class="lvl-head">
-        <div class="lvl-icon" style="background:#fef08a;"><?= htmlspecialchars($m['icon'] ?: 'ðŸŒŸ') ?></div>
+        <div class="lvl-icon" style="background:#fef08a;"><i class="ph-fill ph-star" style="color:#d97706;font-size:26px;"></i></div>
         <div class="lvl-meta">
           <div class="lvl-name"><?= htmlspecialchars($m['name']) ?></div>
           <div class="lvl-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
@@ -572,21 +517,21 @@ html body { background: #f97316 !important; background-image: none !important; }
         </div>
       </div>
       <div class="lvl-specs">
-        <div class="lvl-spec"><i class="ph-bold ph-video-camera" style="color:#7c3aed;"></i> <?= $m['watch_limit'] ?> Video/hari</div>
+        <div class="lvl-spec"><i class="ph-bold ph-video-camera" style="color:#d97706;"></i> <?= $m['watch_limit'] ?> Video/hari</div>
         <div class="lvl-spec"><i class="ph-bold ph-trend-up" style="color:#10b981;"></i> WD Maks Bebas</div>
         <div class="lvl-spec lvl-spec--full"><i class="ph-bold ph-star" style="color:#d97706;"></i> Semua fitur premium + prioritas admin</div>
       </div>
       <button type="button" class="lvl-cta lvl-cta--legend <?= !$can_afford ? 'lvl-cta--disabled' : '' ?>">
-        <?= $can_afford ? 'ðŸŒŸ Gas Jadi Legenda!' : 'ðŸ’³ Saldo Kurang â€“ Topup Dulu' ?>
+        <?= $can_afford ? 'Gas Jadi Legenda!' : 'Saldo Kurang &mdash; Topup Dulu' ?>
       </button>
     </div>
     <?php endif; ?>
 
     <?php if ($jagoan): $m = $jagoan; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
     <div class="lvl lvl--jagoan" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
-      <div class="lvl-sticker lvl-sticker--org">ðŸ”¥ POPULER</div>
+      <div class="lvl-sticker lvl-sticker--org"><i class="ph-fill ph-fire"></i> POPULER</div>
       <div class="lvl-head">
-        <div class="lvl-icon" style="background:#e0f2fe;"><?= htmlspecialchars($m['icon'] ?: 'ðŸ†') ?></div>
+        <div class="lvl-icon" style="background:#e0f2fe;"><i class="ph-fill ph-trophy" style="color:#0284c7;font-size:26px;"></i></div>
         <div class="lvl-meta">
           <div class="lvl-name"><?= htmlspecialchars($m['name']) ?></div>
           <div class="lvl-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
@@ -599,10 +544,10 @@ html body { background: #f97316 !important; background-image: none !important; }
       <div class="lvl-specs">
         <div class="lvl-spec"><i class="ph-bold ph-video-camera" style="color:#0ea5e9;"></i> <?= $m['watch_limit'] ?> Video/hari</div>
         <div class="lvl-spec"><i class="ph-bold ph-arrow-circle-down" style="color:#10b981;"></i> Min. WD rendah</div>
-        <div class="lvl-spec lvl-spec--full"><i class="ph-bold ph-lightning" style="color:#f59e0b;"></i> Paling banyak dipilih â€“ nilai terbaik!</div>
+        <div class="lvl-spec lvl-spec--full"><i class="ph-bold ph-lightning" style="color:#f59e0b;"></i> Paling banyak dipilih &mdash; nilai terbaik!</div>
       </div>
       <button type="button" class="lvl-cta lvl-cta--jagoan <?= !$can_afford ? 'lvl-cta--disabled' : '' ?>">
-        <?= $can_afford ? 'ðŸ† Jadilah Jagoan!' : 'ðŸ’³ Saldo Kurang â€“ Topup Dulu' ?>
+        <?= $can_afford ? 'Jadilah Jagoan!' : 'Saldo Kurang &mdash; Topup Dulu' ?>
       </button>
     </div>
     <?php endif; ?>
@@ -610,7 +555,7 @@ html body { background: #f97316 !important; background-image: none !important; }
     <?php if ($pejuang): $m = $pejuang; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
     <div class="lvl lvl--pejuang" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
       <div class="lvl-head">
-        <div class="lvl-icon" style="background:#f1f5f9;"><?= htmlspecialchars($m['icon'] ?: 'âš”ï¸') ?></div>
+        <div class="lvl-icon" style="background:#f1f5f9;"><i class="ph-bold ph-sword" style="color:#475569;font-size:24px;"></i></div>
         <div class="lvl-meta">
           <div class="lvl-name"><?= htmlspecialchars($m['name']) ?></div>
           <div class="lvl-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
@@ -625,21 +570,21 @@ html body { background: #f97316 !important; background-image: none !important; }
         <div class="lvl-spec"><i class="ph-bold ph-coins" style="color:#64748b;"></i> Mulai cuan instan</div>
       </div>
       <button type="button" class="lvl-cta lvl-cta--pejuang <?= !$can_afford ? 'lvl-cta--disabled' : '' ?>">
-        <?= $can_afford ? 'âš”ï¸ Mulai Jadi Pejuang!' : 'ðŸ’³ Saldo Kurang â€“ Topup Dulu' ?>
+        <?= $can_afford ? 'Mulai Jadi Pejuang!' : 'Saldo Kurang &mdash; Topup Dulu' ?>
       </button>
     </div>
     <?php endif; ?>
 
   </form>
 
-  <!-- â”€â”€ INFO CARD â”€â”€ -->
+  <!-- INFO CARD -->
   <div class="gc" style="margin-top:4px;margin-bottom:24px;">
     <div style="font-size:14px;font-weight:900;color:#0f172a;margin-bottom:14px;display:flex;align-items:center;gap:6px;">
       <i class="ph-bold ph-lightbulb" style="color:#f59e0b;font-size:18px;"></i> Cara Upgrade
     </div>
     <div class="step-row">
       <div class="step-num" style="background:#a7f3d0;">1</div>
-      <div class="step-txt"><strong>Topup Saldo Beli</strong> via menu Deposit â€” digunakan khusus untuk beli rank.</div>
+      <div class="step-txt"><strong>Topup Saldo Beli</strong> via menu Deposit &mdash; khusus untuk beli rank.</div>
     </div>
     <div class="step-row">
       <div class="step-num" style="background:#fde047;">2</div>
@@ -647,7 +592,7 @@ html body { background: #f97316 !important; background-image: none !important; }
     </div>
     <div class="step-row" style="margin-bottom:16px;">
       <div class="step-num" style="background:#f9a8d4;">3</div>
-      <div class="step-txt"><strong>Konfirmasi</strong> di pop-up â€” saldo terpotong &amp; rank langsung aktif!</div>
+      <div class="step-txt"><strong>Konfirmasi</strong> di pop-up &mdash; saldo terpotong &amp; rank langsung aktif!</div>
     </div>
 
     <div style="border-top:2.5px dashed #e2e8f0;padding-top:14px;margin-bottom:14px;">
@@ -655,36 +600,36 @@ html body { background: #f97316 !important; background-image: none !important; }
         <i class="ph-bold ph-check-circle" style="color:#10b981;font-size:16px;"></i> Keuntungan Naik Rank
       </div>
       <div class="ben-grid">
-        <span class="ben-pill" style="background:#e0f2fe;">ðŸ“¹ Nonton Lebih Banyak</span>
-        <span class="ben-pill" style="background:#dcfce7;">ðŸ’¸ Min. WD Makin Rendah</span>
-        <span class="ben-pill" style="background:#fef08a;">ðŸ“ˆ Cuan Makin Deras</span>
-        <span class="ben-pill" style="background:#fce7f3;">ðŸ’° Max WD Meroket</span>
+        <span class="ben-pill" style="background:#e0f2fe;">Nonton Lebih Banyak</span>
+        <span class="ben-pill" style="background:#dcfce7;">Min. WD Makin Rendah</span>
+        <span class="ben-pill" style="background:#fff8d0;">Cuan Makin Deras</span>
+        <span class="ben-pill" style="background:#fce7f3;">Max WD Meroket</span>
       </div>
     </div>
 
     <div style="background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px;padding:12px;">
       <div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:4px;"><i class="ph-bold ph-warning" style="color:#f59e0b;"></i> Catatan</div>
       <div style="font-size:11px;font-weight:800;color:#475569;line-height:1.5;">
-        â€¢ Rank baru menggantikan rank aktif (sisa masa aktif hangus).<br>
-        â€¢ Saldo Beli tidak bisa ditarik ke rekening.
+        &bull; Rank baru menggantikan rank aktif (sisa masa aktif hangus).<br>
+        &bull; Saldo Beli tidak bisa ditarik ke rekening.
       </div>
     </div>
   </div>
 
 </div>
 
-<!-- â•â•â•â•â•â• CONFIRMATION MODAL â•â•â•â•â•â• -->
+<!-- CONFIRMATION MODAL -->
 <div id="upgrade-modal" class="cg-modal">
   <div class="cg-modal-card">
-    <div class="cg-mc-hdr">ðŸš€ Konfirmasi Upgrade</div>
+    <div class="cg-mc-hdr"><i class="ph-bold ph-rocket-launch"></i> Konfirmasi Upgrade</div>
     <div class="cg-mc-sub">Pastikan kamu yakin sebelum memproses!</div>
     <div class="cg-mc-box">
       <div class="cg-mc-lbl">Rank Dipilih</div>
-      <div class="cg-mc-val" id="modal-name">â€”</div>
-      <div class="cg-mc-price" id="price-row">Harga: <span id="modal-price">â€”</span></div>
-      <div class="cg-mc-discount" id="discount-row">Diskon: -<span id="modal-discount">â€”</span> (<span id="modal-pct">â€”</span>)</div>
-      <div class="cg-mc-total" id="final-price-row">Total Bayar: <span id="modal-final-price">â€”</span></div>
-      <div class="cg-mc-dur">Berlaku <span id="modal-days">â€”</span> hari setelah aktivasi</div>
+      <div class="cg-mc-val" id="modal-name">--</div>
+      <div class="cg-mc-price" id="price-row">Harga: <span id="modal-price">--</span></div>
+      <div class="cg-mc-discount" id="discount-row">Diskon: -<span id="modal-discount">--</span> (<span id="modal-pct">--</span>)</div>
+      <div class="cg-mc-total" id="final-price-row">Total Bayar: <span id="modal-final-price">--</span></div>
+      <div class="cg-mc-dur">Berlaku <span id="modal-days">--</span> hari setelah aktivasi</div>
     </div>
     <div style="margin-bottom:16px;">
       <button type="button" id="toggle-voucher-btn" onclick="toggleVoucher()" style="background:none;border:none;color:#0ea5e9;font-weight:900;font-size:12px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;"><i class="ph-bold ph-tag"></i> Pakai Voucher Diskon?</button>
@@ -695,18 +640,18 @@ html body { background: #f97316 !important; background-image: none !important; }
       <div id="voucher-msg" style="font-size:11px;font-weight:800;margin-top:6px;display:none;"></div>
     </div>
     <div id="modal-warn" style="display:none;font-size:11px;color:#ef4444;font-weight:800;margin-bottom:16px;background:#fef2f2;border:2px solid #fca5a5;border-radius:10px;padding:10px 12px;"></div>
-    <div style="font-size:11px;color:#94a3b8;font-weight:800;margin-bottom:16px;text-align:center;">âš ï¸ Saldo Beli otomatis terpotong. Aksi ini permanen.</div>
+    <div style="font-size:11px;color:#94a3b8;font-weight:800;margin-bottom:16px;text-align:center;">Saldo Beli otomatis terpotong. Aksi ini permanen.</div>
     <div class="cg-btn-row">
       <button type="button" class="cg-btn cg-btn--cancel" onclick="closeConfirm()">Batal</button>
-      <button type="button" id="modal-confirm-btn" class="cg-btn cg-btn--confirm" onclick="submitUpgrade()">âœ… YA, GAS!</button>
+      <button type="button" id="modal-confirm-btn" class="cg-btn cg-btn--confirm" onclick="submitUpgrade()">YA, GAS!</button>
     </div>
   </div>
 </div>
 
-<!-- â•â•â•â•â•â• REFUND MODAL â•â•â•â•â•â• -->
+<!-- REFUND MODAL -->
 <div id="refund-modal" class="cg-modal">
   <div class="cg-modal-card" style="border-color:#b91c1c;box-shadow:0 8px 0 #b91c1c;">
-    <div class="cg-mc-hdr" style="color:#ef4444;">âš ï¸ Minta Refund?</div>
+    <div class="cg-mc-hdr" style="color:#ef4444;"><i class="ph-bold ph-warning"></i> Minta Refund?</div>
     <div class="cg-mc-sub">Kamu yakin ingin refund rank aktifmu?</div>
     <div style="background:#fef2f2;border:2.5px solid #fca5a5;border-radius:14px;padding:12px;margin-bottom:16px;font-size:11px;font-weight:800;color:#991b1b;line-height:1.5;">
       Saldo dikembalikan ke <strong>Saldo Beli</strong> dengan potongan admin (jika ada). Rank kamu akan hangus!
@@ -731,12 +676,12 @@ function checkAffordability(p) {
   const warn = document.getElementById('modal-warn');
   if (userBal < p) {
     btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
-    btn.innerText = 'ðŸ’³ Saldo Kurang';
+    btn.innerText = 'Saldo Kurang';
     warn.style.display = 'block';
-    warn.innerHTML = 'âš ï¸ Kurang <strong>Rp ' + (p - userBal).toLocaleString('id-ID') + '</strong>. Silakan deposit dulu.';
+    warn.innerHTML = 'Saldo kurang <strong>Rp ' + (p - userBal).toLocaleString('id-ID') + '</strong>. Silakan deposit dulu.';
   } else {
     btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
-    btn.innerText = 'âœ… YA, GAS!';
+    btn.innerText = 'YA, GAS!';
     warn.style.display = 'none';
   }
 }
@@ -764,28 +709,28 @@ function closeConfirm() {
 function toggleVoucher() {
   const vb = document.getElementById('voucher-box');
   const tb = document.getElementById('toggle-voucher-btn');
-  if(vb.style.display === 'none') { vb.style.display='flex'; tb.innerHTML='âœ– Tutup Voucher'; }
+  if(vb.style.display === 'none') { vb.style.display='flex'; tb.innerHTML='<i class="ph-bold ph-x"></i> Tutup Voucher'; }
   else { vb.style.display='none'; tb.innerHTML='<i class="ph-bold ph-tag"></i> Pakai Voucher Diskon?'; }
 }
 function applyVoucher() {
   const code = document.getElementById('voucher-input').value.toUpperCase().trim();
   const mid = document.getElementById('chosen-id').value;
   const msg = document.getElementById('voucher-msg');
-  if(!code){ msg.style.color='#ef4444'; msg.innerText='âš ï¸ Masukkan kode voucher.'; msg.style.display='block'; return; }
-  msg.style.color='#94a3b8'; msg.innerText='â³ Mengecek...'; msg.style.display='block';
+  if(!code){ msg.style.color='#ef4444'; msg.innerText='Masukkan kode voucher.'; msg.style.display='block'; return; }
+  msg.style.color='#94a3b8'; msg.innerText='Mengecek...'; msg.style.display='block';
   fetch('', {
     method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
     body:'action=check_voucher&code='+encodeURIComponent(code)+'&membership_id='+encodeURIComponent(mid)+'&_csrf='+encodeURIComponent(document.querySelector('input[name="_csrf"]')?.value||'')
   })
   .then(r=>r.json())
   .then(res=>{
-    if(res.error){ msg.style.color='#ef4444'; msg.innerText='âŒ '+res.error; msg.style.display='block';
+    if(res.error){ msg.style.color='#ef4444'; msg.innerText=res.error; msg.style.display='block';
       document.getElementById('applied-voucher-code').value='';
       document.getElementById('discount-row').style.display='none';
       document.getElementById('final-price-row').style.display='none';
       checkAffordability(currentPrice);
     } else {
-      msg.style.color='#10b981'; msg.innerText='âœ… Diskon '+res.discount_text+' aktif!'; msg.style.display='block';
+      msg.style.color='#10b981'; msg.innerText='Diskon '+res.discount_text+' aktif!'; msg.style.display='block';
       document.getElementById('applied-voucher-code').value=code;
       document.getElementById('modal-discount').textContent=res.discount_amount_formatted;
       document.getElementById('modal-pct').textContent=res.discount_text;
@@ -797,16 +742,15 @@ function applyVoucher() {
       checkAffordability(res.final_price);
     }
   })
-  .catch(()=>{ msg.style.color='#ef4444'; msg.innerText='âŒ Gagal cek voucher.'; msg.style.display='block'; });
+  .catch(()=>{ msg.style.color='#ef4444'; msg.innerText='Gagal cek voucher.'; msg.style.display='block'; });
 }
 function submitUpgrade() {
   const btn = document.getElementById('modal-confirm-btn');
-  btn.disabled = true; btn.textContent = 'â³ Memproses...';
+  btn.disabled = true; btn.textContent = 'Memproses...';
   document.getElementById('upgrade-form').submit();
 }
-document.getElementById('upgrade-modal').addEventListener('click', e=>{ if(e.target===this||e.target.id==='upgrade-modal') closeConfirm(); });
-document.getElementById('refund-modal').addEventListener('click', e=>{ if(e.target.id==='refund-modal') e.target.style.display='none'; });
+document.getElementById('upgrade-modal').addEventListener('click', function(e){ if(e.target===this) closeConfirm(); });
+document.getElementById('refund-modal').addEventListener('click', function(e){ if(e.target===this) e.target.style.display='none'; });
 </script>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
-
