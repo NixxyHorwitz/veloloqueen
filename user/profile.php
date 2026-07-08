@@ -86,8 +86,7 @@ $_psvg = [
 /* ══════════════════════════════════════════════
    PROFILE PAGE — COMPACT GAME STYLE
    ══════════════════════════════════════════════ */
-body { background: #f97316 !important; color: #0f172a; }
-.prof-page { padding: 12px 14px 24px; position: relative; z-index: 2;}
+.prof-page { padding: 12px 14px 24px; }
 
 /* ── Flash ── */
 .prof-flash { padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; margin-bottom: 12px; border: 2px solid; display: flex; align-items: center; gap: 8px; box-shadow: 0 3px 0; }
@@ -122,11 +121,11 @@ body { background: #f97316 !important; color: #0f172a; }
 .ref-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #ca8a04; }
 
 /* ── GRID NAV ── */
-.nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-.nav-item { background: #ffffff; border: 2.5px solid #c2410c; border-radius: 12px; padding: 12px 10px; display: flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 3px 0 #9a3412; color: #9a3412; transition: transform 0.1s; }
-.nav-item:active { transform: translateY(2px); box-shadow: 0 0 0 #9a3412; }
-.nav-item i { font-size: 20px; color: #ea580c; }
-.nav-item span { font-size: 12px; font-weight: 900; }
+.p-nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.p-nav-item { background: #ffffff; border: 2.5px solid #c2410c; border-radius: 12px; padding: 12px 10px; display: flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 3px 0 #9a3412; color: #9a3412; transition: transform 0.1s; }
+.p-nav-item:active { transform: translateY(2px); box-shadow: 0 0 0 #9a3412; }
+.p-nav-item i { font-size: 20px; color: #ea580c; }
+.p-nav-item span { font-size: 12px; font-weight: 900; }
 
 /* ── COMPACT ACCORDIONS ── */
 .c-group { background: #ffffff; border: 2.5px solid #c2410c; border-radius: 14px; box-shadow: 0 4px 0 #9a3412; overflow: hidden; margin-bottom: 12px; }
@@ -161,7 +160,7 @@ body { background: #f97316 !important; color: #0f172a; }
 </style>
 
 <!-- BACKGROUND -->
-<div style="position:fixed;inset:0;background:radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%);background-size:50px 50px;background-position:0 0, 25px 25px;pointer-events:none;z-index:1;"></div>
+<div style="position:fixed;inset:0;background:radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%);background-size:50px 50px;background-position:0 0, 25px 25px;pointer-events:none;z-index:-1;"></div>
 
 <div class="prof-page">
   <?php if ($flash): ?>
@@ -210,17 +209,17 @@ body { background: #f97316 !important; color: #0f172a; }
   </div>
 
   <!-- GRID NAV -->
-  <div class="nav-grid">
-    <a href="/edit-rekening" class="nav-item">
+  <div class="p-nav-grid">
+    <a href="/edit-rekening" class="p-nav-item">
       <i class="ph-fill ph-bank"></i> <span>Rekening</span>
     </a>
-    <a href="/upgrade" class="nav-item">
+    <a href="/upgrade" class="p-nav-item">
       <i class="ph-fill ph-rocket-launch"></i> <span>Upgrade</span>
     </a>
-    <a href="/history" class="nav-item">
+    <a href="/history" class="p-nav-item">
       <i class="ph-fill ph-receipt"></i> <span>Riwayat</span>
     </a>
-    <a href="/panduan" class="nav-item">
+    <a href="/panduan" class="p-nav-item">
       <i class="ph-fill ph-book-open"></i> <span>Panduan</span>
     </a>
   </div>
