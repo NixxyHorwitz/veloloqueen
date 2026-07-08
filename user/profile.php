@@ -264,7 +264,7 @@ body { background: #f97316 !important; color: #0f172a; }
   <div class="contact-row">
     <?php foreach ($_contact_btns as $cb): ?>
       <?php
-        $t = strtolower($cb['type']);
+        $t = strtolower($cb['icon_value']);
         $svg = $_psvg[$t] ?? $_psvg['cs'];
         $c = match($t) {
             'wa' => 'background:linear-gradient(135deg, #4ade80, #16a34a);border-color:#14532d;box-shadow:0 3px 0 #14532d;',
