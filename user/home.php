@@ -656,7 +656,7 @@ body { background: #f97316 !important; }
        style="background:linear-gradient(135deg,#60a5fa,#1d4ed8);box-shadow:0 4px 0 #1e3a8a">
       <i class="ph-fill ph-gift"></i>
       <div class="bento-wide__txt">
-        <div class="bento-wide__label">Tukar Poin</div>
+        <div class="bento-wide__label">Tukar Kode</div>
         <div class="bento-wide__sub">Klaim hadiahmu 🎁</div>
       </div>
     </a>
