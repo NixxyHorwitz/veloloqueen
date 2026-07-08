@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/auth/guard.php';
 $flash = $flashType = '';
@@ -66,9 +66,9 @@ require dirname(__DIR__) . '/partials/header.php';
 ?>
 
 <style>
-/* ══════════════════════════════════════════════════════════
-   PROFILE PAGE — CASUAL GAME UI v2 (COMPACT & MINIMALIST)
-   ══════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   PROFILE PAGE â€” CASUAL GAME UI v2 (COMPACT & MINIMALIST)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* HERO */
 .p-hero {
@@ -211,7 +211,7 @@ require dirname(__DIR__) . '/partials/header.php';
 #toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 900; border: 2px solid #14532d; box-shadow: 0 4px 0 #14532d; display: none; z-index: 1000; }
 </style>
 
-<div class="p-hero">
+<!-- FORCE UPDATE 1 --><div class="p-hero">
   <div class="p-hero-top">
     <div class="p-avatar"><?= strtoupper(substr($user['username'], 0, 1)) ?></div>
     <div class="p-info">
@@ -359,7 +359,7 @@ require dirname(__DIR__) . '/partials/header.php';
   </a>
 </div>
 
-<div id="toast">✅ Tersalin!</div>
+<div id="toast">âœ… Tersalin!</div>
 <script src="/assets/js/toast.js"></script>
 <script>
 function toggleAcc(id) {
