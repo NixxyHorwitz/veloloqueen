@@ -93,20 +93,40 @@ body {
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
+  flex-direction: column;
+  padding: 0;
 }
 
-/* Outer Card */
+.auth-wrapper {
+  flex: 1;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.auth-hero-logo { font-size: 36px; font-weight: 900; text-shadow: 0 4px 0 #c2410c; margin-bottom: 12px; }
+.auth-hero-logo em { color: #fde68a; font-style: normal; }
+.auth-hero-emoji { font-size: 80px; animation: float-hero 3s ease-in-out infinite; filter: drop-shadow(0 10px 10px rgba(234,88,12,0.5)); }
+@keyframes float-hero { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+/* Outer Card - Bottom Sheet */
 .auth-card {
   background: #fff8f0;
-  border: 4px solid #fff;
-  border-radius: 36px;
-  box-shadow: 0 10px 0 #c2410c, 0 20px 40px rgba(0,0,0,0.3);
-  padding: 32px 24px 24px;
+  border-top: 5px solid #fff;
+  border-radius: 40px 40px 0 0;
+  box-shadow: 0 -10px 30px rgba(194,65,12,0.4);
+  padding: 36px 24px 40px;
   width: 100%;
-  max-width: 380px;
   position: relative;
 }
 
@@ -132,9 +152,7 @@ body {
 .auth-close:active { transform: translateY(3px); box-shadow: 0 2px 0 #b91c1c; }
 
 .auth-header { text-align: center; margin-bottom: 24px; }
-.auth-emoji { font-size: 48px; margin-bottom: 8px; display: inline-block; animation: bounce 2s infinite ease-in-out; }
-@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-.auth-title { font-size: 22px; font-weight: 900; color: #0f172a; line-height: 1.2; }
+.auth-title { font-size: 24px; font-weight: 900; color: #0f172a; line-height: 1.2; }
 .auth-subtitle { font-size: 13px; font-weight: 700; color: #64748b; margin-top: 4px; }
 
 /* Error alert */
@@ -213,42 +231,50 @@ body {
 </head>
 <body>
 
-<div class="auth-card">
-  <a href="/" class="auth-close">✕</a>
+<div class="auth-wrapper">
   
-  <div class="auth-header">
-    <div class="auth-emoji">👋</div>
-    <div class="auth-title">Selamat Datang</div>
-    <div class="auth-subtitle">Masuk ke akunmu dan mulai nonton!</div>
+  <div class="auth-hero">
+    <div class="auth-hero-emoji">🚀</div>
+    <div class="auth-hero-logo">Velo<em>star</em></div>
   </div>
 
-  <?php if ($error): ?>
-  <div class="auth-err">⚠️ <?= htmlspecialchars($error) ?></div>
-  <?php endif; ?>
-
-  <form method="POST">
-    <?= csrf_field() ?>
-
-    <div class="inp-group">
-      <label class="inp-label">Username / Email</label>
-      <div class="inp-box">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <input type="text" name="login" value="<?= htmlspecialchars($_POST['login'] ?? '') ?>" placeholder="username atau email" autofocus autocomplete="username">
-      </div>
+  <div class="auth-card">
+    <a href="/" class="auth-close">✕</a>
+    
+    <div class="auth-header">
+      <div class="auth-title">Selamat Datang</div>
+      <div class="auth-subtitle">Masuk ke akunmu dan mulai nonton!</div>
     </div>
 
-    <div class="inp-group">
-      <label class="inp-label">Password</label>
-      <div class="inp-box">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        <input type="password" id="pwd" name="password" placeholder="Password kamu" autocomplete="current-password">
-        <button type="button" class="eye" onclick="let p=document.getElementById('pwd');p.type=p.type==='password'?'text':'password'">👁</button>
-      </div>
-    </div>
+    <?php if ($error): ?>
+    <div class="auth-err">⚠️ <?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
-    <button type="submit" class="btn-3d btn-primary">Masuk Sekarang 🚀</button>
-    <a href="/register" class="btn-3d btn-secondary">Belum Punya Akun? Daftar ✨</a>
-  </form>
+    <form method="POST">
+      <?= csrf_field() ?>
+
+      <div class="inp-group">
+        <label class="inp-label">Username / Email</label>
+        <div class="inp-box">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" name="login" value="<?= htmlspecialchars($_POST['login'] ?? '') ?>" placeholder="username atau email" autofocus autocomplete="username">
+        </div>
+      </div>
+
+      <div class="inp-group">
+        <label class="inp-label">Password</label>
+        <div class="inp-box">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <input type="password" id="pwd" name="password" placeholder="Password kamu" autocomplete="current-password">
+          <button type="button" class="eye" onclick="let p=document.getElementById('pwd');p.type=p.type==='password'?'text':'password'">👁</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-3d btn-primary">Masuk Sekarang 🚀</button>
+      <a href="/register" class="btn-3d btn-secondary">Belum Punya Akun? Daftar ✨</a>
+    </form>
+  </div>
+  
 </div>
 
 </body>
