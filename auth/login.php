@@ -104,7 +104,7 @@ body {
   border: 4px solid #fff;
   border-radius: 36px;
   box-shadow: 0 10px 0 #c2410c, 0 20px 40px rgba(0,0,0,0.3);
-  padding: 32px 24px 24px;
+  padding: 24px 20px 20px;
   width: 100%;
   max-width: 380px;
   position: relative;
@@ -155,23 +155,23 @@ body {
 .inp-box {
   display: flex; align-items: stretch;
   background: #fff;
-  border: 3.5px solid #cbd5e1;
-  border-radius: 20px;
-  box-shadow: 0 6px 0 #e2e8f0;
+  border: 2.5px solid #cbd5e1;
+  border-radius: 16px;
+  box-shadow: 0 5px 0 #e2e8f0;
   transition: all 0.2s;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 .inp-box:focus-within {
   border-color: #f97316;
-  box-shadow: 0 6px 0 #ea580c;
+  box-shadow: 0 5px 0 #ea580c;
   transform: translateY(-2px);
 }
 .inp-icon {
   background: #f1f5f9;
-  padding: 0 16px;
+  padding: 0 14px;
   display: flex; align-items: center; justify-content: center;
-  border-right: 3.5px solid #cbd5e1;
+  border-right: 2.5px solid #cbd5e1;
   color: #94a3b8;
   transition: all 0.2s;
 }
@@ -180,26 +180,28 @@ body {
   border-right-color: #f97316;
   color: #f97316;
 }
-.inp-icon svg { width: 22px; height: 22px; }
+.inp-icon svg { width: 20px; height: 20px; }
 .inp-field {
-  flex: 1; padding: 14px 16px; display: flex; align-items: center; position: relative;
+  flex: 1; padding: 10px 14px; display: flex; align-items: center; position: relative;
 }
 .inp-field input {
   width: 100%; border: none; outline: none; background: none;
-  font-size: 15px; font-weight: 800; color: #0f172a; font-family: inherit;
+  font-size: 14px; font-weight: 800; color: #0f172a; font-family: inherit;
 }
-.inp-field input::placeholder { color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; }
-.inp-field .eye { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; color: #94a3b8; transition: color 0.2s; margin-left: 10px; }
+.inp-field input::placeholder { color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+.inp-field .eye { background: none; border: none; font-size: 16px; cursor: pointer; padding: 0; color: #94a3b8; transition: color 0.2s; margin-left: 8px; }
 .inp-field .eye:hover { color: #0f172a; }
 
 /* 3D Buttons */
 .btn-3d {
-  border: none; border-radius: 20px; padding: 14px;
-  font-weight: 900; font-size: 16px; font-family: inherit;
+  width: 100%;
+  border: none; border-radius: 20px; padding: 12px;
+  font-weight: 900; font-size: 15px; font-family: inherit;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   cursor: pointer; position: relative; overflow: hidden; text-decoration: none;
   transition: transform 0.1s, box-shadow 0.1s;
   text-shadow: 0 2px 2px rgba(0,0,0,0.15);
+  margin-top: 16px;
 }
 .btn-3d::after {
   content: ''; position: absolute; top: 4px; left: 10%; right: 10%; height: 35%;
@@ -208,26 +210,14 @@ body {
 }
 .btn-3d:active { transform: translateY(5px); }
 
-.auth-actions {
-  display: flex; gap: 12px; margin-top: 10px;
-}
-
 .btn-primary {
-  flex: 1;
   background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff;
-  border: 3.5px solid #93c5fd; box-shadow: 0 6px 0 #1d4ed8;
+  border: 3.5px solid #93c5fd; box-shadow: 0 5px 0 #1d4ed8;
 }
 .btn-primary:active { box-shadow: 0 1px 0 #1d4ed8; }
 
-.btn-secondary {
-  width: 64px; flex-shrink: 0;
-  background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff;
-  border: 3.5px solid #fde68a; box-shadow: 0 6px 0 #d97706;
-}
-.btn-secondary:active { box-shadow: 0 1px 0 #d97706; }
-
 /* Footer */
-.auth-ft { text-align: center; font-size: 13px; color: #64748b; font-weight: 700; margin-top: 24px; }
+.auth-ft { text-align: center; font-size: 13px; color: #64748b; font-weight: 700; margin-top: 20px; }
 .auth-ft a { color: #ea580c; font-weight: 900; text-decoration: underline; }
 </style>
 </head>
@@ -268,13 +258,10 @@ body {
       </div>
     </div>
 
-    <div class="auth-actions">
-      <a href="/register" class="btn-3d btn-secondary" title="Daftar Baru">
-        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 4v16m8-8H4"/></svg>
-      </a>
-      <button type="submit" class="btn-3d btn-primary">MASUK SEKARANG 🚀</button>
-    </div>
+    <button type="submit" class="btn-3d btn-primary">MASUK SEKARANG 🚀</button>
   </form>
+
+  <div class="auth-ft">Belum buat akun? <a href="/register">Buat di sini</a></div>
 </div>
 
 </body>
