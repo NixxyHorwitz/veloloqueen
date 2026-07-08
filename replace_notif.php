@@ -1,56 +1,8 @@
 <?php
-declare(strict_types=1);
-require_once dirname(__DIR__) . '/auth/guard.php';
+$orig = file_get_contents(__DIR__ . '/user/notifications.php');
+$parts = explode('<style>', $orig, 2);
 
-// ── Fetch notifications for this user ────────────────────────────────────────
-$notifications = [];
-try {
-    $stmt = $pdo->prepare(
-        "SELECT n.*, IF(nr.id IS NOT NULL, 1, 0) as is_read
-         FROM notifications n
-         LEFT JOIN notification_reads nr ON nr.notification_id=n.id AND nr.user_id=?
-         WHERE (n.target_type='all' OR (n.target_user_ids IS NOT NULL AND JSON_CONTAINS(n.target_user_ids, JSON_QUOTE(?))))
-           AND (n.expires_at IS NULL OR n.expires_at > NOW())
-         ORDER BY n.created_at DESC
-         LIMIT 50"
-    );
-    $stmt->execute([$user['id'], (string)$user['id']]);
-    $notifications = $stmt->fetchAll();
-} catch (\Throwable $e) {
-    // Fallback: hanya ambil notif 'all' jika JSON_CONTAINS error
-    try {
-        $stmt = $pdo->prepare(
-            "SELECT n.*, IF(nr.id IS NOT NULL, 1, 0) as is_read
-             FROM notifications n
-             LEFT JOIN notification_reads nr ON nr.notification_id=n.id AND nr.user_id=?
-             WHERE n.target_type='all'
-               AND (n.expires_at IS NULL OR n.expires_at > NOW())
-             ORDER BY n.created_at DESC LIMIT 50"
-        );
-        $stmt->execute([$user['id']]);
-        $notifications = $stmt->fetchAll();
-    } catch (\Throwable $ex) {}
-}
-
-$unread_count = 0;
-foreach ($notifications as $n) {
-    if (!$n['is_read']) $unread_count++;
-}
-
-$pageTitle  = 'Notifikasi  ';
-$activePage = 'notifications';
-require dirname(__DIR__) . '/partials/header.php';
-
-// Type config for casual game style
-$type_cfg = [
-    'info'     => ['bg' => 'linear-gradient(135deg, #e0f2fe, #bae6fd)', 'icon' => 'ℹ️', 'label' => 'Info', 'color' => '#0284c7', 'border' => '#7dd3e8'],
-    'success'  => ['bg' => 'linear-gradient(135deg, #d1fae5, #a7f3d0)', 'icon' => '✅', 'label' => 'Sukses', 'color' => '#059669', 'border' => '#6ee7b7'],
-    'warning'  => ['bg' => 'linear-gradient(135deg, #fef08a, #fde047)', 'icon' => '⚠️', 'label' => 'Awas', 'color' => '#b45309', 'border' => '#facc15'],
-    'alert'    => ['bg' => 'linear-gradient(135deg, #fee2e2, #fecaca)', 'icon' => '🚨', 'label' => 'Penting', 'color' => '#b91c1c', 'border' => '#fca5a5'],
-    'congrats' => ['bg' => 'linear-gradient(135deg, #ede9fe, #ddd6fe)', 'icon' => '🎉', 'label' => 'Selamat', 'color' => '#6d28d9', 'border' => '#c4b5fd'],
-];
-?>
-
+$newHtml = <<<'EOT'
 <style>
 /* ══════════════════════════════════════════════
    NOTIFICATIONS PAGE — CASUAL GAME STYLE (ULTRA COMPACT)
@@ -190,3 +142,7 @@ async function markAllRead() {
 </script>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
+EOT;
+
+file_put_contents(__DIR__ . '/user/notifications.php', $parts[0] . $newHtml);
+echo "Notifications updated successfully.";
