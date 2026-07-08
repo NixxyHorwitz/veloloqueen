@@ -277,6 +277,7 @@ require dirname(__DIR__) . '/partials/header.php';
 /* ══════════════════════════════════════════════
    UPGRADE PAGE — TRUE CASUAL GAME STYLE
    ══════════════════════════════════════════════ */
+body { background: #fff8f0 !important; }
 .up-page { padding: 0 0 20px; }
 
 /* ── Hero Banner ── */
@@ -483,14 +484,21 @@ require dirname(__DIR__) . '/partials/header.php';
         $m_class = "m-card--" . ($i % 5);
         $bg_color = ['#f8fafc','#f0f9ff','#fefce8','#faf5ff','#fef2f2'][$i % 5];
         $txt_color = ['#0f172a','#0369a1','#b45309','#6b21a8','#b91c1c'][$i % 5];
-      ?>
-      <div class="m-card <?= $m_class ?>">
         
-        <?php if ($i === 2): ?>
+        $is_gold = ($i === 2);
+        $is_mythic = ($i === 3);
+      ?>
+      <div class="m-card <?= $m_class ?>" <?= $is_mythic ? 'style="border-color:#ca8a04; box-shadow:0 8px 0 #a16207; transform:scale(1.02); margin-top:16px; margin-bottom:20px; background:#fefce8; z-index:10;"' : '' ?>>
+        
+        <?php if ($is_gold): ?>
         <div class="m-badge-pop">🔥 TERPOPULER</div>
         <?php endif; ?>
+
+        <?php if ($is_mythic): ?>
+        <div class="m-badge-pop" style="background:linear-gradient(135deg, #eab308, #ca8a04); border-color:#fff; box-shadow:0 3px 0 #854d0e; font-size:12px; padding:6px 14px; top:-16px; right:-12px; transform:rotate(6deg);">👑 BEST DEAL!</div>
+        <?php endif; ?>
         
-        <?php if ((float)$m['original_price'] > 0): ?>
+        <?php if ((float)$m['original_price'] > 0 && !$is_mythic): ?>
         <div class="m-badge-pro">🎉 PROMO DISKON!</div>
         <?php endif; ?>
         
@@ -500,7 +508,7 @@ require dirname(__DIR__) . '/partials/header.php';
               <?= htmlspecialchars($m['icon'] ?: '⭐') ?>
             </div>
             <div>
-              <div class="m-name" style="color:<?= $txt_color ?>"><?= htmlspecialchars($m['name']) ?></div>
+              <div class="m-name" style="color:<?= $txt_color ?>; <?= $is_mythic ? 'font-size:18px; color:#b45309;' : '' ?>"><?= htmlspecialchars($m['name']) ?></div>
               <div class="m-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
             </div>
           </div>
@@ -508,18 +516,32 @@ require dirname(__DIR__) . '/partials/header.php';
             <?php if ((float)$m['original_price'] > 0): ?>
             <div class="m-price-old"><?= format_rp((float)$m['original_price']) ?></div>
             <?php endif; ?>
-            <div class="m-price" style="color:<?= $txt_color ?>"><?= format_rp((float)$m['price']) ?></div>
+            <div class="m-price" style="color:<?= $txt_color ?>; <?= $is_mythic ? 'font-size:22px; color:#b45309;' : '' ?>"><?= format_rp((float)$m['price']) ?></div>
           </div>
         </div>
         
-        <div class="m-specs">
-          <div><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>× Tonton / hari</div>
-          <div><i class="ph-bold ph-trend-up"></i> Maksimal Narik <?= (float)$m['max_wd'] > 0 ? format_rp((float)$m['max_wd']) : '<span style="color:#10b981;font-weight:900">Tanpa batas</span>' ?></div>
-          <?php if ($m['description']): ?><div class="m-desc"><i class="ph-bold ph-info"></i> <?= nl2br(htmlspecialchars($m['description'])) ?></div><?php endif; ?>
+        <div class="m-specs" <?= $is_mythic ? 'style="background:#fef9c3; border-color:#fde047;"' : '' ?>>
+          <div><i class="ph-bold ph-video-camera" style="color:#0ea5e9"></i> <?= $m['watch_limit'] ?>× Tonton/hari</div>
+          <div><i class="ph-bold ph-trend-up" style="color:#10b981"></i> Maks WD <?= (float)$m['max_wd'] > 0 ? format_rp((float)$m['max_wd']) : '<span style="color:#10b981;">Bebas</span>' ?></div>
+          
+          <?php if ($m['description']): ?>
+            <div class="m-desc" <?= $is_mythic ? 'style="border-top-color:#fde047;"' : '' ?>>
+              <?php 
+              $lines = explode("\n", $m['description']);
+              foreach ($lines as $line) {
+                  $line = trim($line);
+                  if (empty($line)) continue;
+                  $line = ltrim($line, '- ');
+                  echo '<div style="display:flex; gap:6px; margin-bottom:4px; align-items:flex-start;"><i class="ph-bold ph-check" style="color:#10b981; margin-top:2px;"></i><span>' . htmlspecialchars($line) . '</span></div>';
+              }
+              ?>
+            </div>
+          <?php endif; ?>
         </div>
         
         <div class="m-actions">
           <button type="button" class="m-btn <?= $can_afford ? 'm-btn--buy' : 'm-btn--disabled' ?>"
+            <?= $is_mythic && $can_afford ? 'style="background:linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 0 #b45309; text-shadow:0 1px 2px rgba(0,0,0,0.3); font-size:14px; padding:14px;"' : '' ?>
             onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
             <i class="ph-bold ph-rocket-launch" style="font-size:16px"></i> <?= $can_afford ? 'Upgrade Sekarang' : 'Saldo Kurang' ?>
           </button>
