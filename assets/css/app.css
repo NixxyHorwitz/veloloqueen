@@ -94,7 +94,7 @@ body {
 .topbar__right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; overflow: visible; }
 .topbar__avatar { width: 36px; height: 36px; border-radius: 50%; background: #fde68a; color: #0e7490; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; text-decoration: none; border: 2.5px solid #bae6fd; box-shadow: 0 3px 0 #0c4a6e; }
 .topbar__avatar:hover { background: #fff; }
-.page-content { flex: 1; padding: 12px 10px; padding-bottom: calc(var(--nav-h) + 24px); }
+.page-content { flex: 1; padding: 0; padding-bottom: calc(var(--nav-h) + 24px); }
 
 .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--max-w); height: var(--nav-h); background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%); border-top: 3px solid #075985; box-shadow: 0 -4px 0 #0c4a6e; display: flex; z-index: 200; }
 .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 700; transition: all .2s; }

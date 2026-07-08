@@ -649,15 +649,7 @@ body { background: #f97316 !important; }
       </div>
     </a>
 
-    <!-- WIDE: Naik Level -->
-    <a href="/upgrade" class="bento-wide"
-       style="background:linear-gradient(135deg,#fbbf24,#ea580c);box-shadow:0 4px 0 #c2410c">
-      <i class="ph-fill ph-crown-simple"></i>
-      <div class="bento-wide__txt">
-        <div class="bento-wide__label">Naik Level</div>
-        <div class="bento-wide__sub">Buka keuntungan 👑</div>
-      </div>
-    </a>
+
 
     <?php if (setting($pdo, 'investment_enabled', '1') === '1'): ?>
     <!-- SM: Investasi -->
