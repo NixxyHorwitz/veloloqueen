@@ -197,7 +197,8 @@ body { background: #f97316 !important; }
 }
 
 /* ── CONTENT AREA ── */
-.home-body { background: #fff8f0; padding: 16px 14px 0; }
+.page-content { display: flex; flex-direction: column; padding-bottom: 0 !important; }
+.home-body { background: #fff8f0; padding: 16px 14px calc(var(--nav-h) + 24px); flex: 1; }
 
 /* ── SECTION HEADER ── */
 .sh {
