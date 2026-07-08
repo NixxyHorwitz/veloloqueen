@@ -1,8 +1,15 @@
 <?php
 $orig = file_get_contents(__DIR__ . '/user/redeem.php');
-$parts = explode("require dirname(__DIR__) . '/partials/header.php';\n?>\n", $orig, 2);
+// Normalize line endings to LF just for the split
+$normalized = str_replace("\r\n", "\n", $orig);
+$parts = explode("require dirname(__DIR__) . '/partials/header.php';\n?>", $normalized, 2);
+
+if (count($parts) < 2) {
+    die("Failed to split file.");
+}
 
 $newHtml = <<<'EOT'
+
 <style>
 /* ══════════════════════════════════════════════
    REDEEM PAGE — CASUAL GAME STYLE (ULTRA COMPACT)
@@ -174,5 +181,8 @@ function checkRedeem(e) {
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
 EOT;
 
-file_put_contents(__DIR__ . '/user/redeem.php', $parts[0] . "require dirname(__DIR__) . '/partials/header.php';\n?>\n" . $newHtml);
-echo "Redeem page updated successfully.";
+$finalContent = $parts[0] . "require dirname(__DIR__) . '/partials/header.php';\n?>" . $newHtml;
+// Convert back to CRLF just to be nice
+$finalContent = str_replace("\n", "\r\n", $finalContent);
+file_put_contents(__DIR__ . '/user/redeem.php', $finalContent);
+echo "Redeem page updated successfully (fixed split).";
