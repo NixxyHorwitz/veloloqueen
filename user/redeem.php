@@ -145,286 +145,274 @@ require dirname(__DIR__) . '/partials/header.php';
 ?>
 <style>
 /* ══════════════════════════════════════════════
-   REDEEM — MOBILE CASUAL GAME BENTO STYLE
+   REDEEM PAGE — CASUAL GAME STYLE (SETEMA WD)
    ══════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900;1000&display=swap');
+html body { background: #f97316 !important; background-image: none !important; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
-* { box-sizing: border-box; }
-body { background: #f97316 !important; font-family: 'Nunito', sans-serif !important; margin: 0; padding: 0; }
-
-/* ─── HERO BANNER (gridded blue) ─── */
-.rdm-hero {
-  position: relative;
-  background: linear-gradient(180deg, #4b9ef5 0%, #3b82f6 60%, #1d4ed8 100%);
-  padding: 14px 16px 0;
-  overflow: hidden;
-  text-align: center;
-  min-height: 150px;
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+.rdm-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
-.rdm-hero::before {
+
+/* ── BLUE TOP BANNER (sama seperti WD) ── */
+.wd-top {
+  background: #38bdf8;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 40px 20px;
+  background-position: 0 0, 20px 10px;
+  position: relative;
+  padding: 16px 14px 48px;
+  border-bottom: 3px solid #0284c7;
+  overflow: hidden;
+}
+
+.wd-top-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.wd-back-btn {
+  width: 32px; height: 32px;
+  background: #fde047;
+  border: none;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #ca8a04; font-size: 16px;
+  box-shadow: 0 3px 0 #a16207;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: transform 0.1s;
+}
+.wd-back-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #a16207; }
+
+.wd-notice-pill {
+  flex: 1;
+  background: #fef08a;
+  border: 2.5px solid #ca8a04;
+  border-radius: 20px;
+  padding: 8px 12px 8px 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 0 #a16207;
+}
+.wd-notice-icon { font-size: 20px; flex-shrink: 0; }
+.wd-notice-txt { font-size: 11px; font-weight: 800; color: #854d0e; line-height: 1.2; }
+
+/* GIF mascot floating dari hero ke body */
+.rdm-gif-mascot {
+  position: absolute;
+  bottom: -28px;
+  right: 14px;
+  z-index: 10;
+}
+.rdm-gif-mascot img {
+  width: 100px;
+  height: auto;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  display: block;
+}
+
+/* ── ORANGE BODY (sama seperti WD) ── */
+.wd-body {
+  flex: 1;
+  background: #f97316;
+  padding: 20px 14px 100px;
+  position: relative;
+}
+.wd-body::before {
   content: '';
   position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%),
+              radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%);
+  background-size: 50px 50px;
+  background-position: 0 0, 25px 25px;
   pointer-events: none;
 }
-.rdm-hero-gif {
-  position: relative; z-index: 2;
-  width: 150px;
-  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.35));
-  display: block;
-  margin: 0 auto;
-  /* sits on the edge of hero so it "floats" on the orange */
-  margin-bottom: -18px;
-}
 
-/* ─── ORANGE BODY ─── */
-.rdm-body {
-  background: #f97316;
-  padding: 30px 14px 100px;
-  position: relative;
-  min-height: 60vh;
-}
-.rdm-body::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.07) 10%, transparent 10%),
-              radial-gradient(circle, rgba(255,255,255,0.07) 10%, transparent 10%);
-  background-size: 36px 36px;
-  background-position: 0 0, 18px 18px;
-  pointer-events: none; z-index: 0;
-}
-
-/* ─── FLASH ALERT ─── */
-.rdm-alert {
+/* ── SECTION HEADER ── */
+.wd-section-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
   position: relative; z-index: 2;
-  padding: 12px 14px; border-radius: 16px;
-  font-size: 12px; font-weight: 800;
-  margin-bottom: 14px; border: 2px solid;
-  text-align: center;
 }
-.rdm-alert.success { background: #dcfce7; color: #166534; border-color: #4ade80; }
-.rdm-alert.error   { background: #fee2e2; color: #991b1b; border-color: #f87171; }
+.wd-sh-title { font-size: 15px; font-weight: 900; color: #7c2d12; }
 
-/* ─── SECTION LABEL ─── */
-.rdm-label {
+/* ── INPUT CODE (style bento seperti wallet row) ── */
+.rdm-code-box {
+  background: #fffbeb;
+  border: 2.5px solid #b45309;
+  border-radius: 20px;
+  padding: 14px;
+  margin-bottom: 20px;
   position: relative; z-index: 2;
-  font-size: 15px; font-weight: 900;
-  color: #fff; margin-bottom: 10px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  display: flex; align-items: center; gap: 6px;
+  box-shadow: 0 4px 0 #b45309;
 }
-
-/* ─── INPUT BENTO ─── */
-.rdm-input-wrap {
-  position: relative; z-index: 2;
-  background: #fff9f0;
-  border-radius: 24px;
-  padding: 16px 16px 14px;
-  box-shadow: 0 6px 0 rgba(0,0,0,0.12);
-  margin-bottom: 14px;
-}
-.rdm-input {
+.rdm-code-input {
   width: 100%;
   background: #fff;
-  border: 3px solid #fed7aa;
-  border-radius: 16px;
+  border: 2px solid #fde68a;
+  border-radius: 14px;
   padding: 14px;
-  font-size: 18px; font-weight: 900;
-  color: #431407;
+  font-size: 20px; font-weight: 900;
+  color: #7c2d12;
   font-family: 'Nunito', sans-serif;
   text-transform: uppercase;
   letter-spacing: 4px;
   text-align: center;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+  transition: border-color 0.2s;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
 }
-.rdm-input:focus {
-  border-color: #f97316;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.06), 0 0 0 3px rgba(249,115,22,0.25);
-}
-.rdm-input::placeholder { color: #fdba74; font-weight: 800; letter-spacing: 2px; }
+.rdm-code-input:focus { border-color: #f97316; }
+.rdm-code-input::placeholder { color: #fcd34d; font-weight: 800; letter-spacing: 2px; }
 
-/* ─── SUBMIT BUTTON (pill style like screenshot) ─── */
-.rdm-submit {
+/* ── SUBMIT BUTTON (persis sama kayak wd-submit-btn) ── */
+.wd-submit-btn {
   width: 100%;
+  background: linear-gradient(180deg, #f8fafc, #e2e8f0);
+  border: 3px solid #cbd5e1;
+  border-radius: 30px;
   padding: 16px;
-  border-radius: 50px; /* pill */
-  font-size: 18px; font-weight: 900;
-  color: #78350f;
-  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 50%, #dcfce7 100%);
-  border: 3px solid #bbf7d0;
-  box-shadow: 0 6px 0 rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.8);
+  font-size: 18px;
+  font-weight: 900;
+  color: #15803d;
+  text-shadow: 0 1px 0 #fff;
+  box-shadow: 0 6px 0 #94a3b8, inset 0 2px 4px rgba(255,255,255,1);
   cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  font-family: 'Nunito', sans-serif;
-  letter-spacing: 0.5px;
+  transition: transform 0.1s;
+  position: relative;
+  z-index: 2;
 }
-.rdm-submit:active { transform: translateY(6px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
-.rdm-submit:disabled { opacity: 0.6; pointer-events: none; }
-.rdm-submit i { font-size: 22px; color: #16a34a; }
+.wd-submit-btn::before {
+  content:''; position:absolute; top:4px; left:50%; transform:translateX(-50%);
+  width: 90%; height: 8px; background: rgba(255,255,255,0.8); border-radius:10px;
+}
+.wd-submit-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #94a3b8; }
+.wd-submit-btn:disabled { background: #cbd5e1; border-color:#94a3b8; color:#334155; box-shadow:none; transform:none; }
 
-/* ─── INFO BENTO ─── */
-.rdm-info-bento {
+/* ── INFO BOX (bento krem) ── */
+.rdm-info-box {
+  background: #fffbeb;
+  border: 2.5px solid #b45309;
+  border-radius: 20px;
+  padding: 14px;
   position: relative; z-index: 2;
-  background: #fff9f0;
-  border-radius: 24px;
-  padding: 16px;
-  box-shadow: 0 6px 0 rgba(0,0,0,0.1);
-  margin-bottom: 14px;
+  box-shadow: 0 4px 0 #b45309;
 }
-.rdm-info-bento-title {
+.rdm-info-title {
   font-size: 13px; font-weight: 900;
-  color: #c2410c;
+  color: #7c2d12;
   margin-bottom: 10px;
   display: flex; align-items: center; gap: 6px;
 }
-.rdm-info-bento-title i { font-size: 18px; }
-.rdm-info-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rdm-info-title i { font-size: 18px; color: #b45309; }
+.rdm-info-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .rdm-info-list li {
   display: flex; align-items: flex-start; gap: 8px;
   font-size: 11px; font-weight: 800;
   color: #78350f;
   line-height: 1.5;
-  background: rgba(249,115,22,0.08);
-  border-radius: 12px;
-  padding: 8px 10px;
+  background: rgba(253,230,138,0.4);
+  border-radius: 10px;
+  padding: 7px 10px;
+  border: 1.5px solid rgba(202,138,4,0.25);
 }
-.rdm-info-list li::before {
-  content: '🎯'; font-size: 14px; flex-shrink: 0; margin-top: -1px;
+.rdm-info-list li i { color: #d97706; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── FLASH NOTICE ── */
+.wd-notice-pill.flash-pill {
+  margin-bottom: 0;
+  flex: 1;
 }
 
-/* ─── MODAL ─── */
-#brutal-confirm {
-  display: none; position: fixed;
-  top:0; left:0; width:100%; height:100%;
-  background: rgba(15,23,42,0.75);
-  z-index: 9999;
-  align-items: center; justify-content: center;
-  padding: 20px;
-  backdrop-filter: blur(6px);
-}
-.m-card {
-  width: 100%; max-width: 320px;
-  background: #fff9f0;
-  border-radius: 28px;
-  box-shadow: 0 12px 0 rgba(0,0,0,0.15);
-  overflow: hidden;
-  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.m-hdr {
-  background: linear-gradient(135deg, #fbbf24, #f97316);
-  padding: 14px 16px;
-  font-size: 16px; font-weight: 900;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  display: flex; align-items: center; gap: 8px;
-  text-align: center; justify-content: center;
-}
-.m-body { padding: 16px; }
-.m-list {
-  margin: 0 0 14px; padding: 0;
-  list-style: none;
-  display: flex; flex-direction: column; gap: 6px;
-}
-.m-list li {
-  background: #fef3c7;
-  border-radius: 12px;
-  padding: 8px 12px;
-  font-size: 13px; font-weight: 900;
-  color: #92400e;
-  border: 2px solid #fde68a;
-}
-.m-confirm-txt {
-  font-size: 11px; font-weight: 800;
-  color: #92400e;
-  text-align: center; margin-bottom: 14px;
-}
-.m-btn-row { display: flex; gap: 10px; }
-.m-btn {
-  flex: 1; padding: 12px;
-  border-radius: 50px;
-  font-weight: 900; font-size: 13px;
-  text-align: center; cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s;
-  font-family: 'Nunito', sans-serif;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.m-btn.cancel {
-  background: #f1f5f9;
-  box-shadow: 0 4px 0 #94a3b8;
-  color: #475569;
-}
-.m-btn.confirm {
-  background: linear-gradient(180deg, #4ade80, #16a34a);
-  box-shadow: 0 4px 0 #15803d;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-.m-btn:active { transform: translateY(4px); box-shadow: none; }
-
-@keyframes popIn {
-  0%   { transform: scale(0.7) translateY(40px); opacity: 0; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
-}
+/* ── MODAL (persis seperti WD cg-modal) ── */
+.cg-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(3px); }
+.cg-modal-box { background:#fffbeb; width:100%; max-width:320px; border-radius:24px; border:3px solid #b45309; box-shadow:0 8px 0 #7c2d12; overflow:hidden; animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+.cg-modal-hdr { background:linear-gradient(135deg, #fde047, #f59e0b); padding:14px; text-align:center; color:#7c2d12; font-weight:900; font-size:14px; border-bottom:2.5px solid #d97706; }
+.cg-modal-bd { padding:20px; }
+.cg-modal-list { list-style:none; margin:0 0 14px; padding:0; display:flex; flex-direction:column; gap:6px; }
+.cg-modal-list li { background:#fef08a; border:1.5px solid #d97706; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:900; color:#7c2d12; }
+.cg-modal-actions { display:flex; gap:10px; }
+.cg-btn-cancel { flex:1; padding:12px; background:#f1f5f9; border:2.5px solid #cbd5e1; border-radius:12px; font-weight:900; color:#64748b; font-size:12px; box-shadow:0 4px 0 #94a3b8; cursor:pointer; }
+.cg-btn-confirm { flex:1.5; padding:12px; background:#4ade80; border:2.5px solid #166534; border-radius:12px; font-weight:900; color:#fff; box-shadow:0 4px 0 #166534; font-size:12px; cursor:pointer; }
+.cg-btn-confirm:active { transform:translateY(3px); box-shadow:0 1px 0 #166534; }
+.cg-btn-cancel:active { transform:translateY(3px); box-shadow:0 1px 0 #94a3b8; }
+@keyframes popIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
 </style>
 
-<!-- HERO BANNER -->
-<div class="rdm-hero">
-  <img class="rdm-hero-gif" src="/assets/ccg.gif" alt="Buaya Makan Kado">
-</div>
+<div class="rdm-container">
+  <!-- TOP BANNER (persis seperti WD) -->
+  <div class="wd-top">
+    <div class="wd-top-bar">
+      <a href="/home" class="wd-back-btn"><i class="ph-bold ph-arrow-left"></i></a>
 
-<div class="rdm-body">
-  <?php if ($flash): ?>
-  <div class="rdm-alert <?= $flashType ?>"><?= htmlspecialchars($flash) ?></div>
-  <?php endif; ?>
+      <?php if ($flash): ?>
+        <div class="wd-notice-pill" style="<?= $flashType==='error' ? 'background:#fef2f2; border-color:#dc2626; box-shadow:0 4px 0 #991b1b;' : 'background:#f0fdf4; border-color:#16a34a; box-shadow:0 4px 0 #14532d;' ?>">
+          <div class="wd-notice-icon"><?= $flashType==='error' ? '❌' : '🎉' ?></div>
+          <div class="wd-notice-txt" style="<?= $flashType==='error' ? 'color:#7f1d1d' : 'color:#14532d' ?>"><?= htmlspecialchars($flash) ?></div>
+        </div>
+      <?php else: ?>
+        <div class="wd-notice-pill">
+          <div class="wd-notice-icon">🎁</div>
+          <div class="wd-notice-txt">Tukarkan kode hadiah dan dapatkan reward melimpah!</div>
+        </div>
+      <?php endif; ?>
+    </div>
 
-  <!-- LABEL -->
-  <div class="rdm-label">🎁 Tukar Kode Redeem</div>
-
-  <!-- INPUT BENTO -->
-  <div class="rdm-input-wrap">
-    <form id="form-claim" method="POST" onsubmit="checkRedeem(event)">
-      <?= csrf_field() ?>
-      <input type="hidden" name="action" value="claim">
-      <input class="rdm-input" type="text" name="code" placeholder="KODE HADIAH" autocomplete="off" required>
-      <button type="submit" id="btn-check" class="rdm-submit" style="margin-top:10px;">
-        <i class="ph-fill ph-gift"></i> Cek &amp; Klaim
-      </button>
-    </form>
+    <!-- GIF Mascot floating di pojok -->
+    <div class="rdm-gif-mascot">
+      <img src="/assets/ccg.gif" alt="Buaya Kado">
+    </div>
   </div>
 
-  <!-- INFO BENTO -->
-  <div class="rdm-info-bento">
-    <div class="rdm-info-bento-title"><i class="ph-fill ph-lightbulb"></i> Cara Klaim</div>
-    <ul class="rdm-info-list">
-      <li>Kode tidak case-sensitive (huruf besar/kecil otomatis disesuaikan).</li>
-      <li>Satu akun hanya bisa klaim setiap kode sebanyak 1x saja.</li>
-      <li>Reward bisa berupa <strong>Saldo WD, Saldo Beli, atau Level Membership</strong>.</li>
-    </ul>
+  <!-- ORANGE BODY -->
+  <div class="wd-body">
+    <!-- SECTION HEADER -->
+    <div class="wd-section-hdr">
+      <div class="wd-sh-title">Masukkan Kode</div>
+    </div>
+
+    <!-- INPUT CODE BOX -->
+    <div class="rdm-code-box">
+      <form id="form-claim" method="POST" onsubmit="checkRedeem(event)">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="claim">
+        <input class="rdm-code-input" type="text" name="code" placeholder="KODE HADIAH" autocomplete="off" required>
+        <button type="submit" id="btn-check" class="wd-submit-btn">Cek &amp; Klaim</button>
+      </form>
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="rdm-info-box">
+      <div class="rdm-info-title"><i class="ph-fill ph-lightbulb"></i> Info Kode Redeem</div>
+      <ul class="rdm-info-list">
+        <li><i class="ph-bold ph-check-circle"></i> Kode tidak case-sensitive, huruf besar/kecil otomatis disesuaikan.</li>
+        <li><i class="ph-bold ph-check-circle"></i> Satu akun hanya bisa klaim setiap kode sebanyak <strong>1x</strong> saja.</li>
+        <li><i class="ph-bold ph-check-circle"></i> Reward bisa berupa <strong>Saldo WD, Saldo Beli, atau Level Membership</strong>.</li>
+      </ul>
+    </div>
   </div>
 </div>
 
-<!-- MODAL KONFIRMASI -->
-<div id="brutal-confirm">
-  <div class="m-card">
-    <div class="m-hdr">🎉 Konfirmasi Klaim</div>
-    <div class="m-body">
-      <div class="m-confirm-txt">Kode ini berisi reward berikut:</div>
-      <ul class="m-list" id="brutal-confirm-list"></ul>
-      <div class="m-confirm-txt">Apakah kamu yakin ingin klaim sekarang?</div>
-      <div class="m-btn-row">
-        <div onclick="document.getElementById('brutal-confirm').style.display='none'" class="m-btn cancel">
-          <i class="ph-bold ph-x"></i> Batal
-        </div>
-        <div onclick="confirmBrutalClaim()" class="m-btn confirm">
-          <i class="ph-bold ph-check"></i> Klaim!
-        </div>
+<!-- MODAL KONFIRMASI (sama persis seperti WD) -->
+<div class="cg-modal" id="brutal-confirm">
+  <div class="cg-modal-box">
+    <div class="cg-modal-hdr">🎉 Konfirmasi Klaim Hadiah</div>
+    <div class="cg-modal-bd">
+      <div style="font-size:12px;font-weight:800;color:#7c2d12;margin-bottom:10px;text-align:center;">Kode ini berisi reward berikut:</div>
+      <ul class="cg-modal-list" id="brutal-confirm-list"></ul>
+      <div style="font-size:11px;font-weight:800;color:#9a3412;text-align:center;margin-bottom:14px;">Yakin ingin klaim sekarang?</div>
+      <div class="cg-modal-actions">
+        <div onclick="document.getElementById('brutal-confirm').style.display='none'" class="cg-btn-cancel">Batal</div>
+        <div onclick="confirmBrutalClaim()" class="cg-btn-confirm">Klaim Sekarang!</div>
       </div>
     </div>
   </div>
@@ -443,7 +431,7 @@ function checkRedeem(e) {
   const code = form.querySelector('input[name="code"]').value;
   const btn  = document.getElementById('btn-check');
   btn.disabled = true;
-  btn.innerHTML = '<i class="ph-bold ph-circle-notch" style="animation:spin .8s linear infinite;display:inline-block;"></i> Mengecek...';
+  btn.textContent = 'Mengecek...';
 
   fetch('', {
     method: 'POST',
@@ -453,7 +441,7 @@ function checkRedeem(e) {
   .then(r => r.json())
   .then(res => {
     btn.disabled = false;
-    btn.innerHTML = '<i class="ph-fill ph-gift"></i> Cek &amp; Klaim';
+    btn.textContent = 'Cek & Klaim';
     if (res.error) {
       typeof nToast !== 'undefined' ? nToast(res.error, 'error') : alert(res.error);
     } else {
@@ -465,13 +453,10 @@ function checkRedeem(e) {
   })
   .catch(() => {
     btn.disabled = false;
-    btn.innerHTML = '<i class="ph-fill ph-gift"></i> Cek &amp; Klaim';
+    btn.textContent = 'Cek & Klaim';
     typeof nToast !== 'undefined' ? nToast('Terjadi kesalahan jaringan.', 'error') : alert('Terjadi kesalahan jaringan.');
   });
 }
 </script>
-<style>
-@keyframes spin { to { transform: rotate(360deg); } }
-</style>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
