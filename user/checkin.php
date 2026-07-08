@@ -6,7 +6,7 @@ $checkin_min  = max(1, (float) setting($pdo, 'checkin_reward_min', '500'));
 $checkin_max  = max($checkin_min, (float) setting($pdo, 'checkin_reward_max', '2000'));
 $today        = date('Y-m-d');
 $last_checkin = $user['last_checkin'] ?? null;
-$already      = $last_checkin === $today;
+$already      = false; // DEBUG TESTING: ALWAYS FALSE
 
 // Streak hitung
 $streak = 0;
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
             // Double-guard: WHERE clause pakai CURDATE() server → tanggal device klien tidak berpengaruh
             $stmt = $pdo->prepare(
                 "UPDATE users SET balance_dep=balance_dep+?, last_checkin=CURDATE()
-                 WHERE id=? AND (last_checkin IS NULL OR last_checkin < CURDATE())"
+                 WHERE id=?" // DEBUG TESTING: removed last_checkin restriction
             );
             $stmt->execute([$reward_given, $user['id']]);
             if ($stmt->rowCount() > 0) {
@@ -107,7 +107,7 @@ body { background: #f97316 !important; color: #0f172a; }
 @keyframes blinker { 50% { opacity: 0.3; } }
 
 /* ── THE CUPS ── */
-.cup { width: 70px; height: 90px; position: absolute; bottom: 20px; transform-origin: bottom center; cursor: pointer; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.cup { width: 70px; height: 90px; position: absolute; bottom: 20px; transform-origin: bottom center; cursor: pointer; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), left 0.35s ease; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
 /* The visual cup graphic (SVG or CSS shape) */
 .cup-graphic { width: 100%; height: 100%; background: linear-gradient(180deg, #ef4444 0%, #b91c1c 80%, #7f1d1d 100%); border-radius: 8px 8px 12px 12px; border: 3px solid #7f1d1d; border-top: 6px solid #fca5a5; box-shadow: inset 0 -10px 15px rgba(0,0,0,0.4), 0 8px 10px rgba(0,0,0,0.5); position: relative; z-index: 11; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
 /* Lift animation */
