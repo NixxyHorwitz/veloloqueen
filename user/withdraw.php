@@ -30,7 +30,7 @@ $min_withdraw  = $user_mem ? (float)$user_mem['min_wd'] : 0;
 $max_withdraw  = $user_mem ? (float)$user_mem['max_wd'] : 0;
 $max_available = min((float)$user['balance_wd'], $max_withdraw > 0 ? $max_withdraw : (float)$user['balance_wd']);
 
-$predefined_amounts = [10000, 25000, 50000, 75000, 100000, 150000, 250000, 500000, 1000000, 2500000, 5000000];
+$predefined_amounts = [10000,  50000, 100000, 150000, 250000, 500000, 1000000, 2500000, 5000000];
 
 if ($min_withdraw > 0 && !in_array((int)$min_withdraw, $predefined_amounts, true)) {
     $predefined_amounts[] = (int)$min_withdraw;
