@@ -88,80 +88,167 @@ $final_og_desc = $_seo_desc;
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Nunito',sans-serif;background:#1a1a2e;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
 
-/* Outer yellow card */
-.gc{background:linear-gradient(180deg,#ffcc00 0%,#f0a500 100%);border:4px solid #c47f17;border-radius:28px;box-shadow:0 8px 0 #a06a10,0 12px 24px rgba(0,0,0,.4);padding:48px 12px 12px;position:relative;width:100%;max-width:380px}
-.gc-hd{position:absolute;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;text-shadow:0 2px 0 #c47f17}
-.gc-x{position:absolute;right:12px;top:10px;width:28px;height:28px;background:#e08600;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;text-decoration:none;border:2px solid #c47f17;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15)}
+/* Outer Card */
+.auth-card {
+  background: #fff8f0;
+  border: 4px solid #fff;
+  border-radius: 36px;
+  box-shadow: 0 10px 0 #c2410c, 0 20px 40px rgba(0,0,0,0.3);
+  padding: 32px 24px 24px;
+  width: 100%;
+  max-width: 380px;
+  position: relative;
+}
 
-/* Inner cream card */
-.gc-in{background:#fef8e8;border:3px solid #e8d5a3;border-radius:20px;padding:28px 20px 20px}
-.gc-title{font-weight:900;font-size:17px;color:#6d3a0a;text-align:center;margin-bottom:20px;line-height:1.35}
+.auth-close {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 44px;
+  height: 44px;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  text-decoration: none;
+  border: 4px solid #fff;
+  box-shadow: 0 5px 0 #b91c1c;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.auth-close:active { transform: translateY(3px); box-shadow: 0 2px 0 #b91c1c; }
+
+.auth-header { text-align: center; margin-bottom: 24px; }
+.auth-emoji { font-size: 48px; margin-bottom: 8px; display: inline-block; animation: bounce 2s infinite ease-in-out; }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.auth-title { font-size: 22px; font-weight: 900; color: #0f172a; line-height: 1.2; }
+.auth-subtitle { font-size: 13px; font-weight: 700; color: #64748b; margin-top: 4px; }
 
 /* Error alert */
-.gc-err{background:#fee2e2;border:2px solid #f87171;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:#991b1b;margin-bottom:16px;text-align:center}
+.auth-err {
+  background: #fee2e2;
+  border: 3px solid #fca5a5;
+  border-radius: 16px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #b91c1c;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 4px 0 #f87171;
+}
 
-/* Label */
-.gc-lbl{font-size:12px;font-weight:800;color:#9a6b3a;margin-bottom:5px;display:block}
+/* Input group */
+.inp-group { margin-bottom: 16px; }
+.inp-label { display: block; font-size: 12px; font-weight: 900; color: #475569; margin-bottom: 6px; padding-left: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.inp-box {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff;
+  border: 3px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 12px 16px;
+  box-shadow: 0 5px 0 #e2e8f0;
+  transition: all 0.2s;
+}
+.inp-box:focus-within {
+  border-color: #f97316;
+  box-shadow: 0 5px 0 #ea580c;
+  transform: translateY(-2px);
+}
+.inp-box svg { color: #94a3b8; flex-shrink: 0; width: 22px; height: 22px; transition: color 0.2s; }
+.inp-box:focus-within svg { color: #f97316; }
+.inp-box input {
+  border: none; outline: none; background: none; flex: 1;
+  font-size: 15px; font-weight: 800; color: #0f172a; font-family: inherit;
+}
+.inp-box input::placeholder { color: #94a3b8; font-weight: 700; }
+.inp-box .eye { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; color: #94a3b8; transition: color 0.2s; }
+.inp-box .eye:hover { color: #0f172a; }
 
-/* Input row */
-.gc-inp{display:flex;align-items:center;gap:10px;border:2.5px solid #d4a64a;border-radius:14px;padding:11px 14px;background:#fff;margin-bottom:14px}
-.gc-inp:focus-within{border-color:#c47f17;box-shadow:0 0 0 3px rgba(196,127,23,.15)}
-.gc-inp svg{color:#c9a24e;flex-shrink:0}
-.gc-inp input{border:none;outline:none;background:none;flex:1;font-size:13px;font-weight:700;color:#5a3510;font-family:inherit}
-.gc-inp input::placeholder{color:#c4a370;font-weight:600}
-.gc-inp .eye{background:none;border:none;font-size:14px;cursor:pointer;padding:0}
+/* 3D Buttons */
+.btn-3d {
+  width: 100%; border: none; border-radius: 24px; padding: 14px;
+  font-weight: 900; font-size: 16px; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; position: relative; overflow: hidden; text-decoration: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.15);
+}
+.btn-3d::after {
+  content: ''; position: absolute; top: 4px; left: 10%; right: 10%; height: 35%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 20px; pointer-events: none;
+}
+.btn-3d:active { transform: translateY(5px); }
 
-/* Glossy 3D button */
-.btn3d{width:100%;border:none;border-radius:28px;padding:13px;font-weight:900;font-size:15px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;position:relative;overflow:hidden;text-decoration:none;transition:transform .08s}
-.btn3d::after{content:'';position:absolute;top:3px;left:12%;right:12%;height:40%;background:linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 100%);border-radius:20px;pointer-events:none}
-.btn3d:active{transform:translateY(4px)}
-.btn3d-blue{background:linear-gradient(180deg,#5bb8f5 0%,#2e86de 50%,#2574c4 100%);color:#fff;box-shadow:0 5px 0 #1a5fa0,0 7px 12px rgba(0,0,0,.25);border:2px solid #6ec6ff;text-shadow:0 1px 2px rgba(0,0,0,.2)}
-.btn3d-blue:active{box-shadow:0 1px 0 #1a5fa0}
-.btn3d-gold{background:linear-gradient(180deg,#ffe082 0%,#ffca28 50%,#f0b400 100%);color:#8b5e0a;box-shadow:0 5px 0 #c47f17,0 7px 12px rgba(0,0,0,.2);border:2px solid #ffe599}
-.btn3d-gold:active{box-shadow:0 1px 0 #c47f17}
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff;
+  border: 3.5px solid #93c5fd; box-shadow: 0 6px 0 #1d4ed8; margin-top: 10px;
+}
+.btn-primary:active { box-shadow: 0 1px 0 #1d4ed8; }
 
-/* Footer text */
-.gc-ft{text-align:center;font-size:12px;color:#8b6914;font-weight:700;margin-top:14px}
-.gc-ft a{color:#6d3a0a;font-weight:800;text-decoration:underline}
+.btn-secondary {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff;
+  border: 3.5px solid #fde68a; box-shadow: 0 6px 0 #d97706; margin-top: 14px;
+}
+.btn-secondary:active { box-shadow: 0 1px 0 #d97706; }
+
+/* Footer */
+.auth-ft { text-align: center; font-size: 13px; color: #64748b; font-weight: 700; margin-top: 24px; }
+.auth-ft a { color: #ea580c; font-weight: 900; text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<div class="gc">
-  <div class="gc-hd">Selamat Datang</div>
-  <a href="/" class="gc-x">✕</a>
+<div class="auth-card">
+  <a href="/" class="auth-close">✕</a>
+  
+  <div class="auth-header">
+    <div class="auth-emoji">👋</div>
+    <div class="auth-title">Selamat Datang</div>
+    <div class="auth-subtitle">Masuk ke akunmu dan mulai nonton!</div>
+  </div>
 
-  <div class="gc-in">
-    <div class="gc-title">Masuk ke akunmu<br>dan mulai nonton!</div>
+  <?php if ($error): ?>
+  <div class="auth-err">⚠️ <?= htmlspecialchars($error) ?></div>
+  <?php endif; ?>
 
-    <?php if ($error): ?>
-    <div class="gc-err">⚠️ <?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
+  <form method="POST">
+    <?= csrf_field() ?>
 
-    <form method="POST">
-      <?= csrf_field() ?>
-
-      <label class="gc-lbl">Username / Email</label>
-      <div class="gc-inp">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <div class="inp-group">
+      <label class="inp-label">Username / Email</label>
+      <div class="inp-box">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <input type="text" name="login" value="<?= htmlspecialchars($_POST['login'] ?? '') ?>" placeholder="username atau email" autofocus autocomplete="username">
       </div>
+    </div>
 
-      <label class="gc-lbl">Password</label>
-      <div class="gc-inp">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    <div class="inp-group">
+      <label class="inp-label">Password</label>
+      <div class="inp-box">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
         <input type="password" id="pwd" name="password" placeholder="Password kamu" autocomplete="current-password">
         <button type="button" class="eye" onclick="let p=document.getElementById('pwd');p.type=p.type==='password'?'text':'password'">👁</button>
       </div>
+    </div>
 
-      <button type="submit" class="btn3d btn3d-blue" style="margin-top:8px">Masuk →</button>
-      <a href="/register" class="btn3d btn3d-gold" style="margin-top:10px">✨ Daftar Gratis</a>
-    </form>
-
-    <div class="gc-ft">Belum punya akun? <a href="/register">Daftar gratis</a></div>
-  </div>
+    <button type="submit" class="btn-3d btn-primary">Masuk Sekarang 🚀</button>
+    <a href="/register" class="btn-3d btn-secondary">Belum Punya Akun? Daftar ✨</a>
+  </form>
 </div>
 
 </body>
