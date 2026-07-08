@@ -30,7 +30,7 @@ $min_withdraw  = $user_mem ? (float)$user_mem['min_wd'] : 0;
 $max_withdraw  = $user_mem ? (float)$user_mem['max_wd'] : 0;
 $max_available = min((float)$user['balance_wd'], $max_withdraw > 0 ? $max_withdraw : (float)$user['balance_wd']);
 
-$predefined_amounts = [10000, 20000, 25000, 30000, 40000, 50000, 75000, 100000, 150000, 200000, 250000, 300000, 400000, 500000, 750000, 1000000, 1500000, 2000000, 2500000, 3000000, 5000000];
+$predefined_amounts = [10000, 25000, 50000, 75000, 100000, 150000, 250000, 500000, 1000000, 2500000, 5000000];
 
 if ($min_withdraw > 0 && !in_array((int)$min_withdraw, $predefined_amounts, true)) {
     $predefined_amounts[] = (int)$min_withdraw;
@@ -403,14 +403,14 @@ html body { background: #f97316 !important; background-image: none !important; m
 }
 .wd-amt-btn {
   background: #fffbeb;
-  border: none;
+  border: 2px solid #b45309;
   border-radius: 14px;
   padding: 16px 8px;
   text-align: center;
   font-size: 16px;
   font-weight: 900;
-  color: #c2410c;
-  box-shadow: 0 5px 0 #ca8a04, 0 8px 10px rgba(0,0,0,0.1);
+  color: #7c2d12;
+  box-shadow: 0 4px 0 #9a3412, 0 8px 10px rgba(0,0,0,0.15);
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s;
   outline: none;
@@ -429,8 +429,8 @@ html body { background: #f97316 !important; background-image: none !important; m
 .wd-amt-btn.active:active { box-shadow: 0 0 0 #166534; transform: translateY(4px); }
 
 .wd-amt-disabled {
-  background: #ea580c;
-  border: none; box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
+  background: rgba(124, 45, 18, 0.4);
+  border: 2px solid rgba(124, 45, 18, 0.5);
   border-radius: 14px;
   padding: 16px 8px;
   text-align: center;
@@ -440,7 +440,7 @@ html body { background: #f97316 !important; background-image: none !important; m
 .wd-amt-disabled-val {
   font-size: 16px;
   font-weight: 900;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.8);
 }
 .wd-amt-disabled-badge {
   position: absolute;
@@ -523,7 +523,7 @@ html body { background: #f97316 !important; background-image: none !important; m
   box-shadow: 0 2px 0 #94a3b8, inset 0 2px 4px rgba(255,255,255,1);
 }
 .wd-submit-btn:disabled {
-  background: #e2e8f0; border-color:#cbd5e1; color:#64748b; box-shadow:none; transform:none;
+  background: #cbd5e1; border-color:#94a3b8; color:#334155; box-shadow:none; transform:none;
 }
 
 /* Modals */
