@@ -2,25 +2,30 @@
 
   <style>
   /* ══════════════════════════════════════════════════════
-     CASUAL GAME BOTTOM NAV — FULL-WIDTH BAR STYLE
+     CASUAL GAME BOTTOM NAV — FIXED RESPONSIVE 5 ITEMS
      ══════════════════════════════════════════════════════ */
   .bottom-nav {
     position: fixed !important;
     bottom: 0 !important;
-    left: 0 !important; right: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100% !important;
+    max-width: 480px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
     background: #fff !important;
     border-top: 4px solid #ea580c !important;
-    box-shadow: 0 -4px 0 #c2410c, 0 -8px 20px rgba(234,88,12,0.15) !important;
-    display: flex !important;
-    justify-content: space-around !important;
+    box-shadow: 0 -4px 0 #c2410c !important;
+    /* GRID: 5 equal columns — one per nav item */
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
     align-items: stretch !important;
+    height: 66px !important;
     padding: 0 !important;
     z-index: 9999 !important;
-    height: 72px !important;
   }
 
-  body { padding-bottom: 80px !important; }
+  body { padding-bottom: 74px !important; }
 
   .nav-item {
     display: flex !important;
@@ -28,76 +33,68 @@
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    color: #94a3b8 !important;
-    font-size: 10px !important;
-    font-weight: 800 !important;
+    color: #cbd5e1 !important;
+    font-size: 9px !important;
+    font-weight: 900 !important;
+    font-family: 'Nunito', sans-serif !important;
     gap: 3px !important;
-    padding: 8px 0 6px !important;
-    flex: 1 !important;
+    padding: 6px 2px 4px !important;
     border: none !important;
     background: transparent !important;
     position: relative;
-    transition: all 0.15s ease !important;
-    font-family: 'Nunito', sans-serif !important;
+    transition: color 0.15s ease !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
-
   .nav-item i {
-    font-size: 24px !important;
-    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    font-size: 22px !important;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     color: #cbd5e1 !important;
   }
 
   /* Active state */
-  .nav-item.active {
-    color: #ea580c !important;
-  }
+  .nav-item.active { color: #ea580c !important; }
   .nav-item.active i {
     color: #ea580c !important;
-    transform: translateY(-3px) scale(1.15) !important;
+    transform: translateY(-2px) scale(1.1) !important;
   }
   .nav-item.active::after {
     content: '';
-    position: absolute;
-    bottom: 0; left: 50%;
+    position: absolute; bottom: 0; left: 50%;
     transform: translateX(-50%);
-    width: 32px; height: 4px;
-    background: linear-gradient(90deg, #f97316, #ea580c);
-    border-radius: 4px 4px 0 0;
+    width: 28px; height: 3px;
+    background: #ea580c;
+    border-radius: 3px 3px 0 0;
   }
 
-  /* Center PLAY button — special */
+  /* Center PLAY button */
   .nav-item--play {
-    background: transparent !important;
+    position: relative !important;
   }
-  .nav-item--play .nav-play-btn {
-    width: 52px; height: 52px;
+  .nav-play-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    margin-top: -18px; /* lift above nav bar */
+  }
+  .nav-play-btn {
+    width: 50px; height: 50px;
     background: linear-gradient(135deg, #f97316, #ea580c);
     border: 3px solid #fff;
     border-radius: 18px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 5px 0 #c2410c;
+    box-shadow: 0 5px 0 #c2410c, 0 8px 16px rgba(234,88,12,0.3);
     transition: transform 0.1s, box-shadow 0.1s;
-    margin-top: -16px;
-    position: relative;
   }
-  .nav-item--play .nav-play-btn i {
-    font-size: 26px !important;
-    color: #fff !important;
-    transform: none !important;
-  }
-  .nav-item--play:active .nav-play-btn {
-    transform: translateY(4px);
-    box-shadow: 0 1px 0 #c2410c;
-  }
-  .nav-item--play.active .nav-play-btn {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    box-shadow: 0 5px 0 #d97706;
-  }
-  .nav-item--play.active i { transform: none !important; }
-  .nav-item--play.active { color: #f59e0b !important; }
+  .nav-play-btn i { font-size: 24px !important; color: #fff !important; transform: none !important; }
+  .nav-item--play:active .nav-play-btn { transform: translateY(4px); box-shadow: 0 1px 0 #c2410c; }
+  .nav-item--play.active .nav-play-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); box-shadow: 0 5px 0 #d97706; }
+  .nav-play-label { font-size: 9px; font-weight: 900; color: #cbd5e1; font-family: 'Nunito', sans-serif; }
+  .nav-item--play.active .nav-play-label { color: #f59e0b; }
 
-  /* Float contact adjustment */
-  .float-contact-wrap { bottom: 90px !important; }
+  /* Floating contact adjustment */
+  .float-contact-wrap { bottom: 82px !important; }
   </style>
 
   <nav class="bottom-nav">
@@ -107,14 +104,17 @@
     </a>
     <a href="/upgrade" class="nav-item <?= ($activePage??'')==='upgrade'?'active':'' ?>">
       <i class="<?= ($activePage??'')==='upgrade'?'ph-fill':'ph-bold' ?> ph-crown-simple"></i>
-      Naik Level
+      Level
     </a>
 
+    <!-- Center: PLAY button -->
     <a href="/videos" class="nav-item nav-item--play <?= ($activePage??'')==='videos'?'active':'' ?>">
-      <div class="nav-play-btn">
-        <i class="ph-fill ph-play"></i>
+      <div class="nav-play-wrap">
+        <div class="nav-play-btn">
+          <i class="ph-fill ph-play"></i>
+        </div>
+        <span class="nav-play-label">Tonton</span>
       </div>
-      Tonton
     </a>
 
     <a href="/referral" class="nav-item <?= ($activePage??'')==='referral'?'active':'' ?>">
@@ -129,7 +129,6 @@
 </div>
 
 <?php
-// ── Floating contact buttons ─────────────────────────────────
 $_floating_on = setting($pdo, 'floating_enabled', '1') === '1';
 $_float_btns  = [];
 if ($_floating_on) {
@@ -149,35 +148,22 @@ $_fsvg = [
 ?>
 <style>
 .float-contact-wrap {
-  position: fixed; bottom: 88px; right: 14px;
+  position: fixed; bottom: 82px; right: 14px;
   z-index: 500; display: flex; flex-direction: column;
   align-items: flex-end; gap: 10px;
 }
 .float-btn {
-  width: 54px; height: 54px;
-  border-radius: 18px;
+  width: 52px; height: 52px; border-radius: 18px;
   border: 3px solid #fff;
-  box-shadow: 0 6px 0 rgba(0,0,0,0.18), 0 10px 20px rgba(0,0,0,0.12);
+  box-shadow: 0 5px 0 rgba(0,0,0,0.18), 0 8px 16px rgba(0,0,0,0.1);
   display: flex; align-items: center; justify-content: center;
-  text-decoration: none;
-  transition: transform 0.1s, box-shadow 0.1s;
+  text-decoration: none; transition: transform 0.1s, box-shadow 0.1s;
   overflow: hidden; position: relative;
 }
-.float-btn::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
-  pointer-events: none;
-}
-.float-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+.float-btn::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, rgba(255,255,255,0.28) 0%, transparent 100%); pointer-events: none; }
+.float-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
 .float-btn img { width: 100%; height: 100%; object-fit: cover; }
-.float-btn__label {
-  position: absolute; right: 66px; top: 50%; transform: translateY(-50%);
-  background: #0f172a; color: #fff; font-size: 11px; font-weight: 900;
-  white-space: nowrap; padding: 6px 12px; border-radius: 12px;
-  border: 2px solid #1e293b; box-shadow: 0 4px 0 rgba(0,0,0,0.3);
-  opacity: 0; pointer-events: none; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  margin-right: -10px; font-family: 'Nunito', sans-serif;
-}
+.float-btn__label { position: absolute; right: 62px; top: 50%; transform: translateY(-50%); background: #0f172a; color: #fff; font-size: 11px; font-weight: 900; white-space: nowrap; padding: 6px 12px; border-radius: 12px; border: 2px solid #1e293b; box-shadow: 0 4px 0 rgba(0,0,0,0.3); opacity: 0; pointer-events: none; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); margin-right: -10px; font-family: 'Nunito', sans-serif; }
 .float-btn:hover .float-btn__label { opacity: 1; margin-right: 0; }
 </style>
 <div class="float-contact-wrap" id="float-contacts">
@@ -198,7 +184,6 @@ $_fsvg = [
 
 <script src="/assets/js/toast.js"></script>
 <?php
-// ── Global WD Notifs (6 Jam Terakhir)
 $show_wd_notif = true;
 if (function_exists('is_wd_locked') && isset($pdo)) {
     if (is_wd_locked($pdo)) $show_wd_notif = false;
@@ -208,16 +193,14 @@ if ($show_wd_notif) {
     try {
         $wd_notif_stmt = $pdo->query("SELECT u.username, w.amount FROM withdrawals w JOIN users u ON u.id = w.user_id WHERE w.created_at >= DATE_SUB(NOW(), INTERVAL 6 HOUR) ORDER BY w.id DESC LIMIT 15");
         $recent_wd_list = $wd_notif_stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (\Throwable $th) {
-        $recent_wd_list = [];
-    }
+    } catch (\Throwable $th) { $recent_wd_list = []; }
 }
 ?>
 <?php if ($show_wd_notif): ?>
 <script>
 (function() {
   let wdNotifs = <?= json_encode($recent_wd_list ?: []) ?>;
-  const fakeNames = ["Andi","Budi","Cici","Dedi","Eka","Fajar","Gita","Hadi","Indra","Joko","Rina","Siti","Ayu","Dian","Fitri","Maya","Nina","Putra","Rizky","Sari","Tri","Wahyu","Yudi","Agus","Bambang","Rudi","Hendra","Iwan","Yanto","Arif","Hasan","Rizki","Nanda","Ahmad","Irfan","0812","0821","0852","0896"];
+  const fakeNames = ["Andi","Budi","Cici","Dedi","Eka","Fajar","Gita","Hadi","Indra","Joko","Rina","Siti","Ayu","Dian","Fitri","Maya","Nina","Putra","Rizky","Sari","Tri","Wahyu","Yudi","Agus","Bambang","Rudi","Hendra","Iwan","Yanto","Arif","Hasan","Rizki","Nanda","Ahmad","Irfan"];
   function generateFakeWD() {
     const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
     const amount = (Math.floor(Math.random() * 24) + 2) * 10000;
@@ -231,17 +214,11 @@ if ($show_wd_notif) {
       const wd = wdNotifs.pop();
       const amtStr = 'Rp ' + parseFloat(wd.amount).toLocaleString('id-ID');
       let uname = wd.username;
-      if (uname.length > 3) uname = uname.substring(0, 3) + '***';
-      else uname = uname + '***';
-      if (typeof window.nToast === 'function') {
-        window.nToast(`💸 <b>${uname}</b> baru saja menarik <b>${amtStr}</b>`, 'success', 4000);
-      }
-      if (wdNotifs.length > 0) {
-        const nextDelay = Math.floor(Math.random() * (40000 - 15000 + 1)) + 15000;
-        setTimeout(showRandomWD, nextDelay);
-      }
+      uname = uname.length > 3 ? uname.substring(0,3)+'***' : uname+'***';
+      if (typeof window.nToast === 'function') window.nToast(`💸 <b>${uname}</b> baru saja menarik <b>${amtStr}</b>`, 'success', 4000);
+      if (wdNotifs.length > 0) setTimeout(showRandomWD, Math.floor(Math.random()*(40000-15000+1))+15000);
     }
-    // setTimeout(showRandomWD, Math.floor(Math.random() * 6000) + 3000);
+    // setTimeout(showRandomWD, Math.floor(Math.random()*6000)+3000);
   }
 })();
 </script>

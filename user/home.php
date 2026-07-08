@@ -216,25 +216,86 @@ body { background: #f97316 !important; }
   text-decoration: none;
 }
 
-/* ── QUICK ACTIONS GRID ── */
-.qa-grid {
+/* ══ BENTO QUICK ACTIONS ══ */
+.bento-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  grid-template-rows: auto auto auto;
+  gap: 8px;
   margin-bottom: 16px;
 }
-.qa-item { display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; }
-.qa-icon {
-  width: 54px; height: 54px;
-  border-radius: 18px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; color: #fff;
-  border: 3px solid rgba(255,255,255,0.3);
-  box-shadow: 0 5px 0 rgba(0,0,0,0.18);
+/* Big item: spans 2 cols × 2 rows */
+.bento-big {
+  grid-column: span 2;
+  grid-row: span 2;
+  border-radius: 22px;
+  text-decoration: none;
+  display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: flex-end;
+  padding: 14px;
+  min-height: 120px;
+  position: relative; overflow: hidden;
+  border: 3px solid rgba(255,255,255,0.25);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.2);
   transition: transform 0.1s;
 }
-.qa-item:active .qa-icon { transform: translateY(4px); box-shadow: none; }
-.qa-label { font-size: 10px; font-weight: 900; color: #374151; text-align: center; }
+.bento-big:active { transform: translateY(4px); box-shadow: none; }
+.bento-big__emoji {
+  position: absolute; top: 8px; right: 10px;
+  font-size: 44px; opacity: 0.25; pointer-events: none;
+  animation: float-slow 4s ease-in-out infinite;
+}
+@keyframes float-slow { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.bento-big__icon {
+  font-size: 28px; color: rgba(255,255,255,0.9);
+  margin-bottom: 6px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+.bento-big__label {
+  font-size: 13px; font-weight: 900; color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  line-height: 1.2;
+}
+.bento-big__sub {
+  font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.75); margin-top: 2px;
+}
+/* Small item: 1 col × 1 row */
+.bento-sm {
+  border-radius: 18px;
+  text-decoration: none;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5px;
+  padding: 10px 4px;
+  border: 2.5px solid rgba(255,255,255,0.22);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.18);
+  transition: transform 0.1s;
+  min-height: 76px;
+}
+.bento-sm:active { transform: translateY(3px); box-shadow: none; }
+.bento-sm i { font-size: 22px; color: #fff; }
+.bento-sm__label {
+  font-size: 9px; font-weight: 900; color: rgba(255,255,255,0.92);
+  text-align: center; line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+/* Wide item: spans 2 cols */
+.bento-wide {
+  grid-column: span 2;
+  border-radius: 18px;
+  text-decoration: none;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border: 2.5px solid rgba(255,255,255,0.22);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.18);
+  transition: transform 0.1s;
+}
+.bento-wide:active { transform: translateY(3px); box-shadow: none; }
+.bento-wide i { font-size: 22px; color: #fff; flex-shrink: 0; }
+.bento-wide__txt { }
+.bento-wide__label { font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.bento-wide__sub { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.75); }
 
 /* ── BALANCE TILES ── */
 .bal-row {
@@ -280,37 +341,81 @@ body { background: #f97316 !important; }
 .cg-card--green  { border-color: #064e3b; box-shadow: 0 6px 0 #064e3b; background: #f0fdf4; }
 .cg-card--yellow { border-color: #d97706; box-shadow: 0 6px 0 #b45309; background: #fffbeb; }
 
-/* ── VIDEO SCROLL ── */
-.vid-scroll {
-  display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px;
-  scroll-snap-type: x mandatory; scrollbar-width: none;
-  margin: 0 -14px; padding-left: 14px; padding-right: 14px;
+/* ══ VIDEO — FEATURED + MINI SCROLL ══ */
+/* Featured big video */
+.vid-featured {
+  position: relative; border-radius: 20px; overflow: hidden;
+  border: 3px solid #0f172a; box-shadow: 0 6px 0 #0f172a;
+  text-decoration: none; display: block; margin-bottom: 10px;
+  transition: transform 0.1s;
+  aspect-ratio: 16/9;
+  background: #000;
 }
-.vid-scroll::-webkit-scrollbar { display: none; }
-.vid-card {
-  flex: 0 0 148px; scroll-snap-align: start;
-  text-decoration: none; display: flex; flex-direction: column;
-  background: #fff; border: 2.5px solid #0f172a;
-  border-radius: 18px; overflow: hidden;
-  box-shadow: 0 5px 0 #0f172a; transition: transform 0.1s;
+.vid-featured:active { transform: translateY(4px); box-shadow: none; }
+.vid-featured img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.88; }
+.vid-featured__overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 12px;
 }
-.vid-card:active { transform: translateY(4px); box-shadow: none; }
-.vid-card__thumb { position: relative; aspect-ratio: 16/9; background: #000; overflow: hidden; }
-.vid-card__thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
-.vid-card__badge {
-  position: absolute; bottom: 5px; left: 5px;
+.vid-featured__play {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,0.2);
+  border: 3px solid rgba(255,255,255,0.6);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.vid-featured__play i { font-size: 26px; color: #fff; margin-left: 3px; }
+.vid-featured__badge {
+  display: inline-flex; align-items: center; gap: 4px;
   background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: #fff; font-size: 9px; font-weight: 900;
-  padding: 3px 7px; border-radius: 8px;
+  color: #fff; font-size: 10px; font-weight: 900;
+  padding: 4px 10px; border-radius: 10px;
   border: 1.5px solid rgba(255,255,255,0.4);
   box-shadow: 0 2px 0 #15803d;
+  width: fit-content; margin-bottom: 5px;
 }
-.vid-card__play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.15); }
-.vid-card__play i { font-size: 30px; color: #fff; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
-.vid-card__body { padding: 8px; }
-.vid-card__title { font-size: 11px; font-weight: 800; color: #0f172a; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; margin-bottom: 5px; }
-.vid-card__meta { display: flex; align-items: center; justify-content: space-between; font-size: 10px; font-weight: 800; color: #64748b; }
-
+.vid-featured__title {
+  font-size: 13px; font-weight: 900; color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.vid-featured__meta {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.8);
+  margin-top: 4px;
+}
+/* Mini video scroll */
+.vid-mini-scroll {
+  display: flex; gap: 8px; overflow-x: auto;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  margin: 0 -14px; padding: 0 14px 4px;
+}
+.vid-mini-scroll::-webkit-scrollbar { display: none; }
+.vid-mini {
+  flex: 0 0 110px; scroll-snap-align: start;
+  text-decoration: none; display: flex; flex-direction: column;
+  background: #fff; border: 2.5px solid #0f172a;
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 4px 0 #0f172a; transition: transform 0.1s;
+}
+.vid-mini:active { transform: translateY(3px); box-shadow: none; }
+.vid-mini__thumb { position: relative; aspect-ratio: 16/9; background: #000; }
+.vid-mini__thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+.vid-mini__badge {
+  position: absolute; bottom: 3px; left: 3px;
+  background: #16a34a; color: #fff; font-size: 8px; font-weight: 900;
+  padding: 2px 5px; border-radius: 6px;
+}
+.vid-mini__play { position: absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.12); }
+.vid-mini__play i { font-size: 20px; color: #fff; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4)); }
+.vid-mini__body { padding: 6px; }
+.vid-mini__title { font-size: 9px; font-weight: 800; color: #0f172a; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
 /* Video empty */
 .vid-done { background: linear-gradient(135deg, #d1fae5, #a7f3d0); border: 2.5px solid #6ee7b7; border-radius: 18px; padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 0 #6ee7b7; }
 
@@ -331,23 +436,40 @@ body { background: #f97316 !important; }
 .act-date { font-size: 10px; color: #94a3b8; font-weight: 700; }
 .act-amt { font-size: 13px; font-weight: 900; color: #059669; white-space: nowrap; }
 
-/* ── MEMBERSHIP CARDS ── */
-.m-card { background: #fff; border: 3px solid #0f172a; border-radius: 20px; box-shadow: 0 6px 0 #0f172a; padding: 14px; margin-bottom: 10px; position: relative; text-decoration: none; display: block; transition: transform 0.1s; }
+/* ══ MEMBERSHIP — HORIZONTAL SCROLL CARDS ══ */
+.m-scroll {
+  display: flex; gap: 10px; overflow-x: auto;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  margin: 0 -14px; padding: 4px 14px 10px;
+}
+.m-scroll::-webkit-scrollbar { display: none; }
+.m-card {
+  flex: 0 0 200px; scroll-snap-align: start;
+  background: #fff;
+  border-radius: 22px; padding: 14px;
+  position: relative; text-decoration: none;
+  display: flex; flex-direction: column;
+  transition: transform 0.1s;
+  border: 3px solid #0f172a;
+  box-shadow: 0 6px 0 #0f172a;
+}
 .m-card:active { transform: translateY(4px); box-shadow: 0 2px 0 #0f172a; }
-.m-card--0 { border-color: #64748b; box-shadow: 0 6px 0 #475569; }
-.m-card--1 { border-color: #0ea5e9; box-shadow: 0 6px 0 #0369a1; }
-.m-card--2 { border-color: #f59e0b; box-shadow: 0 6px 0 #d97706; }
-.m-card--3 { border-color: #8b5cf6; box-shadow: 0 6px 0 #6d28d9; }
-.m-card--4 { border-color: #ef4444; box-shadow: 0 6px 0 #b91c1c; }
-.m-badge-hot { position: absolute; top:-12px; right:-8px; background: linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; font-size:9px; font-weight:900; padding:4px 10px; border-radius:14px; border:2.5px solid #fff; box-shadow:0 3px 0 #7f1d1d; transform:rotate(5deg); z-index:2; }
-.m-badge-promo { position: absolute; top:-12px; left:-8px; background: linear-gradient(135deg,#22c55e,#16a34a); color:#fff; font-size:9px; font-weight:900; padding:4px 10px; border-radius:14px; border:2.5px solid #fff; box-shadow:0 3px 0 #15803d; transform:rotate(-5deg); z-index:2; }
-.m-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.m-ico { width: 42px; height: 42px; border-radius: 14px; border: 2px solid; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 3px 0 rgba(0,0,0,0.1); }
-.m-name { font-size: 14px; font-weight: 900; line-height: 1.1; margin-bottom: 2px; }
-.m-dur { font-size: 10px; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 4px; }
-.m-price-old { font-size: 10px; font-weight: 800; color: #94a3b8; text-decoration: line-through; }
-.m-price { font-size: 17px; font-weight: 900; }
-.m-specs { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; font-weight: 800; color: #475569; }
+.m-card--0 { border-color: #64748b; box-shadow: 0 6px 0 #475569; background: linear-gradient(160deg, #f8fafc, #e2e8f0); }
+.m-card--1 { border-color: #0ea5e9; box-shadow: 0 6px 0 #0369a1; background: linear-gradient(160deg, #f0f9ff, #dbeafe); }
+.m-card--2 { border-color: #f59e0b; box-shadow: 0 6px 0 #d97706; background: linear-gradient(160deg, #fefce8, #fde68a); }
+.m-card--3 { border-color: #8b5cf6; box-shadow: 0 6px 0 #6d28d9; background: linear-gradient(160deg, #faf5ff, #ede9fe); }
+.m-card--4 { border-color: #ef4444; box-shadow: 0 6px 0 #b91c1c; background: linear-gradient(160deg, #fef2f2, #fecaca); }
+.m-badge-hot { position: absolute; top:-10px; right:-6px; background: linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; font-size:8px; font-weight:900; padding:3px 8px; border-radius:12px; border:2px solid #fff; box-shadow:0 2px 0 #7f1d1d; transform:rotate(4deg); z-index:2; }
+.m-badge-promo { position: absolute; top:-10px; left:-6px; background: linear-gradient(135deg,#22c55e,#16a34a); color:#fff; font-size:8px; font-weight:900; padding:3px 8px; border-radius:12px; border:2px solid #fff; box-shadow:0 2px 0 #15803d; transform:rotate(-4deg); z-index:2; }
+.m-ico { width: 40px; height: 40px; border-radius: 14px; border: 2px solid; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 3px 0 rgba(0,0,0,0.1); margin-bottom: 8px; }
+.m-name { font-size: 13px; font-weight: 900; line-height: 1.1; margin-bottom: 2px; }
+.m-dur { font-size: 9px; font-weight: 800; color: #64748b; display: flex; align-items: center; gap: 3px; margin-bottom: 8px; }
+.m-divider { height: 1.5px; background: rgba(0,0,0,0.08); border-radius: 2px; margin-bottom: 8px; }
+.m-price-old { font-size: 9px; font-weight: 800; color: #94a3b8; text-decoration: line-through; margin-bottom: 1px; }
+.m-price { font-size: 18px; font-weight: 900; margin-bottom: 8px; }
+.m-specs { display: flex; flex-direction: column; gap: 4px; font-size: 9px; font-weight: 800; color: #475569; margin-top: auto; }
+.m-spec-row { display: flex; align-items: center; gap: 4px; }
+.m-cta { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 10px; padding: 7px 0; border-radius: 12px; font-size: 10px; font-weight: 900; color: #fff; background: linear-gradient(135deg, #f97316, #ea580c); border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 3px 0 #c2410c; }
 
 /* ── REFERRAL ── */
 .ref-row { display: flex; align-items: center; gap: 10px; }
@@ -464,61 +586,92 @@ body { background: #f97316 !important; }
   </div>
   <?php endif; ?>
 
-  <!-- ── Quick Actions ── -->
+  <!-- ── Bento Quick Actions ── -->
   <div class="sh" style="margin-bottom:10px">
     <div class="sh__title">🎮 Menu Cepat</div>
   </div>
-  <div class="qa-grid" style="margin-bottom:16px">
-    <a href="/history" class="qa-item">
-      <div class="qa-icon" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);box-shadow:0 5px 0 #5b21b6">
-        <i class="ph-fill ph-receipt"></i>
-      </div>
-      <span class="qa-label">📋 Riwayat</span>
+  <div class="bento-grid" style="margin-bottom:16px">
+
+    <!-- BIG: Tonton Video (hero action) -->
+    <a href="/videos" class="bento-big"
+       style="background:linear-gradient(135deg,#7c3aed,#4f46e5);grid-column:1/3;grid-row:1/3">
+      <div class="bento-big__emoji">🎬</div>
+      <i class="ph-fill ph-play-circle bento-big__icon"></i>
+      <div class="bento-big__label">Tonton<br>Video</div>
+      <div class="bento-big__sub">Kumpulkan reward 💰</div>
     </a>
-    <a href="/missions" class="qa-item">
-      <div class="qa-icon" style="background:linear-gradient(135deg,#f97316,#ea580c);box-shadow:0 5px 0 #c2410c">
-        <i class="ph-fill ph-target"></i>
-      </div>
-      <span class="qa-label">🎯 Tantangan</span>
+
+    <!-- SM: Tantangan -->
+    <a href="/missions" class="bento-sm"
+       style="background:linear-gradient(135deg,#f97316,#ea580c);box-shadow:0 4px 0 #c2410c">
+      <i class="ph-fill ph-target"></i>
+      <span class="bento-sm__label">Tantangan</span>
     </a>
-    <a href="/checkin" class="qa-item">
-      <div class="qa-icon" style="background:linear-gradient(135deg,#f472b6,#db2777);box-shadow:0 5px 0 #9d174d">
-        <i class="ph-fill ph-calendar-check"></i>
-      </div>
-      <span class="qa-label">📅 Hadir</span>
+
+    <!-- SM: Hadir -->
+    <a href="/checkin" class="bento-sm"
+       style="background:linear-gradient(135deg,#f472b6,#db2777);box-shadow:0 4px 0 #9d174d">
+      <i class="ph-fill ph-calendar-check"></i>
+      <span class="bento-sm__label">Absen</span>
     </a>
-    <a href="/referral" class="qa-item">
-      <div class="qa-icon" style="background:linear-gradient(135deg,#34d399,#059669);box-shadow:0 5px 0 #047857">
-        <i class="ph-fill ph-users-three"></i>
-      </div>
-      <span class="qa-label">👥 Squad</span>
+
+    <!-- SM: Riwayat -->
+    <a href="/history" class="bento-sm"
+       style="background:linear-gradient(135deg,#a78bfa,#7c3aed);box-shadow:0 4px 0 #5b21b6">
+      <i class="ph-fill ph-receipt"></i>
+      <span class="bento-sm__label">Riwayat</span>
     </a>
-    <a href="/redeem" class="qa-item">
-      <div class="qa-icon" style="background:linear-gradient(135deg,#60a5fa,#1d4ed8);box-shadow:0 5px 0 #1e3a8a">
-        <i class="ph-fill ph-gift"></i>
-      </div>
-      <span class="qa-label">🎁 Tukar Poin</span>
+
+    <!-- SM: Squad -->
+    <a href="/referral" class="bento-sm"
+       style="background:linear-gradient(135deg,#34d399,#059669);box-shadow:0 4px 0 #047857">
+      <i class="ph-fill ph-users-three"></i>
+      <span class="bento-sm__label">Squad</span>
     </a>
+
+    <!-- WIDE: Tukar Poin -->
+    <a href="/redeem" class="bento-wide"
+       style="background:linear-gradient(135deg,#60a5fa,#1d4ed8);box-shadow:0 4px 0 #1e3a8a">
+      <i class="ph-fill ph-gift"></i>
+      <div class="bento-wide__txt">
+        <div class="bento-wide__label">Tukar Poin</div>
+        <div class="bento-wide__sub">Klaim hadiahmu 🎁</div>
+      </div>
+    </a>
+
+    <!-- WIDE: Naik Level -->
+    <a href="/upgrade" class="bento-wide"
+       style="background:linear-gradient(135deg,#fbbf24,#ea580c);box-shadow:0 4px 0 #c2410c">
+      <i class="ph-fill ph-crown-simple"></i>
+      <div class="bento-wide__txt">
+        <div class="bento-wide__label">Naik Level</div>
+        <div class="bento-wide__sub">Buka keuntungan 👑</div>
+      </div>
+    </a>
+
     <?php if (setting($pdo, 'investment_enabled', '1') === '1'): ?>
-    <a href="/invest" class="qa-item">
-      <div class="qa-icon" style="background:linear-gradient(135deg,#fbbf24,#d97706);box-shadow:0 5px 0 #b45309">
-        <i class="ph-fill ph-trend-up"></i>
-      </div>
-      <span class="qa-label">📈 Investasi</span>
+    <!-- SM: Investasi -->
+    <a href="/invest" class="bento-sm"
+       style="background:linear-gradient(135deg,#fbbf24,#d97706);box-shadow:0 4px 0 #b45309">
+      <i class="ph-fill ph-trend-up"></i>
+      <span class="bento-sm__label">Invest</span>
+    </a>
+    <?php else: ?>
+    <!-- SM: Panduan (fallback) -->
+    <a href="/panduan" class="bento-sm"
+       style="background:linear-gradient(135deg,#6ee7b7,#0891b2);box-shadow:0 4px 0 #0e7490">
+      <i class="ph-fill ph-book-open"></i>
+      <span class="bento-sm__label">Panduan</span>
     </a>
     <?php endif; ?>
-    <a href="/upgrade" class="qa-item">
-      <div class="qa-icon" style="background:linear-gradient(135deg,#fb923c,#dc2626);box-shadow:0 5px 0 #991b1b">
-        <i class="ph-fill ph-crown-simple"></i>
-      </div>
-      <span class="qa-label">👑 Naik Level</span>
+
+    <!-- SM: Panduan -->
+    <a href="/panduan" class="bento-sm"
+       style="background:linear-gradient(135deg,#6ee7b7,#0891b2);box-shadow:0 4px 0 #0e7490">
+      <i class="ph-fill ph-book-open"></i>
+      <span class="bento-sm__label">Panduan</span>
     </a>
-    <a href="/panduan" class="qa-item">
-      <div class="qa-icon" style="background:linear-gradient(135deg,#6ee7b7,#0891b2);box-shadow:0 5px 0 #0e7490">
-        <i class="ph-fill ph-book-open"></i>
-      </div>
-      <span class="qa-label">📖 Panduan</span>
-    </a>
+
   </div>
 
   <!-- ── Balance Tiles ── -->
@@ -571,32 +724,50 @@ body { background: #f97316 !important; }
   </div>
   <?php endif; ?>
 
-  <!-- ── Videos ── -->
+  <!-- ── Videos: Featured + Mini Scroll ── -->
   <?php if (!empty($videos)): ?>
-  <div class="cg-card" style="margin-bottom:14px">
-    <div class="sh">
+  <?php $vid_featured = $videos[0]; $vid_rest = array_slice($videos, 1); ?>
+  <div class="cg-card" style="margin-bottom:14px;padding:12px">
+    <div class="sh" style="margin-bottom:10px">
       <div class="sh__title"><i class="ph-fill ph-video-camera" style="color:#7c3aed"></i> Video Reward 🎬</div>
       <a href="/videos" class="sh__link">Semua →</a>
     </div>
-    <div class="vid-scroll">
-      <?php foreach ($videos as $v): ?>
-      <a href="/watch?id=<?= $v['id'] ?>" class="vid-card">
-        <div class="vid-card__thumb">
+
+    <!-- Featured Video -->
+    <a href="/watch?id=<?= $vid_featured['id'] ?>" class="vid-featured">
+      <img src="<?= yt_thumb($vid_featured['youtube_id']) ?>" alt="<?= htmlspecialchars($vid_featured['title']) ?>"
+           loading="lazy" onerror="this.src='https://img.youtube.com/vi/<?= $vid_featured['youtube_id'] ?>/hqdefault.jpg'">
+      <div class="vid-featured__play"><i class="ph-fill ph-play"></i></div>
+      <div class="vid-featured__overlay">
+        <div class="vid-featured__badge">
+          <i class="ph-bold ph-coins"></i> +<?= format_rp((float)$vid_featured['reward_amount']) ?>
+        </div>
+        <div class="vid-featured__title"><?= htmlspecialchars($vid_featured['title']) ?></div>
+        <div class="vid-featured__meta">
+          <span><i class="ph-bold ph-clock"></i> <?= $vid_featured['watch_duration'] ?>s</span>
+          <span style="background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:10px;font-size:9px">Tonton Sekarang ▶</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Mini scroll for remaining videos -->
+    <?php if (!empty($vid_rest)): ?>
+    <div class="vid-mini-scroll" style="margin-top:8px">
+      <?php foreach ($vid_rest as $v): ?>
+      <a href="/watch?id=<?= $v['id'] ?>" class="vid-mini">
+        <div class="vid-mini__thumb">
           <img src="<?= yt_thumb($v['youtube_id']) ?>" alt="<?= htmlspecialchars($v['title']) ?>" loading="lazy"
                onerror="this.src='https://img.youtube.com/vi/<?= $v['youtube_id'] ?>/hqdefault.jpg'">
-          <div class="vid-card__play"><i class="ph-fill ph-play-circle"></i></div>
-          <div class="vid-card__badge">+<?= format_rp((float)$v['reward_amount']) ?></div>
+          <div class="vid-mini__play"><i class="ph-fill ph-play-circle"></i></div>
+          <div class="vid-mini__badge">+<?= format_rp((float)$v['reward_amount']) ?></div>
         </div>
-        <div class="vid-card__body">
-          <div class="vid-card__title"><?= htmlspecialchars($v['title']) ?></div>
-          <div class="vid-card__meta">
-            <span style="color:#059669;display:flex;align-items:center;gap:2px"><i class="ph-bold ph-coins"></i> <?= format_rp((float)$v['reward_amount']) ?></span>
-            <span style="display:flex;align-items:center;gap:2px"><i class="ph-bold ph-clock"></i> <?= $v['watch_duration'] ?>s</span>
-          </div>
+        <div class="vid-mini__body">
+          <div class="vid-mini__title"><?= htmlspecialchars($v['title']) ?></div>
         </div>
       </a>
       <?php endforeach; ?>
     </div>
+    <?php endif; ?>
   </div>
   <?php elseif (!$is_guest): ?>
   <div class="vid-done" style="margin-bottom:14px">
@@ -631,46 +802,42 @@ body { background: #f97316 !important; }
   </div>
   <?php endif; ?>
 
-  <!-- ── Membership Showcase ── -->
+  <!-- ── Membership Showcase — Horizontal Scroll ── -->
   <?php if (!empty($showcase_memberships)): ?>
-  <div class="sh" style="margin-bottom:10px">
-    <div class="sh__title"><i class="ph-fill ph-crown-simple" style="color:#f59e0b"></i> Paket Level 👑</div>
+  <div class="sh" style="margin-bottom:8px">
+    <div class="sh__title"><i class="ph-fill ph-crown-simple" style="color:#f59e0b"></i> Pilih Levelmu 👑</div>
     <a href="/upgrade" class="sh__link">Semua →</a>
   </div>
-  <?php foreach ($showcase_memberships as $i => $m):
-    $m_class = "m-card--" . ($i % 5);
-    $bg_color = ['#f8fafc','#f0f9ff','#fefce8','#faf5ff','#fef2f2'][$i % 5];
-    $txt_color = ['#0f172a','#0369a1','#b45309','#6b21a8','#b91c1c'][$i % 5];
-  ?>
-  <a href="/upgrade" class="m-card <?= $m_class ?>">
-    <?php if ($i === 2): ?>
-      <div class="m-badge-hot">🔥 TERPOPULER</div>
-    <?php elseif ((float)$m['original_price'] > 0): ?>
-      <div class="m-badge-promo">🎉 PROMO!</div>
-    <?php endif; ?>
-    <div class="m-hdr">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="m-ico" style="background:<?= $bg_color ?>;color:<?= $txt_color ?>;border-color:<?= $txt_color ?>">
-          <?= htmlspecialchars($m['icon'] ?: '⭐') ?>
-        </div>
-        <div>
-          <div class="m-name" style="color:<?= $txt_color ?>"><?= htmlspecialchars($m['name']) ?></div>
-          <div class="m-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
-        </div>
+  <div class="m-scroll" style="margin-bottom:14px">
+    <?php foreach ($showcase_memberships as $i => $m):
+      $m_class = "m-card--" . ($i % 5);
+      $txt_color = ['#334155','#0369a1','#92400e','#6b21a8','#991b1b'][$i % 5];
+      $ico_bg = ['#e2e8f0','#dbeafe','#fde68a','#ede9fe','#fecaca'][$i % 5];
+    ?>
+    <a href="/upgrade" class="m-card <?= $m_class ?>">
+      <?php if ($i === 2): ?>
+        <div class="m-badge-hot">🔥 POPULER</div>
+      <?php elseif ((float)$m['original_price'] > 0): ?>
+        <div class="m-badge-promo">🎉 PROMO</div>
+      <?php endif; ?>
+      <div class="m-ico" style="background:<?= $ico_bg ?>;color:<?= $txt_color ?>;border-color:<?= $txt_color ?>">
+        <?= htmlspecialchars($m['icon'] ?: '⭐') ?>
       </div>
-      <div style="text-align:right">
-        <?php if ((float)$m['original_price'] > 0): ?>
-        <div class="m-price-old"><?= format_rp((float)$m['original_price']) ?></div>
-        <?php endif; ?>
-        <div class="m-price" style="color:<?= $txt_color ?>"><?= format_rp((float)$m['price']) ?></div>
+      <div class="m-name" style="color:<?= $txt_color ?>"><?= htmlspecialchars($m['name']) ?></div>
+      <div class="m-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
+      <div class="m-divider"></div>
+      <?php if ((float)$m['original_price'] > 0): ?>
+      <div class="m-price-old"><?= format_rp((float)$m['original_price']) ?></div>
+      <?php endif; ?>
+      <div class="m-price" style="color:<?= $txt_color ?>"><?= format_rp((float)$m['price']) ?></div>
+      <div class="m-specs">
+        <div class="m-spec-row"><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>× /hari</div>
+        <div class="m-spec-row"><i class="ph-bold ph-trend-up"></i> Maks <?= (float)$m['max_wd'] > 0 ? format_rp((float)$m['max_wd']) : 'Bebas' ?></div>
       </div>
-    </div>
-    <div class="m-specs">
-      <div><i class="ph-bold ph-video-camera"></i> <?= $m['watch_limit'] ?>× Tonton/hari</div>
-      <div><i class="ph-bold ph-trend-up"></i> Maks Tarik <?= (float)$m['max_wd'] > 0 ? format_rp((float)$m['max_wd']) : '<span style="color:#059669">Bebas</span>' ?></div>
-    </div>
-  </a>
-  <?php endforeach; ?>
+      <div class="m-cta"><i class="ph-bold ph-rocket-launch" style="font-size:12px"></i> Pilih Ini</div>
+    </a>
+    <?php endforeach; ?>
+  </div>
   <?php endif; ?>
 
   <!-- ── Recent Activity ── -->
