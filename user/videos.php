@@ -84,6 +84,7 @@ require dirname(__DIR__) . '/partials/header.php';
   body { background: #fff8f0 !important; }
 </style>
 
+<div style="padding: 16px 14px 100px;">
 <div class="cg-card" style="background:#fff; border:3px solid #0f172a; border-radius:22px; box-shadow:0 6px 0 #0f172a; padding:16px; margin-bottom:16px; display:flex; align-items:center; gap:12px; margin-top: 4px;">
   <div style="width:48px;height:48px;background:#c4b5fd;border:3px solid #0f172a;border-radius:16px;box-shadow:0 4px 0 #0f172a;display:flex;align-items:center;justify-content:center;font-size:24px;color:#4c1d95;flex-shrink:0;">
     <i class="ph-bold ph-film-strip"></i>
@@ -304,5 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php endif; ?>
+
+</div>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
