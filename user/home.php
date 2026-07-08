@@ -593,17 +593,17 @@ body { background: #f97316 !important; }
   <div class="bento-grid" style="margin-bottom:16px">
 
     <!-- BIG: Dompet Saya (replaces Tonton) -->
-    <div class="bento-big" style="background:#fff; border:3px solid #e2e8f0; box-shadow:0 6px 0 #cbd5e1; grid-column:1/3; grid-row:1/3; padding:8px; display:flex; flex-direction:column; justify-content:space-between; gap:8px; cursor:default;">
+    <div class="bento-big" style="background:#fff; border:3px solid #e2e8f0; box-shadow:0 6px 0 #cbd5e1; grid-column:1/3; grid-row:1/3; padding:8px; display:flex; flex-direction:column; justify-content:space-between; align-items:stretch; gap:8px; cursor:default;">
       
       <!-- Penghasilan -->
-      <a href="/withdraw" style="flex:1; background:linear-gradient(135deg,#34d399,#059669); border-radius:14px; padding:10px 12px; text-decoration:none; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden; box-shadow:0 4px 0 #047857; transition:transform 0.1s;" onmousedown="this.style.transform='translateY(2px)';this.style.boxShadow='0 2px 0 #047857';" onmouseup="this.style.transform='none';this.style.boxShadow='0 4px 0 #047857';">
+      <a href="/withdraw" style="flex:1; width:100%; background:linear-gradient(135deg,#34d399,#059669); border-radius:14px; padding:10px 12px; text-decoration:none; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden; box-shadow:0 4px 0 #047857; transition:transform 0.1s;" onmousedown="this.style.transform='translateY(2px)';this.style.boxShadow='0 2px 0 #047857';" onmouseup="this.style.transform='none';this.style.boxShadow='0 4px 0 #047857';">
         <i class="ph-bold ph-arrow-circle-up" style="position:absolute; right:-5px; top:50%; transform:translateY(-50%); font-size:46px; color:#fff; opacity:0.15;"></i>
         <span style="font-size:9px; font-weight:900; color:#d1fae5; text-transform:uppercase; letter-spacing:0.5px;">Penghasilan</span>
         <span style="font-size:13px; font-weight:900; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?= format_rp((float)$user['balance_wd']) ?></span>
       </a>
 
       <!-- Saldo Belanja -->
-      <a href="/deposit" style="flex:1; background:linear-gradient(135deg,#60a5fa,#2563eb); border-radius:14px; padding:10px 12px; text-decoration:none; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden; box-shadow:0 4px 0 #1d4ed8; transition:transform 0.1s;" onmousedown="this.style.transform='translateY(2px)';this.style.boxShadow='0 2px 0 #1d4ed8';" onmouseup="this.style.transform='none';this.style.boxShadow='0 4px 0 #1d4ed8';">
+      <a href="/deposit" style="flex:1; width:100%; background:linear-gradient(135deg,#60a5fa,#2563eb); border-radius:14px; padding:10px 12px; text-decoration:none; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden; box-shadow:0 4px 0 #1d4ed8; transition:transform 0.1s;" onmousedown="this.style.transform='translateY(2px)';this.style.boxShadow='0 2px 0 #1d4ed8';" onmouseup="this.style.transform='none';this.style.boxShadow='0 4px 0 #1d4ed8';">
         <i class="ph-bold ph-bank" style="position:absolute; right:-5px; top:50%; transform:translateY(-50%); font-size:46px; color:#fff; opacity:0.15;"></i>
         <span style="font-size:9px; font-weight:900; color:#dbeafe; text-transform:uppercase; letter-spacing:0.5px;">Saldo Belanja</span>
         <span style="font-size:13px; font-weight:900; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?= format_rp((float)$user['balance_dep']) ?></span>
