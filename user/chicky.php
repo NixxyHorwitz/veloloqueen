@@ -136,8 +136,8 @@ canvas {
   </div>
 </div>
 
-<!-- Hidden GIF for character -->
-<img id="chickyImg" src="/assets/running.gif" style="display:none;" crossorigin="anonymous" />
+<!-- Hidden GIF for character (must not be display:none so browser animates it) -->
+<img id="chickyImg" src="/assets/running.gif" style="position:absolute; width:1px; height:1px; opacity:0.01; pointer-events:none; z-index:-1;" crossorigin="anonymous" />
 
 <script>
 const canvas = document.getElementById('gameCanvas');
