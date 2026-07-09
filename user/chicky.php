@@ -181,7 +181,7 @@ let score = 0;
 let hiScore = localStorage.getItem('chickyHiScore') || 0;
 hiScoreVal.innerText = String(Math.floor(hiScore)).padStart(5, '0');
 
-let baseSpeed = 6;
+let baseSpeed = 4;
 let currentSpeed = baseSpeed;
 let frameCount = 0;
 let obstacles = [];
@@ -252,6 +252,7 @@ function resetGame() {
   chicky.vy = 0;
   chicky.isJumping = false;
   hasFrozenFrame = false;
+  chickyDom.style.display = 'block'; // Ensure chicken is visible
   scoreDisplay.innerText = '00000';
 }
 
