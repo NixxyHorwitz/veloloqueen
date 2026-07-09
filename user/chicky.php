@@ -125,6 +125,9 @@ canvas {
     
     <div style="position:relative;">
       <canvas id="gameCanvas" width="600" height="300"></canvas>
+      <!-- DOM GIF for character running (animates perfectly in all browsers) -->
+      <img id="chickyDom" src="/assets/running.gif" style="position:absolute; width:10.666%; height:21.333%; left:8.333%; top:58.666%; z-index:5; pointer-events:none; display:none;" crossorigin="anonymous" />
+
       
       <!-- Loader Screen -->
       <div id="loaderScreen" class="overlay">
@@ -155,8 +158,7 @@ canvas {
   </div>
 </div>
 
-<!-- Hidden GIF for character (must not be display:none so browser animates it) -->
-<img id="chickyImg" src="/assets/running.gif" style="position:absolute; width:1px; height:1px; opacity:0.01; pointer-events:none; z-index:-1;" crossorigin="anonymous" />
+
 
 <script>
 const canvas = document.getElementById('gameCanvas');
@@ -165,7 +167,7 @@ const scoreDisplay = document.getElementById('scoreDisplay');
 const hiScoreVal = document.getElementById('hiScoreVal');
 const startScreen = document.getElementById('startScreen');
 const gameOverScreen = document.getElementById('gameOverScreen');
-const chickyImg = document.getElementById('chickyImg');
+const chickyDom = document.getElementById('chickyDom');
 
 // Game constants
 const CANVAS_W = 600;
@@ -350,27 +352,24 @@ function loop() {
       chicky.isJumping = false;
       chicky.vy = 0;
       hasFrozenFrame = false; // Reset freeze when touching ground
+      chickyDom.style.display = 'block'; // Resume animation
     }
   }
 
   // Draw Chicky
   if (chicky.isJumping) {
+    chickyDom.style.display = 'none'; // Hide DOM element while jumping
     // FREEZE LOGIC: Capture frame once per jump
-    if (!hasFrozenFrame && chickyImg.complete) {
+    if (!hasFrozenFrame && chickyDom.complete) {
       frozenCtx.clearRect(0, 0, chicky.w, chicky.h);
-      frozenCtx.drawImage(chickyImg, 0, 0, chicky.w, chicky.h);
+      frozenCtx.drawImage(chickyDom, 0, 0, chicky.w, chicky.h);
       hasFrozenFrame = true;
     }
     if (hasFrozenFrame) {
       ctx.drawImage(frozenCanvas, chicky.x, chicky.y, chicky.w, chicky.h);
-    } else {
-      ctx.drawImage(chickyImg, chicky.x, chicky.y, chicky.w, chicky.h);
     }
   } else {
-    // On ground: let the GIF animate naturally
-    if (chickyImg.complete) {
-      ctx.drawImage(chickyImg, chicky.x, chicky.y, chicky.w, chicky.h);
-    }
+    // On ground: let the GIF animate naturally via DOM. We don't draw on canvas!
   }
 
   animationId = requestAnimationFrame(loop);
@@ -381,7 +380,7 @@ function initAfterLoad() {
   document.getElementById('loaderScreen').classList.add('hidden');
   document.getElementById('startScreen').classList.remove('hidden');
   if (!isPlaying) {
-    ctx.drawImage(chickyImg, chicky.x, chicky.y, chicky.w, chicky.h);
+    chickyDom.style.display = 'block'; // Show on ground
     // Draw initial ground
     ctx.fillStyle = '#4ade80';
     ctx.fillRect(0, GROUND_Y, CANVAS_W, CANVAS_H - GROUND_Y);
@@ -390,11 +389,11 @@ function initAfterLoad() {
   }
 }
 
-if (chickyImg.complete && chickyImg.naturalWidth > 0) {
+if (chickyDom.complete && chickyDom.naturalWidth > 0) {
   initAfterLoad();
 } else {
-  chickyImg.onload = initAfterLoad;
-  chickyImg.onerror = initAfterLoad; // fallback
+  chickyDom.onload = initAfterLoad;
+  chickyDom.onerror = initAfterLoad; // fallback
 }
 </script>
 
