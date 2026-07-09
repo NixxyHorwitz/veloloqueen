@@ -679,11 +679,11 @@ body { background: #f97316 !important; }
     </a>
     <?php endif; ?>
 
-    <!-- SM: Panduan -->
-    <a href="/panduan" class="bento-sm"
-       style="background:linear-gradient(135deg,#6ee7b7,#0891b2);box-shadow:0 4px 0 #0e7490">
-      <i class="ph-fill ph-book-open"></i>
-      <span class="bento-sm__label">Panduan</span>
+    <!-- SM: Chicky Run -->
+    <a href="/chicky" class="bento-sm"
+       style="background:linear-gradient(135deg,#fde047,#eab308);box-shadow:0 4px 0 #a16207">
+      <i class="ph-fill ph-game-controller"></i>
+      <span class="bento-sm__label">Chicky Run</span>
     </a>
 
     <!-- WIDE: Tarik Saldo -->
