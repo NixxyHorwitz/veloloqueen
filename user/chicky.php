@@ -151,6 +151,7 @@ canvas {
         <div class="overlay-card">
           <h2>GAME OVER</h2>
           <p>Skormu: <span id="finalScore">0</span></p>
+          <p style="font-size:11px; margin-top:-5px;">Tertinggi: <span id="finalHiScore">0</span></p>
           <button class="btn-play" onclick="startGame()">Main Lagi</button>
         </div>
       </div>
@@ -181,7 +182,7 @@ let score = 0;
 let hiScore = localStorage.getItem('chickyHiScore') || 0;
 hiScoreVal.innerText = String(Math.floor(hiScore)).padStart(5, '0');
 
-let baseSpeed = 4;
+let baseSpeed = 2.5;
 let currentSpeed = baseSpeed;
 let frameCount = 0;
 let obstacles = [];
@@ -202,15 +203,50 @@ frozenCanvas.height = chicky.h;
 const frozenCtx = frozenCanvas.getContext('2d');
 let hasFrozenFrame = false;
 
+// Web Audio SFX
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx;
+function playSfx(type) {
+  try {
+    if (!actx) actx = new AudioCtx();
+    if (actx.state === 'suspended') actx.resume();
+    const osc = actx.createOscillator();
+    const gain = actx.createGain();
+    osc.connect(gain); gain.connect(actx.destination);
+    const t = actx.currentTime;
+    if (type === 'jump') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(150, t);
+      osc.frequency.exponentialRampToValueAtTime(300, t + 0.1);
+      gain.gain.setValueAtTime(0.05, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+      osc.start(t); osc.stop(t + 0.1);
+    } else if (type === 'point') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, t);
+      osc.frequency.setValueAtTime(800, t + 0.05);
+      gain.gain.setValueAtTime(0.05, t);
+      gain.gain.linearRampToValueAtTime(0, t + 0.1);
+      osc.start(t); osc.stop(t + 0.1);
+    } else if (type === 'die') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, t);
+      osc.frequency.exponentialRampToValueAtTime(50, t + 0.3);
+      gain.gain.setValueAtTime(0.1, t);
+      gain.gain.linearRampToValueAtTime(0, t + 0.3);
+      osc.start(t); osc.stop(t + 0.3);
+    }
+  } catch(e) {}
+}
+
 // Controls
 function jump() {
   if (!isPlaying) return;
   if (!chicky.isJumping) {
     chicky.isJumping = true;
     chicky.vy = chicky.jumpStrength;
-    
-    // Freeze the GIF at the moment of jump!
-    hasFrozenFrame = false; // reset flag so it captures the immediate frame in the game loop
+    hasFrozenFrame = false; 
+    playSfx('jump');
   }
 }
 window.addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); jump(); } });
@@ -267,6 +303,7 @@ function startGame() {
 function gameOver() {
   isPlaying = false;
   cancelAnimationFrame(animationId);
+  playSfx('die');
   gameOverScreen.classList.remove('hidden');
   document.getElementById('finalScore').innerText = Math.floor(score);
   
@@ -275,6 +312,8 @@ function gameOver() {
     localStorage.setItem('chickyHiScore', hiScore);
     hiScoreVal.innerText = String(Math.floor(hiScore)).padStart(5, '0');
   }
+  let finalHiScoreEl = document.getElementById('finalHiScore');
+  if(finalHiScoreEl) finalHiScoreEl.innerText = Math.floor(hiScore);
 }
 
 function loop() {
@@ -283,7 +322,7 @@ function loop() {
 
   // Update Game Logic
   frameCount++;
-  currentSpeed = baseSpeed + (score * 0.005); // Speed increases with score!
+  currentSpeed = baseSpeed + (score * 0.003); // Speed increases with score!
 
   // Score
   score += 0.1;
@@ -339,6 +378,12 @@ function loop() {
     ) {
       gameOver();
       return;
+    }
+    
+    // Check if passed for SFX
+    if (!obs.passed && obs.x + obs.w < chicky.x) {
+      obs.passed = true;
+      playSfx('point');
     }
   }
   obstacles = obstacles.filter(o => o.x + o.w > 0);
