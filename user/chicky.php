@@ -192,7 +192,7 @@ let clouds = [];
 const chicky = {
   w: 64, h: 64,
   x: 50, y: GROUND_Y - 64,
-  vy: 0, gravity: 0.7, jumpStrength: -13,
+  vy: 0, gravity: 0.45, jumpStrength: -10.5,
   isJumping: false
 };
 
@@ -214,27 +214,28 @@ function playSfx(type) {
     const gain = actx.createGain();
     osc.connect(gain); gain.connect(actx.destination);
     const t = actx.currentTime;
+    
     if (type === 'jump') {
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(150, t);
-      osc.frequency.exponentialRampToValueAtTime(300, t + 0.1);
-      gain.gain.setValueAtTime(0.05, t);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
-      osc.start(t); osc.stop(t + 0.1);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, t);
+      osc.frequency.exponentialRampToValueAtTime(600, t + 0.15);
+      gain.gain.setValueAtTime(0.1, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+      osc.start(t); osc.stop(t + 0.15);
     } else if (type === 'point') {
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(600, t);
-      osc.frequency.setValueAtTime(800, t + 0.05);
+      osc.frequency.setValueAtTime(1000, t);
+      osc.frequency.setValueAtTime(1400, t + 0.05);
       gain.gain.setValueAtTime(0.05, t);
       gain.gain.linearRampToValueAtTime(0, t + 0.1);
       osc.start(t); osc.stop(t + 0.1);
     } else if (type === 'die') {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(200, t);
-      osc.frequency.exponentialRampToValueAtTime(50, t + 0.3);
-      gain.gain.setValueAtTime(0.1, t);
-      gain.gain.linearRampToValueAtTime(0, t + 0.3);
-      osc.start(t); osc.stop(t + 0.3);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, t);
+      osc.frequency.exponentialRampToValueAtTime(100, t + 0.4);
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.linearRampToValueAtTime(0, t + 0.4);
+      osc.start(t); osc.stop(t + 0.4);
     }
   } catch(e) {}
 }
