@@ -182,7 +182,16 @@ let score = 0;
 let hiScore = localStorage.getItem('chickyHiScore') || 0;
 hiScoreVal.innerText = String(Math.floor(hiScore)).padStart(5, '0');
 
-let baseSpeed = 2.5;
+// Config (overridden by server via /api/game_config)
+let CFG = {
+  base_speed: 2.5,
+  speed_multiplier: 0.003,
+  gravity: 0.45,
+  jump_strength: -10.5,
+  obstacle_interval: 80,
+};
+
+let baseSpeed = CFG.base_speed;
 let currentSpeed = baseSpeed;
 let frameCount = 0;
 let obstacles = [];
@@ -192,7 +201,7 @@ let clouds = [];
 const chicky = {
   w: 64, h: 64,
   x: 50, y: GROUND_Y - 64,
-  vy: 0, gravity: 0.45, jumpStrength: -10.5,
+  vy: 0, gravity: CFG.gravity, jumpStrength: CFG.jump_strength,
   isJumping: false
 };
 
@@ -323,14 +332,14 @@ function loop() {
 
   // Update Game Logic
   frameCount++;
-  currentSpeed = baseSpeed + (score * 0.003); // Speed increases with score!
+  currentSpeed = baseSpeed + (score * CFG.speed_multiplier); // Speed increases with score!
 
   // Score
   score += 0.1;
   scoreDisplay.innerText = String(Math.floor(score)).padStart(5, '0');
 
   // Spawn entities
-  if (frameCount % Math.max(60, Math.floor(120 - currentSpeed*5)) === 0) {
+  if (frameCount % Math.max(30, CFG.obstacle_interval - Math.floor(currentSpeed * 3)) === 0) {
     if (Math.random() > 0.2) spawnObstacle();
   }
   if (frameCount % 100 === 0) {
@@ -421,6 +430,21 @@ function loop() {
 
   animationId = requestAnimationFrame(loop);
 }
+
+// Load server game config then init
+fetch('/api/game_config')
+  .then(r => r.json())
+  .then(data => {
+    CFG.base_speed          = parseFloat(data.base_speed)        || CFG.base_speed;
+    CFG.speed_multiplier    = parseFloat(data.speed_multiplier)  || CFG.speed_multiplier;
+    CFG.gravity             = parseFloat(data.gravity)           || CFG.gravity;
+    CFG.jump_strength       = parseFloat(data.jump_strength)     || CFG.jump_strength;
+    CFG.obstacle_interval   = parseInt(data.obstacle_interval)   || CFG.obstacle_interval;
+    baseSpeed               = CFG.base_speed;
+    chicky.gravity          = CFG.gravity;
+    chicky.jumpStrength     = CFG.jump_strength;
+  })
+  .catch(() => {}); // Silent fallback to defaults
 
 // Initial render
 function initAfterLoad() {
