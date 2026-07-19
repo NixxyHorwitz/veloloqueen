@@ -360,7 +360,6 @@ body { background: #f97316 !important; color: #0f172a; margin: 0; padding: 0; }
             <div class="c-sub">Join: <?= date('d M Y', strtotime($dl['created_at'])) ?></div>
           </div>
           <div class="c-right">
-            <div class="c-amt" style="color:#0284c7; font-size:11px;"><?= (int)$dl['dep_count'] ?>x Depo</div>
             <div class="c-badge free" style="margin-top:2px;"><?= htmlspecialchars($dl['membership_name'] ?: 'Free') ?></div>
           </div>
         </div>

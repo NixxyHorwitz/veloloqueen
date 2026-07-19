@@ -212,7 +212,6 @@ body { background: #f97316 !important; color: #0f172a; }
       <div class="c-right">
         <div class="c-badge <?= $badgeCls ?>"><?= htmlspecialchars($r['membership_name'] ?: 'Free') ?></div>
         <div class="c-amt">+<?= format_rp((float)$r['commission_earned']) ?></div>
-        <div class="c-amt gray">Depo: <?= format_rp((float)$r['total_deposit']) ?></div>
       </div>
     </div>
     <?php endforeach; ?>
