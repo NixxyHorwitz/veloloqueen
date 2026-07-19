@@ -55,8 +55,8 @@ $level_blocked = $wd_require_level && $wd_min_level > 0 && $user_level < $wd_min
 $available_amounts = [];
 foreach ($predefined_amounts as $amt) {
     if ($level_blocked) {
-        // Jika terblokir karena butuh upgrade, pamerkan opsi s/d 500rb
-        if ($amt <= 500000) {
+        // Jika terblokir karena butuh upgrade, pamerkan opsi 50rb s/d 500rb
+        if ($amt >= 50000 && $amt <= 500000) {
             $available_amounts[] = $amt;
         }
     } else {
