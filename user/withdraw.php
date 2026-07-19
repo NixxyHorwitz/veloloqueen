@@ -130,7 +130,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!empty($user_mem['is_wd_disabled'])) {
         $flash = '🔴 Penarikan untuk level Anda saat ini sedang ditutup (Maintenance). Silakan upgrade level Anda!'; $flashType = 'error';
     } elseif ($level_blocked) {
-        $flash = "Upgrade ke {$min_level_name} dulu yuk biar bisa tarik saldo!"; $flashType = 'error';
+        if ((float)$user['balance_wd'] < 50000) {
+            $flash = 'Minimal withdraw Rp 50.000 ya.'; $flashType = 'error';
+        } else {
+            $flash = "Upgrade ke {$min_level_name} dulu yuk biar bisa tarik saldo!"; $flashType = 'error';
+        }
     } elseif ($free_age_blocked) {
         $flash = 'Akun harus berumur min. 1 hari untuk WD (Level ' . $user_mem['name'] . ').'; $flashType = 'error';
     } else {
@@ -673,7 +677,11 @@ html body { background: #f97316 !important; background-image: none !important; m
       <?php elseif ($wd_locked): ?>
         <button type="button" class="wd-submit-btn" disabled>Tarik (Terkunci)</button>
       <?php elseif ($level_blocked): ?>
-        <button type="button" class="wd-submit-btn" disabled>Tarik (Butuh Upgrade)</button>
+        <?php if ((float)$user['balance_wd'] < 50000): ?>
+          <button type="button" class="wd-submit-btn" disabled>Tarik (Minimal Rp 50.000)</button>
+        <?php else: ?>
+          <button type="button" class="wd-submit-btn" disabled>Tarik (Butuh Upgrade)</button>
+        <?php endif; ?>
       <?php elseif ($free_age_blocked): ?>
         <button type="button" class="wd-submit-btn" disabled>Tarik (Akun Baru belum bisa narik)</button>
       <?php elseif (!$user['can_withdraw']): ?>
