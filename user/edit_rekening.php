@@ -386,7 +386,7 @@ body {
               <?php if (!empty($banks)): ?>
                 <optgroup label="Transfer Bank">
                   <?php foreach($banks as $b): ?>
-                    <option value="<?= htmlspecialchars($b['name']) ?>" data-logo="<?= htmlspecialchars($b['logo']) ?>">
+                    <option value="<?= htmlspecialchars($b['name']) ?>" data-logo="<?= htmlspecialchars($b['logo'] ?? '') ?>">
                       <?= htmlspecialchars($b['name']) ?>
                     </option>
                   <?php endforeach; ?>
@@ -395,7 +395,7 @@ body {
               <?php if (!empty($ewallets)): ?>
                 <optgroup label="E-Wallet">
                   <?php foreach($ewallets as $e): ?>
-                    <option value="<?= htmlspecialchars($e['name']) ?>" data-logo="<?= htmlspecialchars($e['logo']) ?>">
+                    <option value="<?= htmlspecialchars($e['name']) ?>" data-logo="<?= htmlspecialchars($e['logo'] ?? '') ?>">
                       <?= htmlspecialchars($e['name']) ?>
                     </option>
                   <?php endforeach; ?>
