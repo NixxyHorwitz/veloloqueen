@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->beginTransaction();
                 // Hapus history order yang terkait
                 $pdo->prepare("DELETE FROM upgrade_orders WHERE membership_id=?")->execute([$id]);
-                // Reset user yang menggunakan paket ini ke paket <?= htmlspecialchars(get_free_tier_name($pdo)) ?> (id=1)
+                // Reset user yang menggunakan paket ini ke paket gratis (id=1)
                 $pdo->prepare("UPDATE users SET membership_id=1, membership_expires_at=NULL WHERE membership_id=?")->execute([$id]);
                 // Hapus paket
                 $pdo->prepare("DELETE FROM memberships WHERE id=? AND price>0")->execute([$id]);
