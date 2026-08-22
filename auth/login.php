@@ -20,41 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $login = trim($_POST['login'] ?? '');
     $pwd   = $_POST['password'] ?? '';
-    
-    if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
-        $s = $pdo->prepare("SELECT * FROM users WHERE email=? AND is_active=1");
-        $s->execute([$login]);
-        $user = $s->fetch();
-    } else {
-        // If it looks like a phone number/whatsapp, generate normalized lookup options
-        $clean = preg_replace('/\D/', '', $login);
-        $phone_options = [$login];
-        if (!empty($clean)) {
-            $phone_options[] = $clean;
-            // if clean starts with 62, add stripped version and version with 0
-            if (strpos($clean, '62') === 0) {
-                $stripped = substr($clean, 2);
-                $phone_options[] = $stripped;
-                $phone_options[] = '0' . $stripped;
-            }
-            // if clean starts with 0, add stripped version and version with 62
-            if (strpos($clean, '0') === 0) {
-                $stripped = substr($clean, 1);
-                $phone_options[] = $stripped;
-                $phone_options[] = '62' . $stripped;
-            }
-            $phone_options[] = '0' . $clean;
-            $phone_options[] = '62' . $clean;
-        }
-        
-        $phone_options = array_unique($phone_options);
-        $placeholders = implode(',', array_fill(0, count($phone_options), '?'));
-        
-        // Search by username, email, whatsapp direct, or whatsapp normalized
-        $s = $pdo->prepare("SELECT * FROM users WHERE (username = ? OR whatsapp IN ($placeholders) OR REPLACE(whatsapp, '+', '') IN ($placeholders)) AND is_active=1");
-        $s->execute(array_merge([$login], $phone_options, $phone_options));
-        $user = $s->fetch();
-    }
+    $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+    $s     = $pdo->prepare("SELECT * FROM users WHERE {$field}=? AND is_active=1");
+    $s->execute([$login]);
+    $user  = $s->fetch();
 
     if ($user && password_verify($pwd, $user['password_hash'])) {
         unset($_SESSION[$ip_key . '_att'], $_SESSION[$ip_key . '_lock']);
@@ -70,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Terlalu banyak percobaan. Coba lagi dalam 10 menit.';
     } else {
         $left  = 5 - $new_att;
-        $error = "Nomor HP/username atau password salah. Sisa percobaan: {$left}";
+        $error = "Username/email atau password salah. Sisa percobaan: {$left}";
     }
 }
 end_login:
