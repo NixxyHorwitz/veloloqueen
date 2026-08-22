@@ -1,5 +1,5 @@
 /**
- * Velostar — Casual Game Style Toast System
+ * TontonCuan — Casual Game Style Toast System
  * Usage: nToast('Pesan kamu', 'success'|'error'|'info'|'warn')
  *        nToast.copy('teks') — copy + toast otomatis
  */

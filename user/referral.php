@@ -165,10 +165,10 @@ body { background: #f97316 !important; color: #0f172a; }
   </div>
   
   <div class="share-grid">
-    <a href="https://wa.me/?text=<?= urlencode('Yuk gabung Velostar! Daftar pakai link ku: ' . $ref_url) ?>" target="_blank" class="s-btn wa">
+    <a href="https://wa.me/?text=<?= urlencode('Yuk gabung TontonCuan! Daftar pakai link ku: ' . $ref_url) ?>" target="_blank" class="s-btn wa">
       <i class="ph-bold ph-whatsapp-logo"></i> WhatsApp
     </a>
-    <a href="https://t.me/share/url?url=<?= urlencode($ref_url) ?>&text=<?= urlencode('Gabung Velostar, dapat reward tiap nonton video!') ?>" target="_blank" class="s-btn tg">
+    <a href="https://t.me/share/url?url=<?= urlencode($ref_url) ?>&text=<?= urlencode('Gabung TontonCuan, dapat reward tiap nonton video!') ?>" target="_blank" class="s-btn tg">
       <i class="ph-bold ph-telegram-logo"></i> Telegram
     </a>
   </div>

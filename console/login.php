@@ -95,7 +95,7 @@ body{background:#0f1117;min-height:100vh;display:flex;align-items:center;justify
   <div class="brand-icon">
     <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
   </div>
-  <h4 class="text-white fw-bold mb-1">Velostar</h4>
+  <h4 class="text-white fw-bold mb-1">TontonCuan</h4>
   <p class="text-secondary mb-4" style="font-size:13px">Admin Console</p>
   <?php if ($error): ?>
   <div class="alert alert-danger py-2" style="font-size:13px;border-radius:10px"><?= htmlspecialchars($error) ?></div>
