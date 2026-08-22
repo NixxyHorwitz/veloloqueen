@@ -224,7 +224,7 @@ i[class^="ph-"] {
             🎬
           <?php endif; ?>
         </div>
-        <span>Velo<em>star</em></span>
+        <span>Tonton<em>Cuan</em></span>
       </a>
 
       <?php if (!empty($user)): ?>
