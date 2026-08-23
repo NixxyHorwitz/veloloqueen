@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'claim
         $pdo->prepare("UPDATE users SET balance_wd = balance_wd + ? {$ticketSql} WHERE id=?")
             ->execute([$mission['reward'], $user['id']]);
 
-        $tgMsg = "ðŸŽ¯ <b>MEMBER KLAIM MISI!</b>\n";
+        $tgMsg = "🎯 <b>MEMBER KLAIM MISI!</b>\n";
         $tgMsg .= "Username: <code>" . htmlspecialchars($user['username']) . "</code>\n";
         $tgMsg .= "Misi: <b>" . htmlspecialchars($mission['title']) . "</b>\n";
         $tgMsg .= "Reward: Rp " . number_format($mission['reward'], 0, ',', '.') . "\n";
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'claim
 
         $pdo->commit();
         
-        $msg = 'ðŸŽ‰ Reward diklaim! +'.number_format($mission['reward'],0,',','.').' ke Saldo Tarik.';
+        $msg = '🎉 Reward diklaim! +'.number_format($mission['reward'],0,',','.').' ke Saldo Tarik.';
         if ($is_daily) $msg .= ' (+1 Tiket Spin)';
         echo json_encode(['ok'=>true,'msg'=>$msg,'reward'=>$mission['reward'],'tickets_added'=>$is_daily ? 1 : 0]);
     } catch (\Throwable $e) {
