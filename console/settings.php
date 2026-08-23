@@ -218,7 +218,7 @@ $tabs = [
             
             <div class="row g-2">
               <div class="col-md-6"><div class="c-form-group"><label class="c-label">Limit Tonton <?= htmlspecialchars(get_free_tier_name($pdo)) ?> (video/hari)</label>
-                <input type="number" name="free_watch_limit" class="c-form-control" value="<?= $s('free_watch_limit','5') ?>" min="1"></div></div>
+                <input type="number" name="free_watch_limit" class="c-form-control" value="<?= $s('free_watch_limit','7') ?>" min="1"></div></div>
               <div class="col-md-6"><div class="c-form-group"><label class="c-label">Reward Check-in Min (Rp)</label>
                 <input type="number" name="checkin_reward_min" class="c-form-control" value="<?= $s('checkin_reward_min','500') ?>" min="0"></div></div>
               <div class="col-md-6"><div class="c-form-group"><label class="c-label">Reward Check-in Max (Rp)</label>

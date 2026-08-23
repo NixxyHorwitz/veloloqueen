@@ -5,7 +5,7 @@ require_once dirname(__DIR__) . '/auth/guard.php';
 $pageTitle  = 'Panduan';
 $activePage = 'panduan';
 
-$free_limit  = (int)   setting($pdo, 'free_watch_limit', '5');
+$free_limit  = (int)   setting($pdo, 'free_watch_limit', '7');
 $min_wd      = (float) setting($pdo, 'min_withdraw', '50000');
 $ref_bonus   = (float) setting($pdo, 'referral_bonus', '1000');
 
