@@ -623,6 +623,67 @@ body { background: #f97316 !important; }
   </svg>
 </div>
 
+<!-- LIVECHAT STRIP -->
+<?php if (!$is_guest): ?>
+<a href="/livechat" class="lc-strip">
+  <div class="lc-strip__icon">
+    <i class="ph-fill ph-chat-circle-dots"></i>
+    <span class="lc-strip__dot"></span>
+  </div>
+  <div class="lc-strip__text">
+    <div class="lc-strip__title">Live Chat Support</div>
+    <div class="lc-strip__sub">Ada pertanyaan? Kami siap bantu kamu! 💬</div>
+  </div>
+  <i class="ph-bold ph-arrow-right lc-strip__arr"></i>
+</a>
+<style>
+.lc-strip {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border: 2px solid #fed7aa;
+  border-radius: 16px;
+  margin: 0 14px 0;
+  padding: 12px 14px;
+  text-decoration: none;
+  box-shadow: 0 3px 0 #fdba74;
+  transition: transform 0.12s, box-shadow 0.12s;
+  position: relative;
+  overflow: hidden;
+}
+.lc-strip:active { transform: translateY(2px); box-shadow: 0 1px 0 #fdba74; }
+.lc-strip::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(249,115,22,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+.lc-strip__icon {
+  position: relative; flex-shrink: 0;
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: #fff;
+  box-shadow: 0 3px 8px rgba(234,88,12,0.35);
+}
+.lc-strip__dot {
+  position: absolute; top: -2px; right: -2px;
+  width: 11px; height: 11px;
+  background: #22c55e; border: 2px solid #fff;
+  border-radius: 50%;
+  animation: lc-pulse 2s infinite;
+}
+@keyframes lc-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.8; }
+}
+.lc-strip__text { flex: 1; min-width: 0; }
+.lc-strip__title { font-size: 13px; font-weight: 900; color: #c2410c; font-family: 'Nunito', sans-serif; }
+.lc-strip__sub { font-size: 10px; font-weight: 700; color: #78350f; margin-top: 1px; font-family: 'Nunito', sans-serif; }
+.lc-strip__arr { font-size: 18px; color: #f97316; flex-shrink: 0; }
+</style>
+<?php endif; ?>
+
 <!-- ═══════════════════════════════════════════════════ -->
 <!--  BODY CONTENT                                      -->
 <!-- ═══════════════════════════════════════════════════ -->

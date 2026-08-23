@@ -496,17 +496,16 @@ html body { background: #f97316 !important; background-image: none !important; }
 
     <?php
     $paid    = array_values(array_filter($memberships, fn($m) => (float)$m['price'] > 0));
-    usort($paid, fn($a,$b) => (float)$b['price'] <=> (float)$a['price']);
-    $legend  = $paid[0] ?? null;
+    usort($paid, fn($a,$b) => (float)$a['price'] <=> (float)$b['price']);
+    $pejuang = $paid[0] ?? null;
     $jagoan  = $paid[1] ?? null;
-    $pejuang = $paid[2] ?? null;
+    $legend  = $paid[2] ?? null;
     ?>
 
-    <?php if ($legend): $m = $legend; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
-    <div class="lvl lvl--legend" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
-      <div class="lvl-sticker lvl-sticker--red"><i class="ph-fill ph-crown"></i> BEST DEAL!</div>
+    <?php if ($pejuang): $m = $pejuang; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
+    <div class="lvl lvl--pejuang" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
       <div class="lvl-head">
-        <div class="lvl-icon" style="background:#fef08a;"><i class="ph-fill ph-star" style="color:#d97706;font-size:26px;"></i></div>
+        <div class="lvl-icon" style="background:#f1f5f9;"><i class="ph-bold ph-sword" style="color:#475569;font-size:24px;"></i></div>
         <div class="lvl-meta">
           <div class="lvl-name"><?= htmlspecialchars($m['name']) ?></div>
           <div class="lvl-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
@@ -517,18 +516,18 @@ html body { background: #f97316 !important; background-image: none !important; }
         </div>
       </div>
       <div class="lvl-specs">
-        <div class="lvl-spec"><i class="ph-bold ph-video-camera" style="color:#d97706;"></i> <?= $m['watch_limit'] ?> Video/hari</div>
+        <div class="lvl-spec"><i class="ph-bold ph-video-camera" style="color:#64748b;"></i> <?= $m['watch_limit'] ?> Video/hari</div>
         <div class="lvl-spec"><i class="ph-bold ph-arrow-circle-down" style="color:#10b981;"></i> Min. WD: <?= format_rp((float)$m['min_wd']) ?></div>
         <div class="lvl-spec"><i class="ph-bold ph-arrow-circle-up" style="color:#ef4444;"></i> Max. WD: <?= (float)$m['max_wd'] > 0 ? format_rp((float)$m['max_wd']) : 'Bebas' ?></div>
         <?php if ($m['allow_edit_bank']): ?>
         <div class="lvl-spec"><i class="ph-bold ph-pencil-simple" style="color:#3b82f6;"></i> Bebas Edit Rekening</div>
         <?php endif; ?>
         <?php if ($m['description']): ?>
-        <div class="lvl-spec lvl-spec--full"><i class="ph-bold ph-info" style="color:#d97706;"></i> <?= nl2br(htmlspecialchars($m['description'])) ?></div>
+        <div class="lvl-spec lvl-spec--full"><i class="ph-bold ph-info" style="color:#64748b;"></i> <?= nl2br(htmlspecialchars($m['description'])) ?></div>
         <?php endif; ?>
       </div>
-      <button type="button" class="lvl-cta lvl-cta--legend <?= !$can_afford ? 'lvl-cta--disabled' : '' ?>">
-        <?= $can_afford ? 'Gas Jadi Legenda!' : 'Saldo Kurang &mdash; Topup Dulu' ?>
+      <button type="button" class="lvl-cta lvl-cta--pejuang <?= !$can_afford ? 'lvl-cta--disabled' : '' ?>">
+        <?= $can_afford ? 'Mulai Jadi Pejuang!' : 'Saldo Kurang &mdash; Topup Dulu' ?>
       </button>
     </div>
     <?php endif; ?>
@@ -564,10 +563,11 @@ html body { background: #f97316 !important; background-image: none !important; }
     </div>
     <?php endif; ?>
 
-    <?php if ($pejuang): $m = $pejuang; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
-    <div class="lvl lvl--pejuang" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
+    <?php if ($legend): $m = $legend; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
+    <div class="lvl lvl--legend" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
+      <div class="lvl-sticker lvl-sticker--red"><i class="ph-fill ph-crown"></i> BEST DEAL!</div>
       <div class="lvl-head">
-        <div class="lvl-icon" style="background:#f1f5f9;"><i class="ph-bold ph-sword" style="color:#475569;font-size:24px;"></i></div>
+        <div class="lvl-icon" style="background:#fef08a;"><i class="ph-fill ph-star" style="color:#d97706;font-size:26px;"></i></div>
         <div class="lvl-meta">
           <div class="lvl-name"><?= htmlspecialchars($m['name']) ?></div>
           <div class="lvl-dur"><i class="ph-bold ph-hourglass"></i> <?= $m['duration_days'] ?> Hari</div>
@@ -578,18 +578,18 @@ html body { background: #f97316 !important; background-image: none !important; }
         </div>
       </div>
       <div class="lvl-specs">
-        <div class="lvl-spec"><i class="ph-bold ph-video-camera" style="color:#64748b;"></i> <?= $m['watch_limit'] ?> Video/hari</div>
+        <div class="lvl-spec"><i class="ph-bold ph-video-camera" style="color:#d97706;"></i> <?= $m['watch_limit'] ?> Video/hari</div>
         <div class="lvl-spec"><i class="ph-bold ph-arrow-circle-down" style="color:#10b981;"></i> Min. WD: <?= format_rp((float)$m['min_wd']) ?></div>
         <div class="lvl-spec"><i class="ph-bold ph-arrow-circle-up" style="color:#ef4444;"></i> Max. WD: <?= (float)$m['max_wd'] > 0 ? format_rp((float)$m['max_wd']) : 'Bebas' ?></div>
         <?php if ($m['allow_edit_bank']): ?>
         <div class="lvl-spec"><i class="ph-bold ph-pencil-simple" style="color:#3b82f6;"></i> Bebas Edit Rekening</div>
         <?php endif; ?>
         <?php if ($m['description']): ?>
-        <div class="lvl-spec lvl-spec--full"><i class="ph-bold ph-info" style="color:#64748b;"></i> <?= nl2br(htmlspecialchars($m['description'])) ?></div>
+        <div class="lvl-spec lvl-spec--full"><i class="ph-bold ph-info" style="color:#d97706;"></i> <?= nl2br(htmlspecialchars($m['description'])) ?></div>
         <?php endif; ?>
       </div>
-      <button type="button" class="lvl-cta lvl-cta--pejuang <?= !$can_afford ? 'lvl-cta--disabled' : '' ?>">
-        <?= $can_afford ? 'Mulai Jadi Pejuang!' : 'Saldo Kurang &mdash; Topup Dulu' ?>
+      <button type="button" class="lvl-cta lvl-cta--legend <?= !$can_afford ? 'lvl-cta--disabled' : '' ?>">
+        <?= $can_afford ? 'Gas Jadi Legenda!' : 'Saldo Kurang &mdash; Topup Dulu' ?>
       </button>
     </div>
     <?php endif; ?>
