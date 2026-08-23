@@ -155,57 +155,56 @@ body { background: #f97316 !important; }
   50% { box-shadow: 0 4px 0 #d97706, 0 0 16px rgba(255,255,255,0.4); }
 }
 
-/* Big balance display row */
-.hero-balance-row {
+/* Big balance display */
+.hero-balance {
+  background: rgba(0,0,0,0.12);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 20px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.hero-balance__mascot { font-size: 44px; flex-shrink: 0; animation: bob 3s ease-in-out infinite; }
+@keyframes bob { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-6px) rotate(3deg); } }
+.hero-balance__info { flex: 1; }
+.hero-balance__label { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.5px; }
+.hero-balance__amount { font-size: 30px; font-weight: 900; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.2); line-height: 1.1; }
+.hero-balance__sub { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+/* Action buttons row below balance card */
+.hero-btn-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
-.hero-balance-btn {
+.hero-action-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 18px;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 10px;
+  border-radius: 16px;
   text-decoration: none;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
   color: #fff;
   border: 3px solid #0f172a;
   box-shadow: 0 4px 0 #0f172a;
   transition: transform 0.1s, box-shadow 0.1s;
-  min-height: 60px;
 }
-.hero-balance-btn:active {
+.hero-action-btn:active {
   transform: translateY(3px);
   box-shadow: 0 1px 0 #0f172a;
 }
-.hero-balance-btn i {
-  font-size: 24px;
-  color: #fff;
-  flex-shrink: 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+.hero-action-btn i {
+  font-size: 18px;
 }
-.hero-balance-btn__txt {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-.hero-balance-btn__label {
-  font-size: 9px;
-  font-weight: 800;
-  color: rgba(255,255,255,0.85);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.hero-balance-btn__amount {
-  font-size: 14px;
-  font-weight: 900;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.hero-balance-btn--wd {
+.hero-action-btn--wd {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
-.hero-balance-btn--dep {
+.hero-action-btn--dep {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 }
 
@@ -579,23 +578,25 @@ body { background: #f97316 !important; }
     </a>
   </div>
 
-  <!-- Quick Actions (Withdraw & Topup) -->
-  <div class="hero-balance-row">
-    <!-- Tarik Saldo (balance_wd) -->
-    <a href="/withdraw" class="hero-balance-btn hero-balance-btn--wd">
-      <i class="ph-fill ph-hand-coins"></i>
-      <div class="hero-balance-btn__txt">
-        <span class="hero-balance-btn__label">Tarik Saldo</span>
-        <span class="hero-balance-btn__amount"><?= format_rp((float)$user['balance_wd']) ?></span>
-      </div>
+  <!-- Balance + Mascot -->
+  <div class="hero-balance">
+    <div class="hero-balance__mascot"><img src="/assets/rooster_money.gif" style="width: 60px; height: 60px; object-fit: contain; transform: scale(1.3) translateY(4px);" alt="Mascot"></div>
+    <div class="hero-balance__info">
+      <div class="hero-balance__label">💎 Total Penghasilan</div>
+      <div class="hero-balance__amount"><?= format_rp((float)$user['balance_wd']) ?></div>
+      <div class="hero-balance__sub">🛒 Saldo Belanja: <?= format_rp((float)$user['balance_dep']) ?></div>
+    </div>
+  </div>
+
+  <!-- Action Buttons Row -->
+  <div class="hero-btn-row">
+    <!-- Tarik Saldo -->
+    <a href="/withdraw" class="hero-action-btn hero-action-btn--wd">
+      <i class="ph-bold ph-hand-coins"></i> Tarik Saldo
     </a>
-    <!-- Topup (balance_dep) -->
-    <a href="/deposit" class="hero-balance-btn hero-balance-btn--dep">
-      <i class="ph-fill ph-wallet"></i>
-      <div class="hero-balance-btn__txt">
-        <span class="hero-balance-btn__label">Topup</span>
-        <span class="hero-balance-btn__amount"><?= format_rp((float)$user['balance_dep']) ?></span>
-      </div>
+    <!-- Topup -->
+    <a href="/deposit" class="hero-action-btn hero-action-btn--dep">
+      <i class="ph-bold ph-wallet"></i> Topup Saldo
     </a>
   </div>
 
