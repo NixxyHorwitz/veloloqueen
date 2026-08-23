@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtPending->execute([$user['id']]);
         
         if ($stmtPending->fetchColumn()) {
-            $flash = 'Ã¢ÂÅ’ Permintaan pengembalian dana kamu sebelumnya masih dalam proses verifikasi otomatis.'; $flashType = 'error';
+            $flash = '❌ Permintaan pengembalian dana kamu sebelumnya masih dalam proses verifikasi otomatis.'; $flashType = 'error';
         } else {
             $s = $pdo->prepare("SELECT m.id as membership_id, m.name, m.price, u.refund_cut_percent, u.is_refund_enabled FROM users u LEFT JOIN memberships m ON u.membership_id = m.id WHERE u.id=?");
             $s->execute([$user['id']]);
@@ -110,9 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mName = $uInfo['name'] ?? null;
             
             if (!$mName) {
-                $flash = 'Ã¢ÂÅ’ Kamu tidak memiliki paket aktif.'; $flashType = 'error';
+                $flash = '❌ Kamu tidak memiliki paket aktif.'; $flashType = 'error';
             } elseif (!$uInfo['is_refund_enabled']) {
-                $flash = 'Ã¢ÂÅ’ Akses refund kamu telah dinonaktifkan.'; $flashType = 'error';
+                $flash = '❌ Akses refund kamu telah dinonaktifkan.'; $flashType = 'error';
             } else {
                 $pdo->prepare("INSERT INTO admin_requests (user_id, type) VALUES (?, 'refund_level')")->execute([$user['id']]);
                 $req_id = $pdo->lastInsertId();
@@ -126,19 +126,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $cutAmount = ($basePrice * $pct) / 100;
                 $afterCut = $basePrice - $cutAmount;
                 
-                $msg  = "Ã°Å¸â€™Â° <b>REQUEST REFUND LEVEL</b>\n\n";
-                $msg .= "Ã°Å¸â€˜Â¤ User: <code>{$user['username']}</code>\n";
-                $msg .= "Ã°Å¸Ââ€  Level: <b>{$mName}</b>\n";
-                $msg .= "Ã°Å¸â€™Âµ Harga Awal: <b>" . format_rp($basePrice) . "</b>\n";
-                $msg .= "Ã¢Å“â€šÃ¯Â¸Â Setelah Dipotong ({$pct}%): <b>" . format_rp($afterCut) . "</b>\n\n";
-                $msg .= "Ã¢Å¡Â Ã¯Â¸Â <i>Refund ini akan membatalkan level user dan mengembalikan saldo dengan potongan {$pct}% (jika di-Approve).</i>\n";
+                $msg  = "💰 <b>REQUEST REFUND LEVEL</b>\n\n";
+                $msg .= "👤 User: <code>{$user['username']}</code>\n";
+                $msg .= "🏆 Level: <b>{$mName}</b>\n";
+                $msg .= "💵 Harga Awal: <b>" . format_rp($basePrice) . "</b>\n";
+                $msg .= "✂️ Setelah Dipotong ({$pct}%): <b>" . format_rp($afterCut) . "</b>\n\n";
+                $msg .= "⚠️ <i>Refund ini akan membatalkan level user dan mengembalikan saldo dengan potongan {$pct}% (jika di-Approve).</i>\n";
                 $kb = [
-                    [['text'=>'Ã¢Å“â€¦ Approve Refund', 'callback_data'=>'req_approve_'.$req_id], ['text'=>'Ã¢ÂÅ’ Reject', 'callback_data'=>'req_reject_'.$req_id]],
-                    [['text'=>"Ã¢Å¡â„¢Ã¯Â¸Â Ubah Potongan ({$pct}%)", 'callback_data'=>'edit_refcut_'.$user['id']], ['text'=>'Ã°Å¸â€â€™ Cabut Akses Refund', 'callback_data'=>'toggle_ref_'.$user['id']]]
+                    [['text'=>'✅ Approve Refund', 'callback_data'=>'req_approve_'.$req_id], ['text'=>'❌ Reject', 'callback_data'=>'req_reject_'.$req_id]],
+                    [['text'=>"⚙️ Ubah Potongan ({$pct}%)", 'callback_data'=>'edit_refcut_'.$user['id']], ['text'=>'➡️ Cabut Akses Refund', 'callback_data'=>'toggle_ref_'.$user['id']]]
                 ];
                 send_telegram_notif($pdo, $msg, $kb, 'permintaan');
                 
-                $flash = 'Ã¢Å“â€¦ Permintaan pengembalian dana kamu telah masuk dan sedang diverifikasi oleh sistem secara otomatis.';
+                $flash = '✅ Permintaan pengembalian dana kamu telah masuk dan sedang diverifikasi oleh sistem secara otomatis.';
             }
         }
         goto end_post;
@@ -243,15 +243,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pdo->commit();
                     
                     $us = $pdo->prepare("SELECT * FROM users WHERE id=?"); $us->execute([$user['id']]); $user = $us->fetch();
-                    $flash = 'Ã°Å¸Å½â€° Hore! Upgrade ke ' . htmlspecialchars($chosen['name']) . ' berhasil! Berlaku s/d ' . date('d M Y', strtotime($new_expires)) . ' ya.';
+                    $flash = '🎉 Hore! Upgrade ke ' . htmlspecialchars($chosen['name']) . ' berhasil! Berlaku s/d ' . date('d M Y', strtotime($new_expires)) . ' ya.';
                     $active_membership = $chosen;
                     $can_refund = true; // just upgraded, well within 12 hours
                     
-                    $msgNotif = "Ã°Å¸Å½â€° <b>MEMBER UPGRADE LEVEL</b>\n\n";
-                    $msgNotif .= "Ã°Å¸â€˜Â¤ User: <code>{$user['username']}</code>\n";
-                    $msgNotif .= "Ã°Å¸Ââ€  Level Baru: <b>{$chosen['name']}</b>\n";
-                    $msgNotif .= "Ã°Å¸â€™Â° Harga: " . format_rp((float)$final_price) . "\n";
-                    $msgNotif .= "Ã°Å¸â€¢Â Waktu: " . date('d M Y H:i:s');
+                    $msgNotif = "🎉 <b>MEMBER UPGRADE LEVEL</b>\n\n";
+                    $msgNotif .= "👤 User: <code>{$user['username']}</code>\n";
+                    $msgNotif .= "🏆 Level Baru: <b>{$chosen['name']}</b>\n";
+                    $msgNotif .= "💰 Harga: " . format_rp((float)$final_price) . "\n";
+                    $msgNotif .= "🕒 Waktu: " . date('d M Y H:i:s');
                     send_telegram_notif($pdo, $msgNotif, [], 'log');
                 } else {
                     $pdo->rollBack();
