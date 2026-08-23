@@ -9,7 +9,7 @@ $qris_enabled = setting($pdo, 'qris_enabled', '1') === '1';
 $bankName     = setting($pdo, 'bank_name', 'BCA');
 $bankAccount  = setting($pdo, 'bank_account', '-');
 $bankHolder   = setting($pdo, 'bank_holder', 'Admin');
-$qris_raw     = '00020101021126610014COM.GO-JEK.WWW01189360091431528826820210G1528826820303UMI51440014ID.CO.QRIS.WWW0215ID10265193497510303UMI5204899953033605802ID5918TontonCuan Digital6005BOGOR61051696062070703A016304201E';
+$qris_raw     = '00020101021126570011ID.DANA.WWW011893600915303341139902090334113990303UMI51440014ID.CO.QRIS.WWW0215ID10265535024060303UMI5204504553033605802ID5912Nx Digistore6015Kota Jakarta Se61051281063040D89';
 
 $u_enabled = setting($pdo, 'depo_unique_code_enabled', '0') === '1';
 $u_min = (int)setting($pdo, 'depo_unique_code_min', '1');
