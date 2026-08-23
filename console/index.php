@@ -80,7 +80,7 @@ require __DIR__ . '/partials/header.php';
       <div class="c-card-header"><span class="c-card-title">💰 Keuangan & Saldo</span></div>
       <div class="c-card-body d-flex gap-4">
         <div>
-          <div style="font-size:12px;color:#888;margin-bottom:2px">Total Revenue (Deposit Sukses)</div>
+          <div style="font-size:12px;color:#888;margin-bottom:2px">Total Rmeevenue (Deposit Sukses)</div>
           <div style="font-size:22px;font-weight:800;color:var(--brand)"><?= format_rp($totalRevenue) ?></div>
         </div>
         <div>
