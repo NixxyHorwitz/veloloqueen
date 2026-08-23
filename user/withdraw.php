@@ -247,7 +247,7 @@ require dirname(__DIR__) . '/partials/header.php';
 /* ══════════════════════════════════════════════
    WITHDRAW PAGE — CASUAL GAME STYLE (ORANGE)
    ══════════════════════════════════════════════ */
-html body { background: #f97316 !important; background-image: none !important; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+html body { background: #fff8f0 !important; background-image: none !important; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
 .wd-container {
   display: flex;
@@ -255,21 +255,16 @@ html body { background: #f97316 !important; background-image: none !important; m
   min-height: 100vh;
   max-width: 480px;
   margin: 0 auto;
-  background: #f97316;
-  box-shadow: 0 0 20px rgba(0,0,0,0.15);
+  background: #fff8f0;
+  box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
 
 /* ── BLUE TOP BANNER ── */
 .wd-top {
-  background: #38bdf8; /* Blue sky */
-  background-image: 
-    linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
-  background-size: 40px 20px;
-  background-position: 0 0, 20px 10px;
+  background: linear-gradient(160deg, #fbbf24 0%, #f97316 55%, #ea580c 100%);
   position: relative;
-  padding: 16px 14px 40px;
-  border-bottom: 3px solid #0284c7;
+  padding: 16px 14px 24px;
+  border-bottom: 3px solid #ea580c;
 }
 
 .wd-top-bar {
@@ -280,28 +275,27 @@ html body { background: #f97316 !important; background-image: none !important; m
 
 .wd-back-btn {
   width: 32px; height: 32px;
-  background: #fde047;
-  border: none;
+  background: rgba(255,255,255,0.18);
+  border: 1.5px solid rgba(255,255,255,0.35);
   border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  color: #ca8a04; font-size: 16px;
-  box-shadow: 0 3px 0 #a16207;
+  color: #fff; font-size: 16px;
   text-decoration: none;
   flex-shrink: 0;
   transition: transform 0.1s;
 }
-.wd-back-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #a16207; }
+.wd-back-btn:active { transform: translateY(3px); }
 
 .wd-notice-pill {
   flex: 1;
-  background: #fef08a;
-  border: 2.5px solid #ca8a04;
-  border-radius: 20px;
-  padding: 8px 12px 8px 8px;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.28);
+  border-radius: 16px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 0 #a16207;
+  color: #fff;
 }
 .wd-notice-icon {
   font-size: 20px;
@@ -310,7 +304,7 @@ html body { background: #f97316 !important; background-image: none !important; m
 .wd-notice-txt {
   font-size: 11px;
   font-weight: 800;
-  color: #854d0e;
+  color: #fff;
   line-height: 1.2;
 }
 
@@ -321,53 +315,49 @@ html body { background: #f97316 !important; background-image: none !important; m
 /* ── ORANGE BODY SECTION ── */
 .wd-body {
   flex: 1;
-  background: #f97316;
+  background: #fff8f0;
   padding: 16px 14px 100px;
   position: relative;
 }
-/* Paw pattern overlay */
 .wd-body::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%),
-              radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%);
-  background-size: 50px 50px;
-  background-position: 0 0, 25px 25px;
-  pointer-events: none;
+  display: none;
 }
 
 /* ── SALDO ROW ── */
 .wd-saldo-row {
+  background: #fff;
+  border: 3px solid #0f172a;
+  border-radius: 20px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 0 #0f172a;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   position: relative;
   z-index: 2;
 }
 .wd-saldo-lbl {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 900;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 .wd-saldo-val {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 900;
-  color: #fef08a;
-  text-shadow: 0 2px 0 #ca8a04, 0 3px 4px rgba(0,0,0,0.3);
-  font-style: italic;
-  letter-spacing: -0.5px;
+  color: #0f172a;
+  text-shadow: none;
+  font-style: normal;
 }
 .wd-saldo-icon {
-  font-size: 24px;
+  font-size: 20px;
   font-style: normal;
-  text-shadow: none;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+  filter: none;
 }
 
 /* ── AMOUNT SELECTION ── */
@@ -380,55 +370,55 @@ html body { background: #f97316 !important; background-image: none !important; m
   z-index: 2;
 }
 .wd-sh-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 900;
-  color: #7c2d12;
+  color: #0f172a;
 }
 .wd-sh-badge {
-  background: #fef08a;
-  color: #c2410c;
+  background: #fff;
+  color: #0f172a;
   font-size: 10px;
   font-weight: 900;
   padding: 4px 10px;
   border-radius: 12px;
-  border: 1.5px solid #ea580c;
-  box-shadow: 0 2px 0 #ea580c;
+  border: 2px solid #0f172a;
+  box-shadow: 0 2px 0 #0f172a;
 }
 
 .wd-amt-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 10px;
+  margin-bottom: 20px;
   position: relative;
   z-index: 2;
 }
 .wd-amt-btn {
-  background: #fffbeb;
-  border: 2px solid #b45309;
+  background: #fff;
+  border: 2.5px solid #0f172a;
   border-radius: 14px;
-  padding: 16px 8px;
+  padding: 12px 8px;
   text-align: center;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
-  color: #7c2d12;
-  box-shadow: 0 4px 0 #9a3412, 0 8px 10px rgba(0,0,0,0.15);
+  color: #0f172a;
+  box-shadow: 0 4px 0 #0f172a;
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s;
   outline: none;
 }
 .wd-amt-btn:active {
-  transform: translateY(4px);
-  box-shadow: 0 0px 0 #ca8a04;
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #0f172a;
 }
 .wd-amt-btn.active {
   background: #4ade80;
-  border-color: #166534;
+  border-color: #0f172a;
   color: #fff;
-  box-shadow: 0 4px 0 #166534;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 0 #0f172a;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.15);
 }
-.wd-amt-btn.active:active { box-shadow: 0 0 0 #166534; transform: translateY(4px); }
+.wd-amt-btn.active:active { box-shadow: 0 1px 0 #0f172a; transform: translateY(3px); }
 
 .wd-amt-disabled {
   display: none;
@@ -436,17 +426,17 @@ html body { background: #f97316 !important; background-image: none !important; m
 
 /* ── WALLET / BANK ROW ── */
 .wd-wallet-row {
-  background: #fffbeb;
-  border: 2.5px solid #b45309;
-  border-radius: 20px;
+  background: #fff;
+  border: 2.5px solid #0f172a;
+  border-radius: 16px;
   padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   position: relative;
   z-index: 2;
-  box-shadow: 0 4px 0 #b45309;
+  box-shadow: 0 4px 0 #0f172a;
 }
 .wd-w-left {
   display: flex;
@@ -454,7 +444,7 @@ html body { background: #f97316 !important; background-image: none !important; m
   gap: 8px;
   font-size: 13px;
   font-weight: 900;
-  color: #7c2d12;
+  color: #0f172a;
 }
 .wd-w-logo {
   width: 20px;
@@ -462,9 +452,9 @@ html body { background: #f97316 !important; background-image: none !important; m
   object-fit: contain;
 }
 .wd-w-right {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  color: #9a3412;
+  color: #64748b;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -472,49 +462,46 @@ html body { background: #f97316 !important; background-image: none !important; m
 
 /* In case user hasn't set bank, we render inputs inside this row aesthetic */
 .wd-input-grp { margin-bottom: 12px; position:relative; z-index:2; }
-.wd-input-grp label { display:block; font-size:11px; font-weight:900; color:#fff; margin-bottom:4px; text-shadow:0 1px 2px rgba(0,0,0,0.2); }
-.wd-input-grp input { width:100%; padding:12px; border-radius:14px; border:2.5px solid #b45309; background:#fffbeb; font-weight:800; font-size:12px; color:#7c2d12; box-shadow:0 4px 0 #b45309; outline:none; }
-.wd-input-grp input:focus { border-color:#d97706; }
+.wd-input-grp label { display:block; font-size:11px; font-weight:900; color:#0f172a; margin-bottom:4px; }
+.wd-input-grp input { width:100%; padding:10px 12px; border-radius:12px; border:2.5px solid #0f172a; background:#fff; font-weight:800; font-size:12px; color:#0f172a; box-shadow:0 3px 0 #0f172a; outline:none; }
+.wd-input-grp input:focus { border-color:#3b82f6; }
 
 /* ── SUBMIT BUTTON ── */
 .wd-submit-btn {
   width: 100%;
-  background: linear-gradient(180deg, #f8fafc, #e2e8f0);
-  border: 3px solid #cbd5e1;
-  border-radius: 30px;
-  padding: 16px;
-  font-size: 18px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: 3px solid #0f172a;
+  border-radius: 20px;
+  padding: 14px;
+  font-size: 15px;
   font-weight: 900;
-  color: #15803d;
-  text-shadow: 0 1px 0 #fff;
-  box-shadow: 0 6px 0 #94a3b8, inset 0 2px 4px rgba(255,255,255,1);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  box-shadow: 0 5px 0 #0f172a;
   cursor: pointer;
-  transition: transform 0.1s;
+  transition: transform 0.1s, box-shadow 0.1s;
   position: relative;
   z-index: 2;
 }
-.wd-submit-btn::before {
-  content:''; position:absolute; top:4px; left:50%; transform:translateX(-50%);
-  width: 90%; height: 8px; background: rgba(255,255,255,0.8); border-radius:10px;
-}
+.wd-submit-btn::before { display: none; }
 .wd-submit-btn:active {
   transform: translateY(4px);
-  box-shadow: 0 2px 0 #94a3b8, inset 0 2px 4px rgba(255,255,255,1);
+  box-shadow: 0 1px 0 #0f172a;
 }
 .wd-submit-btn:disabled {
-  background: #cbd5e1; border-color:#94a3b8; color:#334155; box-shadow:none; transform:none;
+  background: #cbd5e1; border-color:#cbd5e1; color:#64748b; box-shadow:none; transform:none;
 }
 
 /* Modals */
 .cg-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(3px); }
-.cg-modal-box { background:#fffbeb; width:100%; max-width:320px; border-radius:24px; border:3px solid #b45309; box-shadow:0 8px 0 #7c2d12; overflow:hidden; animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
-.cg-modal-hdr { background:linear-gradient(135deg, #fde047, #f59e0b); padding:14px; text-align:center; color:#7c2d12; font-weight:900; font-size:14px; border-bottom:2.5px solid #d97706; }
-.cg-modal-bd { padding:20px; text-align:center; }
+.cg-modal-box { background:#fff; width:100%; max-width:320px; border-radius:24px; border:3px solid #0f172a; box-shadow:0 8px 0 #0f172a; overflow:hidden; animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+.cg-modal-hdr { background:linear-gradient(135deg, #fde047, #f59e0b); padding:14px; text-align:center; color:#0f172a; font-weight:900; font-size:14px; border-bottom:2.5px solid #0f172a; }
+.cg-modal-bd { padding:20px; text-align:center; color:#0f172a; font-weight:800; font-size:13px; }
 .cg-modal-actions { display:flex; gap:10px; padding:0 20px 20px; }
-.cg-btn-cancel { flex:1; padding:12px; background:#f1f5f9; border:2.5px solid #cbd5e1; border-radius:12px; font-weight:900; color:#64748b; font-size:12px; box-shadow:0 4px 0 #94a3b8; }
-.cg-btn-confirm { flex:1.5; padding:12px; background:#4ade80; border:2.5px solid #166534; border-radius:12px; font-weight:900; color:#fff; box-shadow:0 4px 0 #166534; font-size:12px; }
-.cg-btn-confirm:active { transform:translateY(3px); box-shadow:0 1px 0 #166534; }
-.cg-btn-cancel:active { transform:translateY(3px); box-shadow:0 1px 0 #94a3b8; }
+.cg-btn-cancel { flex:1; padding:12px; background:#f1f5f9; border:2.5px solid #0f172a; border-radius:12px; font-weight:900; color:#64748b; font-size:12px; box-shadow:0 4px 0 #0f172a; cursor:pointer; }
+.cg-btn-confirm { flex:1.5; padding:12px; background:#4ade80; border:2.5px solid #0f172a; border-radius:12px; font-weight:900; color:#fff; box-shadow:0 4px 0 #0f172a; font-size:12px; cursor:pointer; }
+.cg-btn-confirm:active { transform:translateY(3px); box-shadow:0 1px 0 #0f172a; }
+.cg-btn-cancel:active { transform:translateY(3px); box-shadow:0 1px 0 #0f172a; }
 @keyframes popIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
 </style>
 
