@@ -426,10 +426,7 @@ body {
         <span class="footer-label">Belum punya akun?</span>
         <a href="/register" class="footer-link">Daftar Baru</a>
       </div>
-      <div class="footer-item" style="text-align: right;">
-        <span class="footer-label">Butuh bantuan?</span>
-        <a href="https://wa.me/6281234567890" target="_blank" class="footer-link">Hubungi CS</a>
-      </div>
+      
     </div>
   </div>
 </div>
