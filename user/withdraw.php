@@ -500,6 +500,24 @@ html body { background: #f97316 !important; background-image: none !important; m
 .wd-submit-btn:disabled {
   background: #cbd5e1; border-color:#7c2d12; color:#64748b; box-shadow:none; transform:none;
 }
+.wd-upgrade-cta {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  margin-top: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, #fde047 0%, #f59e0b 100%);
+  border: 3px solid #7c2d12;
+  border-radius: 20px;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #7c2d12;
+  text-decoration: none;
+  box-shadow: 0 5px 0 #7c2d12;
+  transition: transform 0.1s, box-shadow 0.1s;
+  font-family: 'Nunito', sans-serif;
+}
+.wd-upgrade-cta:active { transform: translateY(4px); box-shadow: 0 1px 0 #7c2d12; }
+.wd-upgrade-cta i { font-size: 18px; }
 
 /* Modals */
 .cg-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(3px); }
@@ -632,6 +650,9 @@ html body { background: #f97316 !important; background-image: none !important; m
           <button type="button" class="wd-submit-btn" disabled>Tarik (Minimal Rp 50.000)</button>
         <?php else: ?>
           <button type="button" class="wd-submit-btn" disabled>Tarik (Butuh Upgrade)</button>
+          <a href="/upgrade" class="wd-upgrade-cta">
+            <i class="ph-fill ph-crown"></i> Mau Upgrade? Klik di sini →
+          </a>
         <?php endif; ?>
       <?php elseif ($free_age_blocked): ?>
         <button type="button" class="wd-submit-btn" disabled>Tarik (Akun Baru belum bisa narik)</button>
