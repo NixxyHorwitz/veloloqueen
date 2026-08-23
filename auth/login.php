@@ -370,9 +370,7 @@ body {
           <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
         </svg>
       </div>
-      <div class="version-badge">
-        <span class="dot"></span>[PORTAL-OTENTIKASI-V1.9]
-      </div>
+
     </div>
     <div class="welcome-txt">Welcome,</div>
     <div class="signin-txt">Sign In!</div>
@@ -387,12 +385,11 @@ body {
     <form method="POST">
       <?= csrf_field() ?>
 
-      <!-- Phone / login Input -->
+      <!-- Username / Email Input -->
       <div class="inp-group">
-        <div class="inp-label">Telepon Genggam (HP)</div>
+        <div class="inp-label">Username / Email</div>
         <div class="inp-wrapper">
-          <div class="prefix-badge">+62</div>
-          <input type="text" name="login" value="<?= htmlspecialchars($_POST['login'] ?? '') ?>" placeholder="81234567890" autofocus autocomplete="username" required>
+          <input type="text" name="login" value="<?= htmlspecialchars($_POST['login'] ?? '') ?>" placeholder="Masukkan username atau email" autofocus autocomplete="username" required>
         </div>
       </div>
 
