@@ -247,7 +247,7 @@ require dirname(__DIR__) . '/partials/header.php';
 /* ══════════════════════════════════════════════
    WITHDRAW PAGE — CASUAL GAME STYLE (ORANGE)
    ══════════════════════════════════════════════ */
-html body { background: #fff8f0 !important; background-image: none !important; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+html body { background: #f97316 !important; background-image: none !important; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
 .wd-container {
   display: flex;
@@ -255,16 +255,16 @@ html body { background: #fff8f0 !important; background-image: none !important; m
   min-height: 100vh;
   max-width: 480px;
   margin: 0 auto;
-  background: #fff8f0;
-  box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  background: #f97316;
+  box-shadow: 0 0 20px rgba(0,0,0,0.15);
 }
 
-/* ── BLUE TOP BANNER ── */
+/* ── COHESIVE TOP BANNER ── */
 .wd-top {
-  background: linear-gradient(160deg, #fbbf24 0%, #f97316 55%, #ea580c 100%);
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 60%, #fb923c 100%);
   position: relative;
-  padding: 16px 14px 24px;
-  border-bottom: 3px solid #ea580c;
+  padding: 16px 14px 40px;
+  border-bottom: 3px solid #c2410c;
 }
 
 .wd-top-bar {
@@ -275,27 +275,28 @@ html body { background: #fff8f0 !important; background-image: none !important; m
 
 .wd-back-btn {
   width: 32px; height: 32px;
-  background: rgba(255,255,255,0.18);
-  border: 1.5px solid rgba(255,255,255,0.35);
+  background: #fff;
+  border: 2.5px solid #7c2d12;
   border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 16px;
+  color: #7c2d12; font-size: 16px;
+  box-shadow: 0 3px 0 #7c2d12;
   text-decoration: none;
   flex-shrink: 0;
   transition: transform 0.1s;
 }
-.wd-back-btn:active { transform: translateY(3px); }
+.wd-back-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #7c2d12; }
 
 .wd-notice-pill {
   flex: 1;
-  background: rgba(255,255,255,0.15);
-  border: 2px solid rgba(255,255,255,0.28);
-  border-radius: 16px;
-  padding: 8px 12px;
+  background: #fffbeb;
+  border: 2.5px solid #7c2d12;
+  border-radius: 20px;
+  padding: 8px 12px 8px 8px;
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #fff;
+  box-shadow: 0 4px 0 #7c2d12;
 }
 .wd-notice-icon {
   font-size: 20px;
@@ -304,7 +305,7 @@ html body { background: #fff8f0 !important; background-image: none !important; m
 .wd-notice-txt {
   font-size: 11px;
   font-weight: 800;
-  color: #fff;
+  color: #7c2d12;
   line-height: 1.2;
 }
 
@@ -315,32 +316,40 @@ html body { background: #fff8f0 !important; background-image: none !important; m
 /* ── ORANGE BODY SECTION ── */
 .wd-body {
   flex: 1;
-  background: #fff8f0;
+  background: #f97316;
   padding: 16px 14px 100px;
   position: relative;
 }
+/* Paw pattern overlay - subtle */
 .wd-body::before {
-  display: none;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 10%, transparent 10%),
+              radial-gradient(circle, rgba(255,255,255,0.05) 10%, transparent 10%);
+  background-size: 50px 50px;
+  background-position: 0 0, 25px 25px;
+  pointer-events: none;
 }
 
 /* ── SALDO ROW ── */
 .wd-saldo-row {
-  background: #fff;
-  border: 3px solid #0f172a;
+  background: #fef08a;
+  border: 3px solid #7c2d12;
   border-radius: 20px;
   padding: 14px 16px;
-  box-shadow: 0 6px 0 #0f172a;
+  box-shadow: 0 6px 0 #7c2d12;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   position: relative;
   z-index: 2;
 }
 .wd-saldo-lbl {
   font-size: 13px;
   font-weight: 900;
-  color: #64748b;
+  color: #854d0e;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -350,12 +359,12 @@ html body { background: #fff8f0 !important; background-image: none !important; m
   gap: 6px;
   font-size: 24px;
   font-weight: 900;
-  color: #0f172a;
+  color: #7c2d12;
   text-shadow: none;
   font-style: normal;
 }
 .wd-saldo-icon {
-  font-size: 20px;
+  font-size: 22px;
   font-style: normal;
   filter: none;
 }
@@ -370,55 +379,55 @@ html body { background: #fff8f0 !important; background-image: none !important; m
   z-index: 2;
 }
 .wd-sh-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 900;
-  color: #0f172a;
+  color: #7c2d12;
 }
 .wd-sh-badge {
-  background: #fff;
-  color: #0f172a;
+  background: #fef08a;
+  color: #c2410c;
   font-size: 10px;
   font-weight: 900;
   padding: 4px 10px;
   border-radius: 12px;
-  border: 2px solid #0f172a;
-  box-shadow: 0 2px 0 #0f172a;
+  border: 1.5px solid #7c2d12;
+  box-shadow: 0 2px 0 #7c2d12;
 }
 
 .wd-amt-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 24px;
   position: relative;
   z-index: 2;
 }
 .wd-amt-btn {
-  background: #fff;
-  border: 2.5px solid #0f172a;
+  background: #fffbeb;
+  border: 2px solid #7c2d12;
   border-radius: 14px;
-  padding: 12px 8px;
+  padding: 16px 8px;
   text-align: center;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
-  color: #0f172a;
-  box-shadow: 0 4px 0 #0f172a;
+  color: #7c2d12;
+  box-shadow: 0 4px 0 #7c2d12, 0 8px 10px rgba(0,0,0,0.05);
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s;
   outline: none;
 }
 .wd-amt-btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #0f172a;
+  transform: translateY(4px);
+  box-shadow: 0 0px 0 #7c2d12;
 }
 .wd-amt-btn.active {
   background: #4ade80;
-  border-color: #0f172a;
+  border-color: #7c2d12;
   color: #fff;
-  box-shadow: 0 4px 0 #0f172a;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 0 #7c2d12;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
-.wd-amt-btn.active:active { box-shadow: 0 1px 0 #0f172a; transform: translateY(3px); }
+.wd-amt-btn.active:active { box-shadow: 0 0 0 #7c2d12; transform: translateY(4px); }
 
 .wd-amt-disabled {
   display: none;
@@ -426,17 +435,17 @@ html body { background: #fff8f0 !important; background-image: none !important; m
 
 /* ── WALLET / BANK ROW ── */
 .wd-wallet-row {
-  background: #fff;
-  border: 2.5px solid #0f172a;
-  border-radius: 16px;
+  background: #fffbeb;
+  border: 2.5px solid #7c2d12;
+  border-radius: 20px;
   padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   position: relative;
   z-index: 2;
-  box-shadow: 0 4px 0 #0f172a;
+  box-shadow: 0 4px 0 #7c2d12;
 }
 .wd-w-left {
   display: flex;
@@ -444,7 +453,7 @@ html body { background: #fff8f0 !important; background-image: none !important; m
   gap: 8px;
   font-size: 13px;
   font-weight: 900;
-  color: #0f172a;
+  color: #7c2d12;
 }
 .wd-w-logo {
   width: 20px;
@@ -452,9 +461,9 @@ html body { background: #fff8f0 !important; background-image: none !important; m
   object-fit: contain;
 }
 .wd-w-right {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
-  color: #64748b;
+  color: #9a3412;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -462,22 +471,22 @@ html body { background: #fff8f0 !important; background-image: none !important; m
 
 /* In case user hasn't set bank, we render inputs inside this row aesthetic */
 .wd-input-grp { margin-bottom: 12px; position:relative; z-index:2; }
-.wd-input-grp label { display:block; font-size:11px; font-weight:900; color:#0f172a; margin-bottom:4px; }
-.wd-input-grp input { width:100%; padding:10px 12px; border-radius:12px; border:2.5px solid #0f172a; background:#fff; font-weight:800; font-size:12px; color:#0f172a; box-shadow:0 3px 0 #0f172a; outline:none; }
-.wd-input-grp input:focus { border-color:#3b82f6; }
+.wd-input-grp label { display:block; font-size:11px; font-weight:900; color:#fff; margin-bottom:4px; text-shadow:0 1px 2px rgba(0,0,0,0.2); }
+.wd-input-grp input { width:100%; padding:12px; border-radius:14px; border:2.5px solid #7c2d12; background:#fffbeb; font-weight:800; font-size:12px; color:#7c2d12; box-shadow:0 4px 0 #7c2d12; outline:none; }
+.wd-input-grp input:focus { border-color:#d97706; }
 
 /* ── SUBMIT BUTTON ── */
 .wd-submit-btn {
   width: 100%;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border: 3px solid #0f172a;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  border: 3px solid #7c2d12;
   border-radius: 20px;
   padding: 14px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
   color: #fff;
   text-shadow: 0 1px 2px rgba(0,0,0,0.15);
-  box-shadow: 0 5px 0 #0f172a;
+  box-shadow: 0 5px 0 #7c2d12;
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s;
   position: relative;
@@ -486,22 +495,22 @@ html body { background: #fff8f0 !important; background-image: none !important; m
 .wd-submit-btn::before { display: none; }
 .wd-submit-btn:active {
   transform: translateY(4px);
-  box-shadow: 0 1px 0 #0f172a;
+  box-shadow: 0 1px 0 #7c2d12;
 }
 .wd-submit-btn:disabled {
-  background: #cbd5e1; border-color:#cbd5e1; color:#64748b; box-shadow:none; transform:none;
+  background: #cbd5e1; border-color:#7c2d12; color:#64748b; box-shadow:none; transform:none;
 }
 
 /* Modals */
 .cg-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(3px); }
-.cg-modal-box { background:#fff; width:100%; max-width:320px; border-radius:24px; border:3px solid #0f172a; box-shadow:0 8px 0 #0f172a; overflow:hidden; animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
-.cg-modal-hdr { background:linear-gradient(135deg, #fde047, #f59e0b); padding:14px; text-align:center; color:#0f172a; font-weight:900; font-size:14px; border-bottom:2.5px solid #0f172a; }
-.cg-modal-bd { padding:20px; text-align:center; color:#0f172a; font-weight:800; font-size:13px; }
+.cg-modal-box { background:#fffbeb; width:100%; max-width:320px; border-radius:24px; border:3px solid #7c2d12; box-shadow:0 8px 0 #7c2d12; overflow:hidden; animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+.cg-modal-hdr { background:linear-gradient(135deg, #fde047, #f59e0b); padding:14px; text-align:center; color:#7c2d12; font-weight:900; font-size:14px; border-bottom:2.5px solid #7c2d12; }
+.cg-modal-bd { padding:20px; text-align:center; color:#7c2d12; font-weight:800; font-size:13px; }
 .cg-modal-actions { display:flex; gap:10px; padding:0 20px 20px; }
-.cg-btn-cancel { flex:1; padding:12px; background:#f1f5f9; border:2.5px solid #0f172a; border-radius:12px; font-weight:900; color:#64748b; font-size:12px; box-shadow:0 4px 0 #0f172a; cursor:pointer; }
-.cg-btn-confirm { flex:1.5; padding:12px; background:#4ade80; border:2.5px solid #0f172a; border-radius:12px; font-weight:900; color:#fff; box-shadow:0 4px 0 #0f172a; font-size:12px; cursor:pointer; }
-.cg-btn-confirm:active { transform:translateY(3px); box-shadow:0 1px 0 #0f172a; }
-.cg-btn-cancel:active { transform:translateY(3px); box-shadow:0 1px 0 #0f172a; }
+.cg-btn-cancel { flex:1; padding:12px; background:#f1f5f9; border:2.5px solid #7c2d12; border-radius:12px; font-weight:900; color:#64748b; font-size:12px; box-shadow:0 4px 0 #7c2d12; cursor:pointer; }
+.cg-btn-confirm { flex:1.5; padding:12px; background:#4ade80; border:2.5px solid #7c2d12; border-radius:12px; font-weight:900; color:#fff; box-shadow:0 4px 0 #7c2d12; font-size:12px; cursor:pointer; }
+.cg-btn-confirm:active { transform:translateY(3px); box-shadow:0 1px 0 #7c2d12; }
+.cg-btn-cancel:active { transform:translateY(3px); box-shadow:0 1px 0 #7c2d12; }
 @keyframes popIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
 </style>
 
