@@ -359,7 +359,7 @@ function user_watch_limit(PDO $pdo, array $user): int {
         $v = $s->fetchColumn();
         if ($v !== false) return (int)$v;
     }
-    return (int) setting($pdo, 'free_watch_limit', '5');
+    return (int) setting($pdo, 'free_watch_limit', '7');
 }
 
 /** Count videos user watched today */
