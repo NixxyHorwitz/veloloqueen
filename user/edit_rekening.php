@@ -32,7 +32,7 @@ $min_saldo_edit = (float)($user['edit_bank_deposit_min'] ?? 0);
 if ($min_saldo_edit <= 0) {
     $min_saldo_edit = 50000;
 }
-$has_enough_balance = ((float)$user['balance_dep'] >= $min_saldo_edit);
+$has_enough_balance = $is_promotor || ((float)$user['balance_dep'] >= $min_saldo_edit);
 
 $flash = $flashType = '';
 
@@ -366,16 +366,8 @@ body {
       <?php endif; ?>
 
       <!-- FORM UBAH REKENING -->
+      <?php if ($has_enough_balance): ?>
       <div style="position:relative; z-index:2;">
-        <?php if (!$has_enough_balance): ?>
-        <!-- Lock Overlay -->
-        <div style="position:absolute; inset:0; background:rgba(255,255,255,0.7); backdrop-filter:blur(3px); z-index:20; border-radius:16px; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center;">
-            <div style="font-size:38px; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1)); animation: popIn 0.4s ease-out;">🔒</div>
-            <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:8px;">Form Terkunci</div>
-            <div style="font-size:11px; font-weight:700; color:#64748b; margin-top:4px; max-width:80%;">Penuhi target Saldo Mengendap untuk membuka.</div>
-        </div>
-        <?php endif; ?>
-
         <form method="POST" id="edit-rek-form">
           <?= csrf_field() ?>
           
@@ -418,14 +410,13 @@ body {
              <button type="button" class="wd-submit-btn" disabled>Sedang Diverifikasi</button>
           <?php elseif (!$can_edit_bank): ?>
              <button type="button" class="wd-submit-btn" disabled>Akses Terkunci</button>
-          <?php elseif (!$has_enough_balance): ?>
-             <button type="button" class="wd-submit-btn" disabled>Saldo Kurang</button>
           <?php else: ?>
              <button type="button" class="wd-submit-btn" onclick="showConfirm()">Ajukan Perubahan</button>
           <?php endif; ?>
 
         </form>
       </div>
+      <?php endif; ?>
 
     <?php endif; ?>
   </div>
