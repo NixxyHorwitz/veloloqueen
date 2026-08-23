@@ -255,8 +255,8 @@ html body { background: #f97316 !important; background-image: none !important; m
   min-height: 100vh;
   max-width: 480px;
   margin: 0 auto;
-  background: #f97316;
-  box-shadow: 0 0 20px rgba(0,0,0,0.15);
+  background: transparent;
+  box-shadow: none;
 }
 
 /* ── COHESIVE TOP BANNER ── */
@@ -316,7 +316,7 @@ html body { background: #f97316 !important; background-image: none !important; m
 /* ── ORANGE BODY SECTION ── */
 .wd-body {
   flex: 1;
-  background: #f97316;
+  background: transparent;
   padding: 16px 14px 100px;
   position: relative;
 }
