@@ -208,7 +208,7 @@ foreach ([
     'lc_debug_panel','lc_attachment_enabled','lc_offline_msg',
 ] as $k) { $cfg[$k] = setting($pdo, $k, ''); }
 if (empty($cfg['chat_admin_name'])) $cfg['chat_admin_name'] = 'Admin';
-if (empty($cfg['livechat_enabled'])) $cfg['livechat_enabled'] = '1';
+if ($cfg['livechat_enabled'] === '') $cfg['livechat_enabled'] = '1';
 if (!isset($cfg['lc_attachment_enabled']) || $cfg['lc_attachment_enabled'] === '') $cfg['lc_attachment_enabled'] = '1';
 
 // ── Load sessions ─────────────────────────────────────────────
