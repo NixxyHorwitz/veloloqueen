@@ -9,7 +9,7 @@ if (!$campaign_enabled) {
 }
 
 $reward_amount = (float)setting($pdo, 'threads_campaign_reward', '25000');
-$instructions = setting($pdo, 'threads_campaign_instructions', "Promosikan TontonCuan di Threads, dapatkan cuan tambahan Rp 25.000! \n\nCaranya:\n1. Posting tentang TontonCuan di akun Threads kamu.\n2. Sertakan link referral atau testimoni positif.\n3. Screenshot postingan tersebut.\n4. Upload bukti screenshot di bawah ini untuk diverifikasi admin.");
+$instructions = setting($pdo, 'threads_campaign_instructions', "Promosikan TontonCuan di Threads dan dapatkan cuan tambahan Rp 25.000! \n\nKriteria Postingan:\n1. Postingan harus menyertakan gambar (screenshot/bukti bayar/foto aplikasi).\n2. Teks postingan berupa kalimat ajakan atau cerita pengalaman positif kamu mendapatkan cuan di TontonCuan.\n3. Berikan komentar atau caption positif tentang TontonCuan.\n\nCara Klaim:\n1. Buat postingan sesuai kriteria di atas pada akun Threads kamu.\n2. Ambil screenshot (bukti SS) postingan tersebut.\n3. Upload screenshot di form bawah ini untuk diverifikasi oleh admin.");
 
 // Check if user already has a pending threads campaign request
 $stmtPending = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign' AND status='pending' LIMIT 1");

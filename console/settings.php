@@ -315,7 +315,7 @@ $tabs = [
 
               <div class="c-form-group mb-3">
                 <label class="c-label">Petunjuk & Syarat Kampanye</label>
-                <textarea name="threads_campaign_instructions" class="c-form-control" rows="8" required><?= htmlspecialchars($s('threads_campaign_instructions', "Promosikan TontonCuan di Threads, dapatkan cuan tambahan Rp 25.000! \n\nCaranya:\n1. Posting tentang TontonCuan di akun Threads kamu.\n2. Sertakan link referral atau testimoni positif.\n3. Screenshot postingan tersebut.\n4. Upload bukti screenshot di bawah ini untuk diverifikasi admin.")) ?></textarea>
+                <textarea name="threads_campaign_instructions" class="c-form-control" rows="8" required><?= htmlspecialchars($s('threads_campaign_instructions', "Promosikan TontonCuan di Threads dan dapatkan cuan tambahan Rp 25.000! \n\nKriteria Postingan:\n1. Postingan harus menyertakan gambar (screenshot/bukti bayar/foto aplikasi).\n2. Teks postingan berupa kalimat ajakan atau cerita pengalaman positif kamu mendapatkan cuan di TontonCuan.\n3. Berikan komentar atau caption positif tentang TontonCuan.\n\nCara Klaim:\n1. Buat postingan sesuai kriteria di atas pada akun Threads kamu.\n2. Ambil screenshot (bukti SS) postingan tersebut.\n3. Upload screenshot di form bawah ini untuk diverifikasi oleh admin.")) ?></textarea>
                 <small class="text-muted" style="font-size:11px">Petunjuk langkah demi langkah yang akan ditampilkan kepada pengguna di halaman klaim.</small>
               </div>
 
