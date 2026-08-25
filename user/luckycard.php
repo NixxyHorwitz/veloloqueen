@@ -118,14 +118,14 @@ require dirname(__DIR__) . '/partials/header.php';
 </div>
 
 <div class="game-container">
-    <div class="played-state" id="no-tickets-state" style="<?= $spin_tickets <= 0 ? 'display:flex;' : 'display:none;' ?>">
+    <div class="played-state" id="no-tickets-state" style="<?= $spin_tickets <= 0 ? 'display:flex;' : 'display:none !important; flex: none !important;' ?>">
         <div class="played-icon">🎟️</div>
         <h3 style="font-size:18px;font-weight:900;color:#334155;margin:0 0 8px;">Tiket Spin Habis</h3>
         <p style="font-size:13px;font-weight:700;color:#64748b;margin:0;line-height:1.5;max-width:320px;text-align:center;">Kamu tidak memiliki tiket spin untuk membuka kartu. Selesaikan misi harian atau mingguan untuk mendapatkan tiket gratis!</p>
         <a href="/missions" class="btn-back">Lihat Misi</a>
     </div>
 
-    <div id="game-active-panel" style="<?= $spin_tickets > 0 ? 'display:block;' : 'display:none;' ?>">
+    <div id="game-active-panel" style="<?= $spin_tickets > 0 ? 'display:flex; flex-direction:column; flex:1;' : 'display:none !important; flex: none !important;' ?>">
         <div class="cards-grid">
             <?php for($i = 0; $i < 6; $i++): ?>
             <div class="card-scene" onclick="flipCard(this, <?= $i ?>)">
@@ -495,8 +495,12 @@ function playAgain() {
     // Re-enable playing
     setTimeout(() => {
         if (currentTickets <= 0) {
-            document.getElementById('game-active-panel').style.display = 'none';
-            document.getElementById('no-tickets-state').style.display = 'flex';
+            const activePanel = document.getElementById('game-active-panel');
+            const noTicketsState = document.getElementById('no-tickets-state');
+            activePanel.style.setProperty('display', 'none', 'important');
+            activePanel.style.setProperty('flex', 'none', 'important');
+            noTicketsState.style.setProperty('display', 'flex', 'important');
+            noTicketsState.style.setProperty('flex', '1', 'important');
         } else {
             isPlaying = false;
         }
