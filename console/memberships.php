@@ -175,7 +175,7 @@ require __DIR__ . '/partials/header.php';
 .ms-drawer-close { width: 32px; height: 32px; border: 1px solid rgba(255,255,255,.12); border-radius: 8px; background: rgba(255,255,255,.05); color: #aaa; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: all .15s; }
 .ms-drawer-close:hover { background: rgba(239,68,68,.15); color: #ef4444; border-color: rgba(239,68,68,.4); }
 
-.ms-drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
+.ms-drawer-body { flex: 1; min-height: 0; overflow-y: auto; padding: 24px; }
 .ms-drawer-body::-webkit-scrollbar { width: 5px; }
 .ms-drawer-body::-webkit-scrollbar-track { background: transparent; }
 .ms-drawer-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
