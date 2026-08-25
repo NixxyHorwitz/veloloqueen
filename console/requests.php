@@ -73,17 +73,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         $flash = "Berhasil menyetujui promosi Threads untuk user {$reqData['username']}. Reward " . format_rp($reward) . " telah ditambahkan ke Saldo Tarik.";
                     }
-                } else {
                     $admin_note = clean_input($_POST['admin_note'] ?? '');
-                    if ($reqData['type'] === 'threads_campaign') {
-                        $notifTitle = "Kampanye Threads Ditolak ❌";
-                        $notifMsg = "Maaf, promosi Threads kamu ditolak. Alasan: " . ($admin_note ?: 'Bukti screenshot tidak valid atau tidak memenuhi syarat.');
-                        $pdo->prepare("INSERT INTO notifications (title, message, type, icon, target_type, target_user_ids) VALUES (?, ?, 'warning', '🌀', 'single', ?)")
-                            ->execute([$notifTitle, $notifMsg, json_encode([$reqData['user_id']])]);
-                        $flash = "Permintaan promosi Threads ditolak.";
-                    } else {
-                        $flash = "Permintaan telah ditolak (Rejected).";
-                    }
+                    
+                    // Create user notification for all types of rejections
+                    $typeLabels = [
+                        'change_bank' => 'Perubahan Rekening',
+                        'refund_level' => 'Refund Level',
+                        'refund_wd_hold' => 'Refund WD Hold',
+                        'threads_campaign' => 'Promosi Threads'
+                    ];
+                    $typeName = $typeLabels[$reqData['type']] ?? $reqData['type'];
+                    $notifTitle = "Permintaan {$typeName} Ditolak ❌";
+                    $notifMsg = "Maaf, permintaan {$typeName} kamu ditolak. Alasan: " . ($admin_note ?: 'Ketentuan/syarat tidak terpenuhi.');
+                    
+                    $pdo->prepare("INSERT INTO notifications (title, message, type, icon, target_type, target_user_ids) VALUES (?, ?, 'warning', '🔔', 'single', ?)")
+                        ->execute([$notifTitle, $notifMsg, json_encode([$reqData['user_id']])]);
+                    
+                    $flash = "Permintaan {$typeName} ditolak.";
                 }
                 
                 $pdo->prepare("UPDATE admin_requests SET status=?, admin_note=?, updated_at=NOW() WHERE id=?")->execute([$status, $admin_note ?? null, $id]);
@@ -181,14 +187,7 @@ require __DIR__ . '/partials/header.php';
               <input type="hidden" name="status" value="approved">
               <button type="submit" class="btn btn-sm btn-success" style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;margin-right:4px;" onclick="return confirm('Setujui permintaan ini?')">✅ Approve</button>
             </form>
-            <form method="POST" class="d-inline" onsubmit="return promptRejectReason(this);">
-              <?= csrf_field() ?>
-              <input type="hidden" name="action" value="process_request">
-              <input type="hidden" name="id" value="<?= $req['id'] ?>">
-              <input type="hidden" name="status" value="rejected">
-              <input type="hidden" name="admin_note" value="">
-              <button type="submit" class="btn btn-sm btn-danger" style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;">❌ Reject</button>
-            </form>
+            <button type="button" class="btn btn-sm btn-danger" style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;" onclick="openRejectModal(<?= $req['id'] ?>, '<?= htmlspecialchars($req['type']) ?>')">❌ Reject</button>
             <?php else: ?>
               <span style="font-size:11px;color:#666">Selesai</span>
             <?php endif; ?>
@@ -205,19 +204,48 @@ require __DIR__ . '/partials/header.php';
   </div>
 </div>
 
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content" style="background:#1a1d27;border:1px solid #2d3149;color:#fff;">
+      <form method="POST">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="process_request">
+        <input type="hidden" name="id" id="reject-id">
+        <input type="hidden" name="status" value="rejected">
+        
+        <div class="modal-header border-0">
+          <h6 class="modal-title fw-bold" id="reject-title">Tolak Permintaan</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="c-form-group">
+            <label class="c-label" style="color:#aaa;">Alasan Penolakan (Wajib)</label>
+            <textarea name="admin_note" id="reject-note" class="c-form-control" rows="3" placeholder="Masukkan alasan penolakan..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-sm btn-danger">Kirim & Tolak</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
-function promptRejectReason(form) {
-    const reason = prompt("Masukkan alasan penolakan (Wajib):", "Bukti postingan tidak valid atau tidak memenuhi syarat");
-    if (reason === null) {
-        return false; // User cancelled
-    }
-    const trimmed = reason.trim();
-    if (trimmed === "") {
-        alert("Alasan penolakan wajib diisi!");
-        return false;
-    }
-    form.querySelector('input[name="admin_note"]').value = trimmed;
-    return true;
+var modalReject = new bootstrap.Modal(document.getElementById('rejectModal'));
+function openRejectModal(id, type) {
+    document.getElementById('reject-id').value = id;
+    document.getElementById('reject-note').value = '';
+    const titles = {
+        change_bank: 'Tolak Perubahan Rekening',
+        refund_level: 'Tolak Refund Level',
+        refund_wd_hold: 'Tolak Refund WD Hold',
+        threads_campaign: 'Tolak Promosi Threads'
+    };
+    document.getElementById('reject-title').textContent = titles[type] || 'Tolak Permintaan';
+    modalReject.show();
 }
 </script>
 
