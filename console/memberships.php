@@ -275,7 +275,7 @@ require __DIR__ . '/partials/header.php';
 $total_plans   = count($plans);
 $active_plans  = count(array_filter($plans, fn($p) => $p['is_active']));
 $total_members = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE membership_id != 1 AND membership_expires_at > NOW()")->fetchColumn();
-$total_revenue = (float)$pdo->query("SELECT COALESCE(SUM(amount_paid),0) FROM upgrade_orders WHERE status='approved'")->fetchColumn();
+$total_revenue = (float)$pdo->query("SELECT COALESCE(SUM(amount),0) FROM upgrade_orders WHERE status='confirmed'")->fetchColumn();
 ?>
 
 <!-- PAGE HEADER -->
