@@ -224,6 +224,12 @@ require dirname(__DIR__) . '/partials/header.php';
     min-height: 420px; padding: 20px; display: flex; flex-direction: column;
 }
 
+#game-active-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .played-state {
     padding: 40px 20px; text-align: center; flex: 1; display: flex;
     flex-direction: column; align-items: center; justify-content: center;
@@ -243,6 +249,8 @@ require dirname(__DIR__) . '/partials/header.php';
 }
 
 .card-scene {
+    width: 100%;
+    aspect-ratio: 3/4;
     perspective: 800px;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -253,7 +261,7 @@ require dirname(__DIR__) . '/partials/header.php';
 }
 .card-obj {
     width: 100%;
-    aspect-ratio: 3/4;
+    height: 100%;
     position: relative;
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform-style: preserve-3d;
