@@ -123,12 +123,17 @@ if (setting($pdo, 'maintenance_mode', '0') === '1') {
     
     // Allow /console/ (Admin Area) and API callbacks to bypass
     $is_console = str_starts_with($uri, '/console');
-    $is_webhook = str_starts_with($uri, '/webhook.php') || str_starts_with($uri, '/api/');
+    $is_webhook = str_starts_with($uri, '/webhook.php') || str_contains($uri, '/webhook.php') || str_starts_with($uri, '/api/');
     
     // Allow logged in admins/staff to bypass frontend maintenance
     $is_admin = !empty($_SESSION['admin']) || !empty($_SESSION['staff_username']);
 
-    if (!$is_console && !$is_admin && !$is_webhook) {
+    // Allow guest users (not logged in) to access the registration page
+    $is_register = str_starts_with($uri, '/register') || str_starts_with($uri, '/auth/register.php');
+    $is_logged_in = (auth_user($pdo) !== null);
+    $allow_register_guest = $is_register && !$is_logged_in;
+
+    if (!$is_console && !$is_admin && !$is_webhook && !$allow_register_guest) {
         $msg = setting($pdo, 'maintenance_message', 'Sistem sedang dalam perbaikan.');
         
         // Ensure session lock is released immediately to prevent hanging requests!
