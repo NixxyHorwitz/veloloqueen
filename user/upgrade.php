@@ -2,6 +2,17 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/auth/guard.php';
 
+function get_active_price(array $membership, array $user): float {
+    $price = (float)$membership['price'];
+    if (!empty($membership['is_genjutsu'])) {
+        $balance = (float)($user['balance_dep'] ?? 0);
+        if ($balance >= $price) {
+            $price = (float)$membership['price_genjutsu'];
+        }
+    }
+    return $price;
+}
+
 $memberships = $pdo->query("SELECT * FROM memberships WHERE is_active=1 ORDER BY sort_order ASC")->fetchAll();
 $flash = $flashType = '';
 
@@ -60,9 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
         echo json_encode(['error' => 'Voucher ini tidak dapat digunakan untuk paket pilihanmu.']); exit;
     }
     
-    $ms = $pdo->prepare("SELECT price FROM memberships WHERE id=? AND is_active=1");
+    $ms = $pdo->prepare("SELECT * FROM memberships WHERE id=? AND is_active=1");
     $ms->execute([$mid]);
-    $price = (float)$ms->fetchColumn();
+    $chosen_m = $ms->fetch();
+    if (!$chosen_m) { echo json_encode(['error' => 'Paket tidak valid.']); exit; }
+    $price = get_active_price($chosen_m, $user);
     if (!$price) { echo json_encode(['error' => 'Paket tidak valid.']); exit; }
     
     $is_rp = false;
@@ -155,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flash = 'Paket Free gak usah diupgrade ya!'; $flashType = 'error';
     } else {
         $voucher_code = strtoupper(trim($_POST['voucher_code'] ?? ''));
-        $price = (float)$chosen['price'];
+        $price = get_active_price($chosen, $user);
         $final_price = $price;
         $v_data = null;
         
@@ -502,8 +515,12 @@ html body { background: #f97316 !important; background-image: none !important; }
     $legend  = $paid[2] ?? null;
     ?>
 
-    <?php if ($pejuang): $m = $pejuang; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
-    <div class="lvl lvl--pejuang" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
+    <?php if ($pejuang):
+        $m = $pejuang;
+        $active_price = get_active_price($m, $user);
+        $can_afford = (float)$user['balance_dep'] >= $active_price;
+    ?>
+    <div class="lvl lvl--pejuang" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= $active_price ?>, <?= $m['duration_days'] ?>)">
       <div class="lvl-head">
         <div class="lvl-icon" style="background:#f1f5f9;"><i class="ph-bold ph-sword" style="color:#475569;font-size:24px;"></i></div>
         <div class="lvl-meta">
@@ -512,7 +529,7 @@ html body { background: #f97316 !important; background-image: none !important; }
         </div>
         <div class="lvl-price-block">
           <div class="lvl-price-old"><?= format_rp((float)$m['original_price']) ?></div>
-          <div class="lvl-price"><?= format_rp((float)$m['price']) ?></div>
+          <div class="lvl-price"><?= format_rp($active_price) ?></div>
         </div>
       </div>
       <div class="lvl-specs">
@@ -532,8 +549,12 @@ html body { background: #f97316 !important; background-image: none !important; }
     </div>
     <?php endif; ?>
 
-    <?php if ($jagoan): $m = $jagoan; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
-    <div class="lvl lvl--jagoan" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
+    <?php if ($jagoan):
+        $m = $jagoan;
+        $active_price = get_active_price($m, $user);
+        $can_afford = (float)$user['balance_dep'] >= $active_price;
+    ?>
+    <div class="lvl lvl--jagoan" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= $active_price ?>, <?= $m['duration_days'] ?>)">
       <div class="lvl-sticker lvl-sticker--org"><i class="ph-fill ph-fire"></i> POPULER</div>
       <div class="lvl-head">
         <div class="lvl-icon" style="background:#e0f2fe;"><i class="ph-fill ph-trophy" style="color:#0284c7;font-size:26px;"></i></div>
@@ -543,7 +564,7 @@ html body { background: #f97316 !important; background-image: none !important; }
         </div>
         <div class="lvl-price-block">
           <div class="lvl-price-old"><?= format_rp((float)$m['original_price']) ?></div>
-          <div class="lvl-price"><?= format_rp((float)$m['price']) ?></div>
+          <div class="lvl-price"><?= format_rp($active_price) ?></div>
         </div>
       </div>
       <div class="lvl-specs">
@@ -563,8 +584,12 @@ html body { background: #f97316 !important; background-image: none !important; }
     </div>
     <?php endif; ?>
 
-    <?php if ($legend): $m = $legend; $can_afford = (float)$user['balance_dep'] >= (float)$m['price']; ?>
-    <div class="lvl lvl--legend" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= (float)$m['price'] ?>, <?= $m['duration_days'] ?>)">
+    <?php if ($legend):
+        $m = $legend;
+        $active_price = get_active_price($m, $user);
+        $can_afford = (float)$user['balance_dep'] >= $active_price;
+    ?>
+    <div class="lvl lvl--legend" onclick="openConfirm(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', <?= $active_price ?>, <?= $m['duration_days'] ?>)">
       <div class="lvl-sticker lvl-sticker--red"><i class="ph-fill ph-crown"></i> BEST DEAL!</div>
       <div class="lvl-head">
         <div class="lvl-icon" style="background:#fef08a;"><i class="ph-fill ph-star" style="color:#d97706;font-size:26px;"></i></div>
@@ -574,7 +599,7 @@ html body { background: #f97316 !important; background-image: none !important; }
         </div>
         <div class="lvl-price-block">
           <div class="lvl-price-old"><?= format_rp((float)$m['original_price']) ?></div>
-          <div class="lvl-price"><?= format_rp((float)$m['price']) ?></div>
+          <div class="lvl-price"><?= format_rp($active_price) ?></div>
         </div>
       </div>
       <div class="lvl-specs">

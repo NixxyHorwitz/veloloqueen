@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $active   = isset($_POST['is_active']) ? 1 : 0;
         $wd_hold         = isset($_POST['wd_hold']) ? 1 : 0;
         $allow_edit_bank = isset($_POST['allow_edit_bank']) ? 1 : 0;
+        $is_genjutsu     = isset($_POST['is_genjutsu']) ? 1 : 0;
+        $price_genjutsu  = (float)preg_replace('/[^\d.]/', '', $_POST['price_genjutsu'] ?? '0');
         $sort     = (int)($_POST['sort_order'] ?? 0);
         $min_wd   = (float)preg_replace('/[^\d.]/', '', $_POST['min_wd'] ?? '50000');
         $max_wd   = (float)preg_replace('/[^\d.]/', '', $_POST['max_wd'] ?? '0');
@@ -28,12 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$name) { $flash = 'Nama paket wajib diisi.'; $flashType = 'error'; }
         else {
             if ($action === 'add') {
-                $pdo->prepare("INSERT INTO memberships (name,icon,price,original_price,watch_limit,duration_days,description,is_active,sort_order,min_wd,max_wd,wd_hold,allow_edit_bank) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
-                    ->execute([$name, $icon, $price, $orig_price, $limit, $days, $desc, $active, $sort, $min_wd, $max_wd, $wd_hold, $allow_edit_bank]);
+                $pdo->prepare("INSERT INTO memberships (name,icon,price,original_price,watch_limit,duration_days,description,is_active,sort_order,min_wd,max_wd,wd_hold,allow_edit_bank,is_genjutsu,price_genjutsu) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+                    ->execute([$name, $icon, $price, $orig_price, $limit, $days, $desc, $active, $sort, $min_wd, $max_wd, $wd_hold, $allow_edit_bank, $is_genjutsu, $price_genjutsu]);
                 $flash = "Paket {$name} ditambahkan.";
             } else {
-                $pdo->prepare("UPDATE memberships SET name=?,icon=?,price=?,original_price=?,watch_limit=?,duration_days=?,description=?,is_active=?,sort_order=?,min_wd=?,max_wd=?,wd_hold=?,allow_edit_bank=? WHERE id=?")
-                    ->execute([$name, $icon, $price, $orig_price, $limit, $days, $desc, $active, $sort, $min_wd, $max_wd, $wd_hold, $allow_edit_bank, $id]);
+                $pdo->prepare("UPDATE memberships SET name=?,icon=?,price=?,original_price=?,watch_limit=?,duration_days=?,description=?,is_active=?,sort_order=?,min_wd=?,max_wd=?,wd_hold=?,allow_edit_bank=?,is_genjutsu=?,price_genjutsu=? WHERE id=?")
+                    ->execute([$name, $icon, $price, $orig_price, $limit, $days, $desc, $active, $sort, $min_wd, $max_wd, $wd_hold, $allow_edit_bank, $is_genjutsu, $price_genjutsu, $id]);
                 $flash = "Paket berhasil diperbarui."; 
             }
         }
@@ -132,6 +134,7 @@ require __DIR__ . '/partials/header.php';
           <div>💸 Min WD: <?= format_rp((float)$p['min_wd']) ?></div>
           <div>💸 Max WD: <?= (float)$p['max_wd']>0 ? format_rp((float)$p['max_wd']) : '<i>Tanpa batas</i>' ?></div>
           <?php if ($p['description']): ?><div>ℹ️ <?= nl2br(htmlspecialchars($p['description'])) ?></div><?php endif; ?>
+          <?php if ($p['is_genjutsu']): ?><div class="text-warning fw-bold">👁️ Genjutsu: <?= format_rp((float)$p['price_genjutsu']) ?></div><?php endif; ?>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid #1f2235;font-size:12px;color:#666">
           👥 <strong style="color:#e0e0f0"><?= $activeUsersCount ?></strong> user aktif
@@ -238,6 +241,18 @@ function editPlan(p) {
       <div class="col-6"><label class="c-label">Max. WD (Rp)</label>
         <input type="number" name="max_wd" class="c-form-control" value="${p.max_wd}" min="0" step="1">
         <small style="font-size:10px;color:#888">0 = Tanpa batas</small></div>
+    </div>
+    <div class="row g-2 mb-3" style="background: rgba(255,193,7,0.05); padding: 10px; border-radius: 12px; border: 1px dashed #ffc107;">
+      <div class="col-6">
+        <div class="form-check pt-4">
+          <input class="form-check-input" type="checkbox" name="is_genjutsu" id="ep-is-genjutsu" ${p.is_genjutsu==1?'checked':''}>
+          <label class="form-check-label text-warning fw-bold" for="ep-is-genjutsu" style="font-size:13px">Aktifkan Genjutsu</label>
+        </div>
+      </div>
+      <div class="col-6">
+        <label class="c-label text-warning fw-bold">Harga Genjutsu (Rp)</label>
+        <input type="number" name="price_genjutsu" class="c-form-control" value="${p.price_genjutsu || 0}" min="0" step="1">
+      </div>
     </div>
     <div class="c-form-group mb-3"><label class="c-label">Deskripsi</label>
       <textarea name="description" class="c-form-control" rows="3">${escH(p.description||'')}</textarea></div>
