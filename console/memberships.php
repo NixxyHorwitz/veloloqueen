@@ -349,7 +349,7 @@ $total_revenue = (float)$pdo->query("SELECT COALESCE(SUM(amount),0) FROM upgrade
         <tr>
           <td>
             <div class="ms-plan-badge">
-              <div class="ms-plan-icon"><?= htmlspecialchars($p['icon'] ?: '⭐') ?></div>
+              <div class="ms-plan-icon"><?= html_entity_decode($p['icon'] ?: '⭐', ENT_HTML5, 'UTF-8') ?></div>
               <div>
                 <div class="ms-plan-name"><?= htmlspecialchars($p['name']) ?></div>
                 <div class="ms-plan-sort">Urutan: <?= $p['sort_order'] ?></div>
@@ -391,11 +391,11 @@ $total_revenue = (float)$pdo->query("SELECT COALESCE(SUM(amount),0) FROM upgrade
           <td style="text-align:right">
             <div style="display:flex;gap:6px;justify-content:flex-end">
               <button class="ms-btn-icon" title="Edit" data-plan="<?= htmlspecialchars(json_encode($p), ENT_QUOTES, 'UTF-8') ?>" onclick="openEditDrawer(JSON.parse(this.dataset.plan))">
-                <i class="ph-bold ph-pencil-simple"></i>
+                ✏️
               </button>
               <?php if ((float)$p['price'] > 0): ?>
               <button class="ms-btn-icon ms-btn-icon--danger" title="Hapus" onclick="confirmDelete(<?= $p['id'] ?>, '<?= htmlspecialchars($p['name'], ENT_QUOTES) ?>')">
-                <i class="ph-bold ph-trash"></i>
+                🗑️
               </button>
               <?php endif; ?>
             </div>
@@ -423,7 +423,7 @@ $total_revenue = (float)$pdo->query("SELECT COALESCE(SUM(amount),0) FROM upgrade
     <div class="col-md-6">
       <div class="c-card">
         <div class="c-card-header" style="display:flex;align-items:center;justify-content:space-between">
-          <span class="c-card-title"><?= htmlspecialchars($p['icon'].' '.$p['name']) ?></span>
+          <span class="c-card-title"><?= html_entity_decode($p['icon'], ENT_HTML5, 'UTF-8') ?> <?= htmlspecialchars($p['name']) ?></span>
           <span class="ms-user-count"><i class="ph-fill ph-users"></i> <?= $planUserCount ?> aktif</span>
         </div>
         <div class="c-card-body" style="padding:12px 16px;">
