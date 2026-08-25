@@ -439,37 +439,39 @@ if (isset($update['callback_query'])) {
                             answer_cb($token, $cb_id, '⚠️ WD tidak ditemukan atau sudah tidak berstatus Hold.');
                             http_response_code(200); exit;
                         }
-                    } elseif ($req['type'] === 'threads_campaign') {
+                    } elseif ($req['type'] === 'threads_campaign' || $req['type'] === 'threads_campaign_step2') {
                         $payload = json_decode($req['payload'], true) ?: [];
-                        $reward = (float)($payload['reward_amount'] ?? 5000);
+                        $reward = (float)($payload['reward_amount'] ?? ($req['type'] === 'threads_campaign' ? 25000 : 50000));
                         $pdo->prepare("UPDATE users SET balance_wd = balance_wd + ? WHERE id=?")
                             ->execute([$reward, $req['user_id']]);
                         
-                        $notifTitle = "Kampanye Threads Disetujui! ✅";
-                        $notifMsg = "Selamat! Promosi Threads kamu disetujui. Cuan tambahan sebesar " . format_rp($reward) . " telah ditambahkan ke Saldo Tarik kamu.";
+                        $stepText = $req['type'] === 'threads_campaign_step2' ? 'Langkah 2' : 'Langkah 1';
+                        $notifTitle = "Kampanye Threads {$stepText} Disetujui! ✅";
+                        $notifMsg = "Selamat! Promosi Threads {$stepText} kamu disetujui. Cuan tambahan sebesar " . format_rp($reward) . " telah ditambahkan ke Saldo Tarik kamu.";
                         $pdo->prepare("INSERT INTO notifications (title, message, type, icon, target_type, target_user_ids) VALUES (?, ?, 'success', '🌀', 'single', ?)")
                             ->execute([$notifTitle, $notifMsg, json_encode([$req['user_id']])]);
                         
-                        $msg = "✅ <b>PROMOSI THREADS (APPROVED)</b>\n";
+                        $msg = "✅ <b>PROMOSI THREADS - {$stepText} (APPROVED)</b>\n";
                         $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
                         $msg .= "👤 <b>User:</b> <code>{$req['username']}</code>\n";
                         $msg .= "💵 <b>Reward:</b> <code>" . format_rp($reward) . "</code>\n";
                         $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
-                        $msg .= "<i>Reward telah ditambahkan ke Saldo Tarik user.</i>";
+                        $msg .= "<i>Reward {$stepText} telah ditambahkan ke Saldo Tarik user.</i>";
                     }
                 } else {
                     // Rejected
-                    if ($req['type'] === 'threads_campaign') {
-                        $notifTitle = "Kampanye Threads Ditolak ❌";
-                        $notifMsg = "Maaf, promosi Threads kamu ditolak karena bukti screenshot tidak valid atau tidak memenuhi syarat.";
+                    if ($req['type'] === 'threads_campaign' || $req['type'] === 'threads_campaign_step2') {
+                        $stepText = $req['type'] === 'threads_campaign_step2' ? 'Langkah 2' : 'Langkah 1';
+                        $notifTitle = "Kampanye Threads {$stepText} Ditolak ❌";
+                        $notifMsg = "Maaf, promosi Threads {$stepText} kamu ditolak karena bukti screenshot tidak memenuhi syarat.";
                         $pdo->prepare("INSERT INTO notifications (title, message, type, icon, target_type, target_user_ids) VALUES (?, ?, 'warning', '🌀', 'single', ?)")
                             ->execute([$notifTitle, $notifMsg, json_encode([$req['user_id']])]);
                         
-                        $msg = "❌ <b>PROMOSI THREADS (REJECTED)</b>\n";
+                        $msg = "❌ <b>PROMOSI THREADS - {$stepText} (REJECTED)</b>\n";
                         $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
                         $msg .= "👤 <b>User:</b> <code>{$req['username']}</code>\n";
                         $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
-                        $msg .= "<i>Permintaan ditolak oleh admin.</i>";
+                        $msg .= "<i>Permintaan {$stepText} ditolak oleh admin.</i>";
                     } else {
                         $title = $req['type'] === 'change_bank' ? 'GANTI REKENING' : ($req['type'] === 'refund_level' ? 'REFUND LEVEL' : 'REFUND WD HOLD');
                         $msg = "❌ <b>REQUEST {$title} (REJECTED)</b>\n";

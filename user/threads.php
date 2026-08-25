@@ -9,22 +9,41 @@ if (!$campaign_enabled) {
 }
 
 $reward_amount = (float)setting($pdo, 'threads_campaign_reward', '25000');
-$instructions = setting($pdo, 'threads_campaign_instructions', "Promosikan TontonCuan di Threads dan dapatkan cuan tambahan Rp 25.000! \n\nKriteria Postingan:\n1. Postingan harus menyertakan gambar (screenshot/bukti bayar/foto aplikasi).\n2. Teks postingan berupa kalimat ajakan atau cerita pengalaman positif kamu mendapatkan cuan di TontonCuan.\n3. Berikan komentar atau caption positif tentang TontonCuan.\n\nCara Klaim:\n1. Buat postingan sesuai kriteria di atas pada akun Threads kamu.\n2. Ambil screenshot (bukti SS) postingan tersebut.\n3. Upload screenshot di form bawah ini untuk diverifikasi oleh admin.");
+$reward_amount2 = (float)setting($pdo, 'threads_campaign_reward_step2', '50000');
 
-// Check if user already has a pending threads campaign request
-$stmtPending = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign' AND status='pending' LIMIT 1");
-$stmtPending->execute([$user['id']]);
-$pendingRequest = $stmtPending->fetch();
+$instructions = setting($pdo, 'threads_campaign_instructions', "Promosikan TontonCuan di Threads dan dapatkan cuan tambahan Rp 25.000! \n\nKriteria Postingan Langkah 1:\n1. Postingan harus menyertakan gambar (screenshot/bukti bayar/foto aplikasi).\n2. Di dalam gambar screenshot, HARUS tertera jelas Nama/Username Threads kalian.\n3. Teks postingan berupa kalimat ajakan atau cerita pengalaman positif kamu mendapatkan cuan di TontonCuan.\n4. Berikan komentar atau caption positif tentang TontonCuan.\n\nCara Klaim:\n1. Buat postingan sesuai kriteria di atas pada akun Threads kamu.\n2. Ambil screenshot postingan tersebut (harus terlihat username kalian).\n3. Upload screenshot di form bawah ini.");
+$instructions2 = setting($pdo, 'threads_campaign_instructions_step2', "Promosikan TontonCuan di Threads - Langkah 2 (Dapatkan Rp 50.000 Tambahan!)\n\nKriteria Postingan Langkah 2:\n1. Kamu telah mengundang minimal 10 referral bergabung di TontonCuan.\n2. Berikan screenshot (bukti SS) bahwa postingan Threads kamu ramai (memiliki banyak interaksi like/komen/share/tayangan).");
 
-// Check if user has an approved request (they might have completed it)
-$stmtApproved = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign' AND status='approved' LIMIT 1");
-$stmtApproved->execute([$user['id']]);
-$approvedRequest = $stmtApproved->fetch();
+// Referral stats
+$stmtRefCount = $pdo->prepare("SELECT COUNT(*) FROM users WHERE referred_by=?");
+$stmtRefCount->execute([$user['referral_code']]);
+$user_referral_count = (int)$stmtRefCount->fetchColumn();
 
-// Check if user has a rejected request (so we can show the reason why they failed previously)
-$stmtRejected = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign' AND status='rejected' ORDER BY id DESC LIMIT 1");
-$stmtRejected->execute([$user['id']]);
-$rejectedRequest = $stmtRejected->fetch();
+// Step 1:
+$stmtPending1 = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign' AND status='pending' LIMIT 1");
+$stmtPending1->execute([$user['id']]);
+$pendingRequest = $stmtPending1->fetch(); // keep name to prevent template breaks
+
+$stmtApproved1 = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign' AND status='approved' LIMIT 1");
+$stmtApproved1->execute([$user['id']]);
+$approvedRequest = $stmtApproved1->fetch();
+
+$stmtRejected1 = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign' AND status='rejected' ORDER BY id DESC LIMIT 1");
+$stmtRejected1->execute([$user['id']]);
+$rejectedRequest = $stmtRejected1->fetch();
+
+// Step 2:
+$stmtPending2 = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign_step2' AND status='pending' LIMIT 1");
+$stmtPending2->execute([$user['id']]);
+$pendingRequest2 = $stmtPending2->fetch();
+
+$stmtApproved2 = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign_step2' AND status='approved' LIMIT 1");
+$stmtApproved2->execute([$user['id']]);
+$approvedRequest2 = $stmtApproved2->fetch();
+
+$stmtRejected2 = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign_step2' AND status='rejected' ORDER BY id DESC LIMIT 1");
+$stmtRejected2->execute([$user['id']]);
+$rejectedRequest2 = $stmtRejected2->fetch();
 
 $flash = $flashType = '';
 if ($_SESSION['flash_threads_msg'] ?? null) {
@@ -33,10 +52,20 @@ if ($_SESSION['flash_threads_msg'] ?? null) {
     unset($_SESSION['flash_threads_msg'], $_SESSION['flash_threads_type']);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$pendingRequest) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_enforce();
+    $step = $_POST['step'] ?? 'step1';
     
-    if (empty($_FILES['proof']['tmp_name'])) {
+    // Check if user already has a pending request for this step
+    $checkType = $step === 'step2' ? 'threads_campaign_step2' : 'threads_campaign';
+    $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM admin_requests WHERE user_id=? AND type=? AND status='pending'");
+    $stmtCheck->execute([$user['id'], $checkType]);
+    
+    if ((int)$stmtCheck->fetchColumn() > 0) {
+        $flash = 'Kamu masih memiliki klaim pending untuk langkah ini.'; $flashType = 'error';
+    } elseif ($step === 'step2' && $user_referral_count < 10) {
+        $flash = 'Kamu belum memenuhi syarat 10 referral untuk mengajukan Langkah 2.'; $flashType = 'error';
+    } elseif (empty($_FILES['proof']['tmp_name'])) {
         $flash = 'Silakan pilih file bukti screenshot postingan kamu!'; $flashType = 'error';
     } else {
         $file = $_FILES['proof'];
@@ -52,25 +81,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$pendingRequest) {
                 mkdir($dir, 0755, true);
             }
             
-            $filename = 'threads_' . $user['id'] . '_' . time() . '.' . $ext;
+            $filename = 'threads_' . $step . '_' . $user['id'] . '_' . time() . '.' . $ext;
             if (move_uploaded_file($file['tmp_name'], $dir . $filename)) {
                 $proof_path = 'uploads/threads/' . $filename;
                 
+                $reward = $step === 'step2' ? $reward_amount2 : $reward_amount;
                 // Save to admin_requests
                 $payload = json_encode([
                     'proof_image' => $proof_path,
-                    'reward_amount' => $reward_amount
+                    'reward_amount' => $reward
                 ]);
                 
-                $pdo->prepare("INSERT INTO admin_requests (user_id, type, status, payload, created_at, updated_at) VALUES (?, 'threads_campaign', 'pending', ?, NOW(), NOW())")
-                    ->execute([$user['id'], $payload]);
+                $pdo->prepare("INSERT INTO admin_requests (user_id, type, status, payload, created_at, updated_at) VALUES (?, ?, 'pending', ?, NOW(), NOW())")
+                    ->execute([$user['id'], $checkType, $payload]);
                 $request_id = $pdo->lastInsertId();
                 
                 // Dispatch to Telegram with approve/reject inline keyboard buttons
-                $tgMsg = "🌀 <b>KLAIM PROMOSI THREADS</b>\n";
+                $stepLabel = $step === 'step2' ? 'LANGKAH 2 (VIRAL & 10 REF)' : 'LANGKAH 1 (PROMO THREADS)';
+                $tgMsg = "🌀 <b>KLAIM PROMOSI THREADS - {$stepLabel}</b>\n";
                 $tgMsg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
                 $tgMsg .= "👤 <b>User:</b> <code>{$user['username']}</code> (ID: {$user['id']})\n";
-                $tgMsg .= "💵 <b>Reward:</b> <code>" . format_rp($reward_amount) . "</code>\n";
+                $tgMsg .= "💵 <b>Reward:</b> <code>" . format_rp($reward) . "</code>\n";
+                if ($step === 'step2') {
+                    $tgMsg .= "👥 <b>Total Referral:</b> <code>{$user_referral_count} orang</code>\n";
+                }
                 $tgMsg .= "📅 <b>Tanggal:</b> " . date('d M Y H:i') . "\n";
                 $tgMsg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
                 $tgMsg .= "<i>Silakan verifikasi bukti postingan Threads di atas.</i>";
@@ -363,113 +397,234 @@ html body { background: #f97316 !important; background-image: none !important; c
     <div class="threads-title">
       🌀 Promosi Threads
     </div>
-    <div class="threads-subtitle">Bagikan link referensimu dan raih keuntungan berlipat!</div>
+    <div class="threads-subtitle" style="margin-bottom: 20px;">Bagikan link referensimu dan raih keuntungan berlipat!</div>
 
-    <div class="threads-reward-badge">
-      <span class="threads-reward-lbl">💰 REWARD SALDO TARIK</span>
-      <span class="threads-reward-val"><?= format_rp($reward_amount) ?></span>
+    <!-- TABS CONTAINER -->
+    <div class="threads-tabs" style="display: flex; background: #f1f5f9; padding: 6px; border-radius: 16px; border: 2.5px solid #1e3a8a; margin-bottom: 20px; gap: 6px;">
+      <button type="button" class="tab-btn active" onclick="switchTab('step1')" style="flex: 1; border: none; padding: 10px 6px; border-radius: 12px; font-size: 12px; font-weight: 900; cursor: pointer; transition: all 0.2s; font-family: 'Nunito', sans-serif;">Langkah 1 (Rp 25.000)</button>
+      <button type="button" class="tab-btn" onclick="switchTab('step2')" style="flex: 1; border: none; padding: 10px 6px; border-radius: 12px; font-size: 12px; font-weight: 900; cursor: pointer; transition: all 0.2s; font-family: 'Nunito', sans-serif;">Langkah 2 (Rp 50.000)</button>
     </div>
 
-    <!-- Status logic -->
-    <?php if ($pendingRequest): ?>
-      <?php $pData = json_decode($pendingRequest['payload'], true) ?: []; ?>
-      <div class="threads-status-box">
-        <div class="threads-status-icon">⏳</div>
-        <div class="threads-status-title">Klaim Sedang Diproses</div>
-        <div class="threads-status-desc">Postingan kamu sedang diverifikasi oleh admin. Reward akan otomatis masuk jika bukti terbukti valid.</div>
-        
-        <?php if (!empty($pData['proof_image'])): ?>
-          <img src="/<?= htmlspecialchars($pData['proof_image']) ?>" class="threads-preview-img" alt="Bukti Screenshot">
-        <?php endif; ?>
+    <!-- STEP 1 CONTENT -->
+    <div id="content-step1" class="step-content">
+      <div class="threads-reward-badge">
+        <span class="threads-reward-lbl">💰 REWARD SALDO TARIK</span>
+        <span class="threads-reward-val"><?= format_rp($reward_amount) ?></span>
       </div>
-    <?php elseif ($approvedRequest): ?>
-      <div class="threads-status-box" style="border-color: #22c55e;">
-        <div class="threads-status-icon">🎉</div>
-        <div class="threads-status-title" style="color: #22c55e;">Klaim Berhasil Disetujui!</div>
-        <div class="threads-status-desc">Terima kasih telah mempromosikan TontonCuan di Threads! Reward <?= format_rp($reward_amount) ?> sudah masuk ke saldo tarik kamu.</div>
-      </div>
-    <?php else: ?>
-      <?php if (!empty($rejectedRequest)): ?>
-        <div class="flash-alert flash-alert--err" style="margin-bottom: 16px; display: block;">
-          <i class="ph-bold ph-warning-circle" style="display:inline-block; vertical-align:middle; margin-right:4px;"></i>
-          <span style="vertical-align:middle; font-weight:900;">Klaim Sebelumnya Ditolak:</span>
-          <div style="font-size:11px; margin-top:4px; font-weight:700; color:#991b1b; white-space:pre-wrap;"><?= htmlspecialchars($rejectedRequest['admin_note'] ?: 'Bukti screenshot tidak valid atau tidak memenuhi syarat.') ?></div>
+
+      <!-- Status logic for Step 1 -->
+      <?php if ($pendingRequest): ?>
+        <?php $pData = json_decode($pendingRequest['payload'], true) ?: []; ?>
+        <div class="threads-status-box">
+          <div class="threads-status-icon">⏳</div>
+          <div class="threads-status-title">Klaim Langkah 1 Diproses</div>
+          <div class="threads-status-desc">Postingan kamu sedang diverifikasi oleh admin. Reward akan otomatis masuk jika bukti terbukti valid.</div>
+          
+          <?php if (!empty($pData['proof_image'])): ?>
+            <img src="/<?= htmlspecialchars($pData['proof_image']) ?>" class="threads-preview-img" alt="Bukti Screenshot">
+          <?php endif; ?>
         </div>
-      <?php endif; ?>
-
-      <div class="threads-instructions">
-        <?= htmlspecialchars($instructions) ?>
-      </div>
-
-      <form method="POST" enctype="multipart/form-data">
-        <?= csrf_field() ?>
-        
-        <div class="form-group">
-          <label class="form-label">Upload Bukti Screenshot</label>
-          <div class="threads-file-upload" id="upload-zone">
-            <i class="ph-bold ph-image threads-file-icon" id="upload-icon"></i>
-            <div class="threads-file-text" id="upload-text">Klik atau seret file gambar ke sini (Format: JPG/PNG, Maks: 5MB)</div>
-            <input type="file" name="proof" id="file-input" accept="image/*" required>
+      <?php elseif ($approvedRequest): ?>
+        <div class="threads-status-box" style="border-color: #22c55e; background: #f0fdf4;">
+          <div class="threads-status-icon">🎉</div>
+          <div class="threads-status-title" style="color: #22c55e;">Klaim Langkah 1 Disetujui!</div>
+          <div class="threads-status-desc">Terima kasih telah mempromosikan TontonCuan di Threads! Reward <?= format_rp($reward_amount) ?> sudah masuk ke saldo tarik kamu.</div>
+        </div>
+      <?php else: ?>
+        <?php if (!empty($rejectedRequest)): ?>
+          <div class="flash-alert flash-alert--err" style="margin-bottom: 16px; display: block;">
+            <i class="ph-bold ph-warning-circle" style="display:inline-block; vertical-align:middle; margin-right:4px;"></i>
+            <span style="vertical-align:middle; font-weight:900;">Klaim Sebelumnya Ditolak:</span>
+            <div style="font-size:11px; margin-top:4px; font-weight:700; color:#991b1b; white-space:pre-wrap;"><?= htmlspecialchars($rejectedRequest['admin_note'] ?: 'Bukti screenshot tidak valid atau tidak memenuhi syarat.') ?></div>
           </div>
+        <?php endif; ?>
+
+        <div class="threads-instructions">
+          <?= htmlspecialchars($instructions) ?>
         </div>
 
-        <button type="submit" class="btn-threads-submit">
-          <i class="ph-bold ph-paper-plane-tilt" style="font-size: 16px;"></i> Kirim Bukti Postingan
-        </button>
-      </form>
-    <?php endif; ?>
+        <form method="POST" enctype="multipart/form-data" class="threads-form-step1">
+          <?= csrf_field() ?>
+          <input type="hidden" name="step" value="step1">
+          
+          <div class="form-group">
+            <label class="form-label">Upload Bukti Screenshot</label>
+            <div class="threads-file-upload" id="upload-zone">
+              <i class="ph-bold ph-image threads-file-icon" id="upload-icon"></i>
+              <div class="threads-file-text" id="upload-text">Klik atau seret file gambar ke sini (Format: JPG/PNG/WEBP, Maks: 5MB)</div>
+              <input type="file" name="proof" id="file-input" accept="image/*" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-threads-submit btn-submit-step1">
+            <i class="ph-bold ph-paper-plane-tilt" style="font-size: 16px;"></i> Kirim Bukti Langkah 1
+          </button>
+        </form>
+      <?php endif; ?>
+    </div>
+
+    <!-- STEP 2 CONTENT -->
+    <div id="content-step2" class="step-content" style="display: none;">
+      <div class="threads-reward-badge">
+        <span class="threads-reward-lbl">💰 REWARD SALDO TARIK</span>
+        <span class="threads-reward-val"><?= format_rp($reward_amount2) ?></span>
+      </div>
+
+      <!-- Referral Counter Panel -->
+      <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 16px; padding: 12px 14px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; color: #1e3a8a;">
+        <span>👥 TOTAL REFERRAL KAMU:</span>
+        <span style="font-size: 14px; color: #2563eb; font-weight: 900;"><?= $user_referral_count ?> / 10 Orang</span>
+      </div>
+
+      <!-- Status logic for Step 2 -->
+      <?php if ($user_referral_count < 10): ?>
+        <div class="threads-status-box" style="border-color: #ef4444; background: #fef2f2; border-style: dashed;">
+          <div class="threads-status-icon">🔒</div>
+          <div class="threads-status-title" style="color: #b91c1c;">Langkah 2 Terkunci</div>
+          <div class="threads-status-desc" style="color: #ef4444;">Undang minimal 10 orang bergabung ke TontonCuan untuk membuka Langkah 2. Sisa mengundang: <strong><?= 10 - $user_referral_count ?></strong> orang lagi.</div>
+        </div>
+      <?php elseif ($pendingRequest2): ?>
+        <?php $pData2 = json_decode($pendingRequest2['payload'], true) ?: []; ?>
+        <div class="threads-status-box">
+          <div class="threads-status-icon">⏳</div>
+          <div class="threads-status-title">Klaim Langkah 2 Diproses</div>
+          <div class="threads-status-desc">Bukti postingan viral sedang diverifikasi oleh admin.</div>
+          
+          <?php if (!empty($pData2['proof_image'])): ?>
+            <img src="/<?= htmlspecialchars($pData2['proof_image']) ?>" class="threads-preview-img" alt="Bukti Screenshot">
+          <?php endif; ?>
+        </div>
+      <?php elseif ($approvedRequest2): ?>
+        <div class="threads-status-box" style="border-color: #22c55e; background: #f0fdf4;">
+          <div class="threads-status-icon">🎉</div>
+          <div class="threads-status-title" style="color: #22c55e;">Klaim Langkah 2 Disetujui!</div>
+          <div class="threads-status-desc">Luar biasa! Klaim Langkah 2 Anda telah disetujui. Reward <?= format_rp($reward_amount2) ?> sudah masuk ke saldo tarik kamu.</div>
+        </div>
+      <?php else: ?>
+        <?php if (!empty($rejectedRequest2)): ?>
+          <div class="flash-alert flash-alert--err" style="margin-bottom: 16px; display: block;">
+            <i class="ph-bold ph-warning-circle" style="display:inline-block; vertical-align:middle; margin-right:4px;"></i>
+            <span style="vertical-align:middle; font-weight:900;">Klaim Langkah 2 Ditolak:</span>
+            <div style="font-size:11px; margin-top:4px; font-weight:700; color:#991b1b; white-space:pre-wrap;"><?= htmlspecialchars($rejectedRequest2['admin_note'] ?: 'Bukti screenshot tidak valid atau tidak memenuhi syarat.') ?></div>
+          </div>
+        <?php endif; ?>
+
+        <div class="threads-instructions">
+          <?= htmlspecialchars($instructions2) ?>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="threads-form-step2">
+          <?= csrf_field() ?>
+          <input type="hidden" name="step" value="step2">
+          
+          <div class="form-group">
+            <label class="form-label">Upload Bukti Postingan Ramai</label>
+            <div class="threads-file-upload upload-zone-step2">
+              <i class="ph-bold ph-image threads-file-icon file-icon-step2"></i>
+              <div class="threads-file-text file-text-step2">Klik atau seret file gambar ke sini (Format: JPG/PNG/WEBP, Maks: 5MB)</div>
+              <input type="file" name="proof" class="file-input-step2" accept="image/*" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-threads-submit btn-submit-step2">
+            <i class="ph-bold ph-paper-plane-tilt" style="font-size: 16px;"></i> Kirim Bukti Langkah 2
+          </button>
+        </form>
+      <?php endif; ?>
+    </div>
 
   </div>
 
 </div>
 
+<!-- Tab buttons styles -->
+<style>
+.tab-btn {
+  background: transparent;
+  color: #4b5563;
+}
+.tab-btn.active {
+  background: linear-gradient(135deg, #db2777, #7c3aed) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);
+}
+</style>
+
 <script>
-const fileInput = document.getElementById('file-input');
-const uploadZone = document.getElementById('upload-zone');
-const uploadText = document.getElementById('upload-text');
-const uploadIcon = document.getElementById('upload-icon');
-
-if (fileInput) {
-  fileInput.addEventListener('change', function(e) {
-    if (this.files && this.files[0]) {
-      const file = this.files[0];
-      uploadText.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-      uploadText.style.color = '#4ade80';
-      uploadIcon.style.color = '#4ade80';
-      uploadZone.style.borderColor = '#22c55e';
-    }
-  });
+// Switch Tab Function
+function switchTab(step) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.step-content').forEach(c => c.style.display = 'none');
+  
+  if (step === 'step1') {
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('content-step1').style.display = 'block';
+  } else {
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('content-step2').style.display = 'block';
+  }
 }
 
-// Upload Loading Handler
-const form = document.querySelector('form');
-const submitBtn = document.querySelector('.btn-threads-submit');
-
-if (form && submitBtn && fileInput) {
-  form.addEventListener('submit', function(e) {
-    if (!fileInput.files || fileInput.files.length === 0) {
-      return; // Fallback to HTML5 validation
-    }
-    
-    // Disable inputs & buttons
-    submitBtn.disabled = true;
-    submitBtn.style.opacity = '0.7';
-    submitBtn.style.cursor = 'not-allowed';
-    
-    // Show spinner inside button
-    submitBtn.innerHTML = `
-      <svg class="spinner-svg" viewBox="0 0 50 50" style="margin-right: 8px;">
-        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5" style="stroke-dasharray: 1, 150; stroke-dashoffset: 0;"></circle>
-      </svg>
-      Mengirim Bukti Postingan...
-    `;
-    
-    if (uploadZone) {
-      uploadZone.style.pointerEvents = 'none';
-      uploadZone.style.opacity = '0.5';
-    }
-  });
+// Upload zone handling helper
+function initUploadZone(inputEl, zoneEl, textEl, iconEl) {
+  if (inputEl && zoneEl && textEl && iconEl) {
+    inputEl.addEventListener('change', function(e) {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        textEl.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        textEl.style.color = '#22c55e';
+        iconEl.style.color = '#22c55e';
+        zoneEl.style.borderColor = '#22c55e';
+      }
+    });
+  }
 }
+
+// Form submit handling helper
+function initFormSubmit(formEl, submitEl, inputEl, zoneEl) {
+  if (formEl && submitEl && inputEl) {
+    formEl.addEventListener('submit', function(e) {
+      if (!inputEl.files || inputEl.files.length === 0) {
+        return; // HTML5 validation
+      }
+      submitEl.disabled = true;
+      submitEl.style.opacity = '0.7';
+      submitEl.style.cursor = 'not-allowed';
+      submitEl.innerHTML = `
+        <svg class="spinner-svg" viewBox="0 0 50 50" style="margin-right: 8px;">
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5" style="stroke-dasharray: 1, 150; stroke-dashoffset: 0;"></circle>
+        </svg>
+        Mengirim Bukti...
+      `;
+      if (zoneEl) {
+        zoneEl.style.pointerEvents = 'none';
+        zoneEl.style.opacity = '0.5';
+      }
+    });
+  }
+}
+
+// Initialize step 1
+const fileInput1 = document.getElementById('file-input');
+const uploadZone1 = document.getElementById('upload-zone');
+const uploadText1 = document.getElementById('upload-text');
+const uploadIcon1 = document.getElementById('upload-icon');
+const form1 = document.querySelector('.threads-form-step1');
+const submitBtn1 = document.querySelector('.btn-submit-step1');
+
+initUploadZone(fileInput1, uploadZone1, uploadText1, uploadIcon1);
+initFormSubmit(form1, submitBtn1, fileInput1, uploadZone1);
+
+// Initialize step 2
+const fileInput2 = document.querySelector('.file-input-step2');
+const uploadZone2 = document.querySelector('.upload-zone-step2');
+const uploadText2 = document.querySelector('.file-text-step2');
+const uploadIcon2 = document.querySelector('.file-icon-step2');
+const form2 = document.querySelector('.threads-form-step2');
+const submitBtn2 = document.querySelector('.btn-submit-step2');
+
+initUploadZone(fileInput2, uploadZone2, uploadText2, uploadIcon2);
+initFormSubmit(form2, submitBtn2, fileInput2, uploadZone2);
 </script>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>

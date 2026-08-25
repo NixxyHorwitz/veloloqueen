@@ -49,7 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setting_set($pdo, 'threads_campaign_enabled', isset($_POST['threads_campaign_enabled']) ? '1' : '0');
         setting_set($pdo, 'threads_campaign_reward', clean_input($_POST['threads_campaign_reward'] ?? '25000'));
         setting_set($pdo, 'threads_campaign_instructions', trim($_POST['threads_campaign_instructions'] ?? ''));
-        $flash = 'Pengaturan Kampanye Threads berhasil disimpan!';
+        setting_set($pdo, 'threads_campaign_reward_step2', clean_input($_POST['threads_campaign_reward_step2'] ?? '50000'));
+        setting_set($pdo, 'threads_campaign_instructions_step2', trim($_POST['threads_campaign_instructions_step2'] ?? ''));
+        $flash = 'Pengaturan Kampanye Threads (Langkah 1 & 2) berhasil disimpan!';
     }
 
 
@@ -307,16 +309,33 @@ $tabs = [
                 <small class="text-muted" style="font-size:11px">Jika dinonaktifkan, banner kampanye di halaman Beranda user tidak akan muncul.</small>
               </div>
 
-              <div class="c-form-group mb-3">
-                <label class="c-label">Reward Kampanye (Rp)</label>
-                <input type="number" name="threads_campaign_reward" class="c-form-control" value="<?= htmlspecialchars($s('threads_campaign_reward','25000')) ?>" min="0" required>
-                <small class="text-muted" style="font-size:11px">Jumlah saldo yang akan diberikan kepada pengguna setelah promosi disetujui.</small>
+              <div class="row g-2 mb-3">
+                <div class="col-md-6">
+                  <div class="c-form-group">
+                    <label class="c-label">Reward Langkah 1 (Rp)</label>
+                    <input type="number" name="threads_campaign_reward" class="c-form-control" value="<?= htmlspecialchars($s('threads_campaign_reward','25000')) ?>" min="0" required>
+                    <small class="text-muted" style="font-size:11px">Saldo setelah klaim Langkah 1 disetujui.</small>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="c-form-group">
+                    <label class="c-label">Reward Langkah 2 (Rp)</label>
+                    <input type="number" name="threads_campaign_reward_step2" class="c-form-control" value="<?= htmlspecialchars($s('threads_campaign_reward_step2','50000')) ?>" min="0" required>
+                    <small class="text-muted" style="font-size:11px">Saldo setelah klaim Langkah 2 disetujui.</small>
+                  </div>
+                </div>
               </div>
 
               <div class="c-form-group mb-3">
-                <label class="c-label">Petunjuk & Syarat Kampanye</label>
-                <textarea name="threads_campaign_instructions" class="c-form-control" rows="8" required><?= htmlspecialchars($s('threads_campaign_instructions', "Promosikan TontonCuan di Threads dan dapatkan cuan tambahan Rp 25.000! \n\nKriteria Postingan:\n1. Postingan harus menyertakan gambar (screenshot/bukti bayar/foto aplikasi).\n2. Teks postingan berupa kalimat ajakan atau cerita pengalaman positif kamu mendapatkan cuan di TontonCuan.\n3. Berikan komentar atau caption positif tentang TontonCuan.\n\nCara Klaim:\n1. Buat postingan sesuai kriteria di atas pada akun Threads kamu.\n2. Ambil screenshot (bukti SS) postingan tersebut.\n3. Upload screenshot di form bawah ini untuk diverifikasi oleh admin.")) ?></textarea>
-                <small class="text-muted" style="font-size:11px">Petunjuk langkah demi langkah yang akan ditampilkan kepada pengguna di halaman klaim.</small>
+                <label class="c-label">Petunjuk & Syarat Langkah 1</label>
+                <textarea name="threads_campaign_instructions" class="c-form-control" rows="6" required><?= htmlspecialchars($s('threads_campaign_instructions', "Promosikan TontonCuan di Threads dan dapatkan cuan tambahan Rp 25.000! \n\nKriteria Postingan:\n1. Postingan harus menyertakan gambar (screenshot/bukti bayar/foto aplikasi).\n2. Teks postingan berupa kalimat ajakan atau cerita pengalaman positif kamu mendapatkan cuan di TontonCuan.\n3. Berikan komentar atau caption positif tentang TontonCuan.\n\nCara Klaim:\n1. Buat postingan sesuai kriteria di atas pada akun Threads kamu.\n2. Ambil screenshot (bukti SS) postingan tersebut.\n3. Upload screenshot di form bawah ini untuk diverifikasi oleh admin.")) ?></textarea>
+                <small class="text-muted" style="font-size:11px">Ditampilkan kepada pengguna di halaman klaim Langkah 1.</small>
+              </div>
+
+              <div class="c-form-group mb-3">
+                <label class="c-label">Petunjuk & Syarat Langkah 2</label>
+                <textarea name="threads_campaign_instructions_step2" class="c-form-control" rows="6" required><?= htmlspecialchars($s('threads_campaign_instructions_step2', "Promosikan TontonCuan di Threads - Langkah 2 (Dapatkan Rp 50.000 Tambahan!)\n\nKriteria Postingan Langkah 2:\n1. Kamu telah mengundang minimal 10 referral bergabung di TontonCuan.\n2. Berikan screenshot (bukti SS) bahwa postingan Threads kamu ramai (memiliki banyak interaksi like/komen/share/tayangan).")) ?></textarea>
+                <small class="text-muted" style="font-size:11px">Ditampilkan kepada pengguna di halaman klaim Langkah 2.</small>
               </div>
 
               <button type="submit" class="btn btn-sm text-white" style="background:var(--brand)">Simpan Pengaturan Kampanye</button>

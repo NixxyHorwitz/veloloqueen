@@ -60,18 +60,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         } else {
                             throw new \Exception("WD tidak ditemukan atau sudah tidak berstatus Hold.");
                         }
-                    } elseif ($reqData['type'] === 'threads_campaign') {
+                    } elseif ($reqData['type'] === 'threads_campaign' || $reqData['type'] === 'threads_campaign_step2') {
                         $payload = json_decode($reqData['payload'], true) ?: [];
-                        $reward = (float)($payload['reward_amount'] ?? 5000);
+                        $reward = (float)($payload['reward_amount'] ?? ($reqData['type'] === 'threads_campaign' ? 25000 : 50000));
                         $pdo->prepare("UPDATE users SET balance_wd = balance_wd + ? WHERE id=?")
                             ->execute([$reward, $reqData['user_id']]);
                         
-                        $notifTitle = "Kampanye Threads Disetujui! ✅";
-                        $notifMsg = "Selamat! Promosi Threads kamu disetujui. Cuan tambahan sebesar " . format_rp($reward) . " telah ditambahkan ke Saldo Tarik kamu.";
+                        $stepText = $reqData['type'] === 'threads_campaign_step2' ? 'Langkah 2' : 'Langkah 1';
+                        $notifTitle = "Kampanye Threads {$stepText} Disetujui! ✅";
+                        $notifMsg = "Selamat! Promosi Threads {$stepText} kamu disetujui. Cuan tambahan sebesar " . format_rp($reward) . " telah ditambahkan ke Saldo Tarik kamu.";
                         $pdo->prepare("INSERT INTO notifications (title, message, type, icon, target_type, target_user_ids) VALUES (?, ?, 'success', '🌀', 'single', ?)")
                             ->execute([$notifTitle, $notifMsg, json_encode([$reqData['user_id']])]);
                         
-                        $flash = "Berhasil menyetujui promosi Threads untuk user {$reqData['username']}. Reward " . format_rp($reward) . " telah ditambahkan ke Saldo Tarik.";
+                        $flash = "Berhasil menyetujui promosi Threads {$stepText} untuk user {$reqData['username']}. Reward " . format_rp($reward) . " telah ditambahkan ke Saldo Tarik.";
                     }
                     $admin_note = clean_input($_POST['admin_note'] ?? '');
                     
@@ -149,7 +150,7 @@ require __DIR__ . '/partials/header.php';
           <td><strong style="font-size:13px"><?= htmlspecialchars($req['username']) ?></strong></td>
           <td>
             <span class="badge bg-secondary" style="font-size:11px">
-              <?= $req['type'] === 'change_bank' ? '🏦 Ganti Rekening' : ($req['type'] === 'refund_level' ? '⏪ Refund Level' : ($req['type'] === 'refund_wd_hold' ? '💸 Refund WD Hold' : ($req['type'] === 'threads_campaign' ? '🌀 Promosi Threads' : htmlspecialchars($req['type'])))) ?>
+              <?= $req['type'] === 'change_bank' ? '🏦 Ganti Rekening' : ($req['type'] === 'refund_level' ? '⏪ Refund Level' : ($req['type'] === 'refund_wd_hold' ? '💸 Refund WD Hold' : ($req['type'] === 'threads_campaign' ? '🌀 Threads Langkah 1' : ($req['type'] === 'threads_campaign_step2' ? '🌀 Threads Langkah 2' : htmlspecialchars($req['type']))))) ?>
             </span>
           </td>
           <td style="font-size:12px;color:#ccc;max-width:300px;white-space:normal;">
@@ -162,9 +163,9 @@ require __DIR__ . '/partials/header.php';
                 } else if ($req['type'] === 'refund_wd_hold') {
                     $p = json_decode($req['payload'], true) ?: [];
                     echo "Minta pengembalian dana untuk WD Hold #" . ($p['withdrawal_id'] ?? '?');
-                } else if ($req['type'] === 'threads_campaign') {
+                } else if ($req['type'] === 'threads_campaign' || $req['type'] === 'threads_campaign_step2') {
                     $p = json_decode($req['payload'], true) ?: [];
-                    echo "Klaim Reward: <strong>" . format_rp((float)($p['reward_amount'] ?? 5000)) . "</strong><br>";
+                    echo "Klaim Reward: <strong>" . format_rp((float)($p['reward_amount'] ?? ($req['type'] === 'threads_campaign' ? 25000 : 50000))) . "</strong><br>";
                     if (!empty($p['proof_image'])) {
                         echo "<a href='/" . htmlspecialchars($p['proof_image']) . "' target='_blank' class='btn btn-xs btn-outline-info text-white mt-1 py-0 px-1' style='font-size:10px;'>👁️ Lihat Bukti</a>";
                     }
