@@ -109,6 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'claim
         $pdo->prepare("UPDATE videos SET total_watches=total_watches+1 WHERE id=?")
             ->execute([$vid_id]);
         $pdo->commit();
+        $_SESSION['flash_videos_msg'] = '🎉 Reward ' . format_rp($reward) . ' berhasil diklaim!';
+        $_SESSION['flash_videos_type'] = 'success';
         echo json_encode(['ok'=>true,'reward'=>format_rp($reward),'msg'=>'+'.format_rp($reward).' berhasil!']);
     } catch (\Throwable) {
         $pdo->rollBack();
@@ -503,7 +505,7 @@ async function claimReward() {
     btn.textContent = '✅ Reward Diterima!';
     document.getElementById('prog-fill').classList.add('done');
     setStatus('✅ Reward berhasil! Mengalihkan...', '');
-    setTimeout(() => location.href = '/home', 2500);
+    setTimeout(() => location.href = '/videos', 2500);
   } else {
     nToast(data.msg, 'error');
     btn.disabled    = false;

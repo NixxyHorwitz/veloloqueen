@@ -2,6 +2,13 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/auth/guard.php';
 
+$flash = '';
+if (!empty($_SESSION['flash_videos_msg'])) {
+    $flash = $_SESSION['flash_videos_msg'];
+    $flash_type = $_SESSION['flash_videos_type'] ?? 'success';
+    unset($_SESSION['flash_videos_msg'], $_SESSION['flash_videos_type']);
+}
+
 $watch_limit = user_watch_limit($pdo, $user);
 $watch_today = user_watch_today($pdo, $user);
 
@@ -302,6 +309,16 @@ document.addEventListener('DOMContentLoaded', function() {
       loader.style.display = 'none';
     }
   }
+});
+</script>
+<?php endif; ?>
+
+<?php if (!empty($flash)): ?>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof nToast !== 'undefined') {
+        nToast('<?= addslashes($flash) ?>', '<?= $flash_type ?>');
+    }
 });
 </script>
 <?php endif; ?>
