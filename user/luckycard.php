@@ -87,10 +87,11 @@ $stmt = $pdo->prepare("SELECT spin_tickets FROM users WHERE id=?");
 $stmt->execute([$user['id']]);
 $spin_tickets = (int)$stmt->fetchColumn();
 
-$pageTitle = 'Lucky Card  ';
+$pageTitle = 'Lucky Card';
 $activePage = 'missions';
 require dirname(__DIR__) . '/partials/header.php';
 ?>
+
 <div class="wd-body">
 
 <div class="section-header" style="margin-bottom:20px; background: #fff; padding: 14px 16px; border: 3px solid #c084fc; border-radius: 20px; box-shadow: 0 6px 0 #a855f7; display:flex; align-items:center; justify-content:space-between;">
@@ -118,29 +119,31 @@ require dirname(__DIR__) . '/partials/header.php';
 </div>
 
 <div class="game-container">
-    <div class="played-state" id="no-tickets-state" style="<?= $spin_tickets <= 0 ? 'display:flex;' : 'display:none !important; flex: none !important;' ?>">
-        <div class="played-icon">🎟️</div>
-        <h3 style="font-size:18px;font-weight:900;color:#334155;margin:0 0 8px;">Tiket Spin Habis</h3>
-        <p style="font-size:13px;font-weight:700;color:#64748b;margin:0;line-height:1.5;max-width:320px;text-align:center;">Kamu tidak memiliki tiket spin untuk membuka kartu. Selesaikan misi harian atau mingguan untuk mendapatkan tiket gratis!</p>
-        <a href="/missions" class="btn-back">Lihat Misi</a>
-    </div>
-
-    <div id="game-active-panel" style="<?= $spin_tickets > 0 ? 'display:flex; flex-direction:column; flex:1;' : 'display:none !important; flex: none !important;' ?>">
-        <div class="cards-grid">
-            <?php for($i = 0; $i < 6; $i++): ?>
-            <div class="card-scene" onclick="flipCard(this, <?= $i ?>)">
-                <div class="card-obj" id="card-<?= $i ?>">
-                    <div class="card-face card-front">
-                        <i class="ph-bold ph-question"></i>
-                    </div>
-                    <div class="card-face card-back">
-                        <div class="prize-amt" id="prize-<?= $i ?>">Rp 0</div>
+    <?php if ($spin_tickets <= 0): ?>
+        <div class="played-state" id="no-tickets-state">
+            <div class="played-icon">🎟️</div>
+            <h3 style="font-size:18px;font-weight:900;color:#334155;margin:0 0 8px;">Tiket Spin Habis</h3>
+            <p style="font-size:13px;font-weight:700;color:#64748b;margin:0;line-height:1.5;max-width:320px;text-align:center;">Kamu tidak memiliki tiket spin untuk membuka kartu. Selesaikan misi harian atau mingguan untuk mendapatkan tiket gratis!</p>
+            <a href="/missions" class="btn-back">Lihat Misi</a>
+        </div>
+    <?php else: ?>
+        <div id="game-active-panel">
+            <div class="cards-grid">
+                <?php for($i = 0; $i < 6; $i++): ?>
+                <div class="card-scene" onclick="flipCard(this, <?= $i ?>)">
+                    <div class="card-obj" id="card-<?= $i ?>">
+                        <div class="card-face card-front">
+                            <i class="ph-bold ph-question"></i>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="prize-amt" id="prize-<?= $i ?>">Rp 0</div>
+                        </div>
                     </div>
                 </div>
+                <?php endfor; ?>
             </div>
-            <?php endfor; ?>
         </div>
-    </div>
+    <?php endif; ?>
     
     <div id="result-overlay" style="display:none;">
         <div class="result-box">
@@ -179,6 +182,7 @@ require dirname(__DIR__) . '/partials/header.php';
     background-size: 50px 50px; background-position: 0 0, 25px 25px; pointer-events: none;
     z-index: -1;
 }
+
 .ticket-display {
     background: linear-gradient(135deg, #a855f7, #7e22ce);
     border: 2px solid #9333ea;
@@ -221,13 +225,14 @@ require dirname(__DIR__) . '/partials/header.php';
 .game-container {
     background: #fff; border: 3px solid #e2e8f0; border-radius: 24px;
     box-shadow: 0 8px 0 #cbd5e1; position: relative; overflow: hidden;
-    min-height: 420px; padding: 20px; display: flex; flex-direction: column;
+    min-height: 380px; padding: 20px; display: flex; flex-direction: column;
 }
 
 #game-active-panel {
     flex: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
 .played-state {
@@ -240,7 +245,6 @@ require dirname(__DIR__) . '/partials/header.php';
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    flex: 1;
     align-content: center;
     padding: 10px 0;
 }
@@ -495,18 +499,14 @@ function playAgain() {
     // Re-enable playing
     setTimeout(() => {
         if (currentTickets <= 0) {
-            const activePanel = document.getElementById('game-active-panel');
-            const noTicketsState = document.getElementById('no-tickets-state');
-            activePanel.style.setProperty('display', 'none', 'important');
-            activePanel.style.setProperty('flex', 'none', 'important');
-            noTicketsState.style.setProperty('display', 'flex', 'important');
-            noTicketsState.style.setProperty('flex', '1', 'important');
+            window.location.reload(); // Hard refresh to show PHP no-tickets block
         } else {
             isPlaying = false;
         }
     }, cards.length * 80 + 600);
 }
 </script>
+
 </div>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
