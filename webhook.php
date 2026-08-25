@@ -346,7 +346,8 @@ if (isset($update['callback_query'])) {
             
             if ($req && $req['status'] === 'pending') {
                 $new_status = $action === 'approve' ? 'approved' : 'rejected';
-                $pdo->prepare("UPDATE admin_requests SET status=?, updated_at=NOW() WHERE id=?")->execute([$new_status, $id]);
+                $admin_note = $action === 'reject' ? 'Ditolak via Telegram Bot' : null;
+                $pdo->prepare("UPDATE admin_requests SET status=?, admin_note=?, updated_at=NOW() WHERE id=?")->execute([$new_status, $admin_note, $id]);
                 
                 if ($action === 'approve') {
                     if ($req['type'] === 'change_bank') {

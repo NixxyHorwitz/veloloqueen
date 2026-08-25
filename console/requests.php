@@ -74,9 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $flash = "Berhasil menyetujui promosi Threads untuk user {$reqData['username']}. Reward " . format_rp($reward) . " telah ditambahkan ke Saldo Tarik.";
                     }
                 } else {
+                    $admin_note = clean_input($_POST['admin_note'] ?? '');
                     if ($reqData['type'] === 'threads_campaign') {
                         $notifTitle = "Kampanye Threads Ditolak ❌";
-                        $notifMsg = "Maaf, promosi Threads kamu ditolak karena bukti screenshot tidak valid atau tidak memenuhi syarat.";
+                        $notifMsg = "Maaf, promosi Threads kamu ditolak. Alasan: " . ($admin_note ?: 'Bukti screenshot tidak valid atau tidak memenuhi syarat.');
                         $pdo->prepare("INSERT INTO notifications (title, message, type, icon, target_type, target_user_ids) VALUES (?, ?, 'warning', '🌀', 'single', ?)")
                             ->execute([$notifTitle, $notifMsg, json_encode([$reqData['user_id']])]);
                         $flash = "Permintaan promosi Threads ditolak.";
@@ -85,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
                 
-                $pdo->prepare("UPDATE admin_requests SET status=?, updated_at=NOW() WHERE id=?")->execute([$status, $id]);
+                $pdo->prepare("UPDATE admin_requests SET status=?, admin_note=?, updated_at=NOW() WHERE id=?")->execute([$status, $admin_note ?? null, $id]);
                 $pdo->commit();
             } else {
                 $pdo->rollBack();
@@ -180,12 +181,13 @@ require __DIR__ . '/partials/header.php';
               <input type="hidden" name="status" value="approved">
               <button type="submit" class="btn btn-sm btn-success" style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;margin-right:4px;" onclick="return confirm('Setujui permintaan ini?')">✅ Approve</button>
             </form>
-            <form method="POST" class="d-inline">
+            <form method="POST" class="d-inline" onsubmit="return promptRejectReason(this);">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="process_request">
               <input type="hidden" name="id" value="<?= $req['id'] ?>">
               <input type="hidden" name="status" value="rejected">
-              <button type="submit" class="btn btn-sm btn-danger" style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;" onclick="return confirm('Tolak permintaan ini?')">❌ Reject</button>
+              <input type="hidden" name="admin_note" value="">
+              <button type="submit" class="btn btn-sm btn-danger" style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;">❌ Reject</button>
             </form>
             <?php else: ?>
               <span style="font-size:11px;color:#666">Selesai</span>
@@ -202,5 +204,21 @@ require __DIR__ . '/partials/header.php';
     </table>
   </div>
 </div>
+
+<script>
+function promptRejectReason(form) {
+    const reason = prompt("Masukkan alasan penolakan (Wajib):", "Bukti postingan tidak valid atau tidak memenuhi syarat");
+    if (reason === null) {
+        return false; // User cancelled
+    }
+    const trimmed = reason.trim();
+    if (trimmed === "") {
+        alert("Alasan penolakan wajib diisi!");
+        return false;
+    }
+    form.querySelector('input[name="admin_note"]').value = trimmed;
+    return true;
+}
+</script>
 
 <?php require __DIR__ . '/partials/footer.php'; ?>

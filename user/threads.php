@@ -21,6 +21,11 @@ $stmtApproved = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND 
 $stmtApproved->execute([$user['id']]);
 $approvedRequest = $stmtApproved->fetch();
 
+// Check if user has a rejected request (so we can show the reason why they failed previously)
+$stmtRejected = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign' AND status='rejected' ORDER BY id DESC LIMIT 1");
+$stmtRejected->execute([$user['id']]);
+$rejectedRequest = $stmtRejected->fetch();
+
 $flash = $flashType = '';
 if ($_SESSION['flash_threads_msg'] ?? null) {
     $flash = $_SESSION['flash_threads_msg'];
@@ -384,6 +389,14 @@ html body { background: #f97316 !important; background-image: none !important; c
         <div class="threads-status-desc">Terima kasih telah mempromosikan TontonCuan di Threads! Reward <?= format_rp($reward_amount) ?> sudah masuk ke saldo tarik kamu.</div>
       </div>
     <?php else: ?>
+      <?php if (!empty($rejectedRequest)): ?>
+        <div class="flash-alert flash-alert--err" style="margin-bottom: 16px; display: block;">
+          <i class="ph-bold ph-warning-circle" style="display:inline-block; vertical-align:middle; margin-right:4px;"></i>
+          <span style="vertical-align:middle; font-weight:900;">Klaim Sebelumnya Ditolak:</span>
+          <div style="font-size:11px; margin-top:4px; font-weight:700; color:#991b1b; white-space:pre-wrap;"><?= htmlspecialchars($rejectedRequest['admin_note'] ?: 'Bukti screenshot tidak valid atau tidak memenuhi syarat.') ?></div>
+        </div>
+      <?php endif; ?>
+
       <div class="threads-instructions">
         <?= htmlspecialchars($instructions) ?>
       </div>
