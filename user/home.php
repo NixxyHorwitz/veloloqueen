@@ -857,12 +857,7 @@ body { background: #f97316 !important; }
       <span class="bento-sm__label">Chicky Run</span>
     </a>
 
-    <!-- SM: Lucky Card -->
-    <a href="/luckycard" class="bento-sm"
-       style="background:linear-gradient(135deg,#c084fc,#9333ea);box-shadow:0 4px 0 #7e22ce">
-      <i class="ph-fill ph-cards"></i>
-      <span class="bento-sm__label">Lucky Card</span>
-    </a>
+
 
 
 

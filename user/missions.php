@@ -274,6 +274,24 @@ html body { background: #f97316 !important; font-family: 'Nunito', sans-serif; }
 </div>
 
 <div class="wd-body">
+  <!-- Minigame Banner: Lucky Card -->
+  <a href="/luckycard" style="text-decoration: none; display: block; margin-bottom: 16px; position: relative; z-index: 2;">
+    <div style="background: linear-gradient(135deg, #c084fc, #9333ea); border: 2.5px solid #1e3a8a; border-radius: 14px; box-shadow: 0 4px 0 #1e3a8a; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="background: rgba(255, 255, 255, 0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff;">
+          <i class="ph-fill ph-cards"></i>
+        </div>
+        <div>
+          <div style="font-size: 14px; font-weight: 900; color: #fff; line-height: 1.2;">Game Lucky Card</div>
+          <div style="font-size: 10px; font-weight: 800; color: #f3e8ff; margin-top: 2px;">Gunakan Tiket Spin untuk tebak kartu!</div>
+        </div>
+      </div>
+      <div style="background: #fff; color: #9333ea; font-size: 11px; font-weight: 900; padding: 6px 12px; border-radius: 20px; box-shadow: 0 2px 0 #7e22ce;">
+        Main <strong id="spin-tickets-count"><?= $spin_tickets ?></strong> 🎟️
+      </div>
+    </div>
+  </a>
+
   <!-- TABS -->
   <div class="ms-tabs" role="tablist">
     <button class="ms-tab active" id="tab-daily"    onclick="switchTab('daily')">Harian</button>

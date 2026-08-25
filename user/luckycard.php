@@ -91,6 +91,7 @@ $pageTitle = 'Lucky Card  ';
 $activePage = 'missions';
 require dirname(__DIR__) . '/partials/header.php';
 ?>
+<div class="wd-body">
 
 <div class="section-header" style="margin-bottom:20px; background: #fff; padding: 14px 16px; border: 3px solid #c084fc; border-radius: 20px; box-shadow: 0 6px 0 #a855f7; display:flex; align-items:center; justify-content:space-between;">
   <div>
@@ -102,7 +103,7 @@ require dirname(__DIR__) . '/partials/header.php';
       </div>
       <p style="font-size:12px;font-weight:700;color:#6b21a8;margin:6px 0 0">Bayar pake 1 tiket spin untuk tebak kartu!</p>
   </div>
-  <a href="/home" style="background:#e9d5ff; padding:8px; border-radius:12px; color:#9333ea;"><i class="ph-bold ph-x"></i></a>
+  <a href="/missions" style="background:#e9d5ff; padding:8px; border-radius:12px; color:#9333ea;"><i class="ph-bold ph-x"></i></a>
 </div>
 
 <!-- Ticket Display Panel -->
@@ -164,6 +165,20 @@ require dirname(__DIR__) . '/partials/header.php';
 </div>
 
 <style>
+.wd-body {
+    flex: 1;
+    background: #f97316;
+    padding: 14px 14px 100px;
+    position: relative;
+    z-index: 2;
+    min-height: 80vh;
+}
+.wd-body::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 10%);
+    background-size: 50px 50px; background-position: 0 0, 25px 25px; pointer-events: none;
+    z-index: -1;
+}
 .ticket-display {
     background: linear-gradient(135deg, #a855f7, #7e22ce);
     border: 2px solid #9333ea;
@@ -480,5 +495,6 @@ function playAgain() {
     }, cards.length * 80 + 600);
 }
 </script>
+</div>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
