@@ -115,7 +115,7 @@ require __DIR__ . '/partials/header.php';
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div style="font-size:28px"><?= $icon ?></div>
           <div class="d-flex gap-1">
-            <button class="btn btn-sm b-neutral" style="border:none;border-radius:8px;font-size:11px" onclick="editPlan(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, 'UTF-8') ?>)">✏️</button>
+            <button class="btn btn-sm b-neutral btn-edit-plan" style="border:none;border-radius:8px;font-size:11px" data-plan="<?= htmlspecialchars(json_encode($p), ENT_QUOTES, 'UTF-8') ?>">✏️</button>
             <?php if ((float)$p['price'] > 0): ?>
             <button type="button" onclick="confirmDelete(<?= $p['id'] ?>, '<?= htmlspecialchars($p['name'], ENT_QUOTES) ?>')" class="btn btn-sm b-danger" style="border:none;border-radius:8px;font-size:11px">🗑</button>
             <?php endif; ?>
@@ -205,6 +205,15 @@ require __DIR__ . '/partials/header.php';
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.btn-edit-plan').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const planData = JSON.parse(this.getAttribute('data-plan'));
+      editPlan(planData);
+    });
+  });
+});
+
 function confirmDelete(id, name) {
   document.getElementById('dp-id').value = id;
   document.getElementById('dp-name').textContent = name;
