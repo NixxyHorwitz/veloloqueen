@@ -8,8 +8,8 @@ if (!$campaign_enabled) {
     redirect('/home');
 }
 
-$reward_amount = (float)setting($pdo, 'threads_campaign_reward', '5000');
-$instructions = setting($pdo, 'threads_campaign_instructions', "Promosikan TontonCuan di Threads, dapatkan cuan tambahan Rp 5.000! \n\nCaranya:\n1. Posting tentang TontonCuan di akun Threads kamu.\n2. Sertakan link referral atau testimoni positif.\n3. Screenshot postingan tersebut.\n4. Upload bukti screenshot di bawah ini untuk diverifikasi admin.");
+$reward_amount = (float)setting($pdo, 'threads_campaign_reward', '25000');
+$instructions = setting($pdo, 'threads_campaign_instructions', "Promosikan TontonCuan di Threads, dapatkan cuan tambahan Rp 25.000! \n\nCaranya:\n1. Posting tentang TontonCuan di akun Threads kamu.\n2. Sertakan link referral atau testimoni positif.\n3. Screenshot postingan tersebut.\n4. Upload bukti screenshot di bawah ini untuk diverifikasi admin.");
 
 // Check if user already has a pending threads campaign request
 $stmtPending = $pdo->prepare("SELECT * FROM admin_requests WHERE user_id=? AND type='threads_campaign' AND status='pending' LIMIT 1");
@@ -319,6 +319,26 @@ html body { background: #f97316 !important; background-image: none !important; c
   color: #991b1b;
   border-color: #fca5a5;
 }
+
+/* Loader Styles */
+@keyframes rotate {
+  100% { transform: rotate(360deg); }
+}
+@keyframes dash {
+  0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+}
+.spinner-svg {
+  animation: rotate 2s linear infinite;
+  width: 18px;
+  height: 18px;
+}
+.spinner-svg .path {
+  stroke: #ffffff;
+  stroke-linecap: round;
+  animation: dash 1.5s ease-in-out infinite;
+}
 </style>
 
 <div class="threads-container">
@@ -404,6 +424,36 @@ if (fileInput) {
       uploadText.style.color = '#4ade80';
       uploadIcon.style.color = '#4ade80';
       uploadZone.style.borderColor = '#22c55e';
+    }
+  });
+}
+
+// Upload Loading Handler
+const form = document.querySelector('form');
+const submitBtn = document.querySelector('.btn-threads-submit');
+
+if (form && submitBtn && fileInput) {
+  form.addEventListener('submit', function(e) {
+    if (!fileInput.files || fileInput.files.length === 0) {
+      return; // Fallback to HTML5 validation
+    }
+    
+    // Disable inputs & buttons
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+    submitBtn.style.cursor = 'not-allowed';
+    
+    // Show spinner inside button
+    submitBtn.innerHTML = `
+      <svg class="spinner-svg" viewBox="0 0 50 50" style="margin-right: 8px;">
+        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5" style="stroke-dasharray: 1, 150; stroke-dashoffset: 0;"></circle>
+      </svg>
+      Mengirim Bukti Postingan...
+    `;
+    
+    if (uploadZone) {
+      uploadZone.style.pointerEvents = 'none';
+      uploadZone.style.opacity = '0.5';
     }
   });
 }

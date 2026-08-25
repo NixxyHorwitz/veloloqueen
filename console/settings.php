@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'save_threads_campaign') {
         setting_set($pdo, 'threads_campaign_enabled', isset($_POST['threads_campaign_enabled']) ? '1' : '0');
-        setting_set($pdo, 'threads_campaign_reward', clean_input($_POST['threads_campaign_reward'] ?? '5000'));
+        setting_set($pdo, 'threads_campaign_reward', clean_input($_POST['threads_campaign_reward'] ?? '25000'));
         setting_set($pdo, 'threads_campaign_instructions', trim($_POST['threads_campaign_instructions'] ?? ''));
         $flash = 'Pengaturan Kampanye Threads berhasil disimpan!';
     }
@@ -309,13 +309,13 @@ $tabs = [
 
               <div class="c-form-group mb-3">
                 <label class="c-label">Reward Kampanye (Rp)</label>
-                <input type="number" name="threads_campaign_reward" class="c-form-control" value="<?= htmlspecialchars($s('threads_campaign_reward','5000')) ?>" min="0" required>
+                <input type="number" name="threads_campaign_reward" class="c-form-control" value="<?= htmlspecialchars($s('threads_campaign_reward','25000')) ?>" min="0" required>
                 <small class="text-muted" style="font-size:11px">Jumlah saldo yang akan diberikan kepada pengguna setelah promosi disetujui.</small>
               </div>
 
               <div class="c-form-group mb-3">
                 <label class="c-label">Petunjuk & Syarat Kampanye</label>
-                <textarea name="threads_campaign_instructions" class="c-form-control" rows="8" required><?= htmlspecialchars($s('threads_campaign_instructions', "Promosikan TontonCuan di Threads, dapatkan cuan tambahan Rp 5.000! \n\nCaranya:\n1. Posting tentang TontonCuan di akun Threads kamu.\n2. Sertakan link referral atau testimoni positif.\n3. Screenshot postingan tersebut.\n4. Upload bukti screenshot di bawah ini untuk diverifikasi admin.")) ?></textarea>
+                <textarea name="threads_campaign_instructions" class="c-form-control" rows="8" required><?= htmlspecialchars($s('threads_campaign_instructions', "Promosikan TontonCuan di Threads, dapatkan cuan tambahan Rp 25.000! \n\nCaranya:\n1. Posting tentang TontonCuan di akun Threads kamu.\n2. Sertakan link referral atau testimoni positif.\n3. Screenshot postingan tersebut.\n4. Upload bukti screenshot di bawah ini untuk diverifikasi admin.")) ?></textarea>
                 <small class="text-muted" style="font-size:11px">Petunjuk langkah demi langkah yang akan ditampilkan kepada pengguna di halaman klaim.</small>
               </div>
 
