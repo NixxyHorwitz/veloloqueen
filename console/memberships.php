@@ -150,7 +150,7 @@ require __DIR__ . '/partials/header.php';
 </div>
 
 <!-- Add Modal -->
-<div class="modal fade" id="addPlanModal" tabindex="-1">
+<div class="modal" id="addPlanModal" tabindex="-1">
   <div class="modal-dialog"><div class="modal-content" style="background:#1a1d27;border:1px solid #2d3149">
     <form method="POST">
     <?= csrf_field() ?><input type="hidden" name="action" value="add">
@@ -167,7 +167,7 @@ require __DIR__ . '/partials/header.php';
 </div>
 
 <!-- Edit Modal -->
-<div class="modal fade" id="editPlanModal" tabindex="-1">
+<div class="modal" id="editPlanModal" tabindex="-1">
   <div class="modal-dialog"><div class="modal-content" style="background:#1a1d27;border:1px solid #2d3149">
     <form method="POST">
     <?= csrf_field() ?><input type="hidden" name="action" value="edit"><input type="hidden" name="id" id="ep-id">
@@ -182,7 +182,7 @@ require __DIR__ . '/partials/header.php';
 </div>
 
 <!-- Delete Modal -->
-<div class="modal fade" id="deletePlanModal" tabindex="-1">
+<div class="modal" id="deletePlanModal" tabindex="-1">
   <div class="modal-dialog modal-sm"><div class="modal-content" style="background:#1a1d27;border:1px solid #2d3149">
     <form method="POST">
     <?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" id="dp-id">
@@ -205,6 +205,11 @@ require __DIR__ . '/partials/header.php';
 </div>
 
 <script>
+window.onerror = function(message, source, lineno, colno, error) {
+  alert("JS Error: " + message + " on line " + lineno + "\nSource: " + source);
+  return false;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.btn-edit-plan').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -278,7 +283,7 @@ function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 </script>
 
 <?php $all_memberships = $pdo->query("SELECT * FROM memberships ORDER BY sort_order ASC, price ASC")->fetchAll(); ?>
-<div class="modal fade" id="perfModal" tabindex="-1">
+<div class="modal" id="perfModal" tabindex="-1">
   <div class="modal-dialog"><div class="modal-content" style="background:#1a1d27;border:1px solid #2d3149">
     <form method="POST">
     <?= csrf_field() ?><input type="hidden" name="action" value="save_level_perf">
