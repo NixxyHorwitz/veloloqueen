@@ -96,23 +96,26 @@ require dirname(__DIR__) . '/partials/header.php';
 ?>
 
 <style>
-/* THREADS THEMED DARK PAGE DESIGN */
-html body { background: #000000 !important; background-image: none !important; color: #fff !important; }
-.app-shell { background: #000000 !important; }
-.page-content { background: #000000 !important; }
+/* THREADS THEMED BRIGHT PAGE DESIGN */
+html body { background: #f97316 !important; background-image: none !important; color: #0f172a !important; }
+.app-shell { background: #f97316 !important; }
+.page-content { background: #f97316 !important; }
 
+/* Pattern like withdraw page */
 .threads-container {
   padding: 20px 14px calc(var(--nav-h) + 24px);
   max-width: 480px;
   margin: 0 auto;
   font-family: 'Nunito', sans-serif;
+  position: relative;
+  z-index: 2;
 }
 
 .threads-card {
-  background: #101010;
-  border: 2px solid #262626;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  background: #ffffff;
+  border: 2.5px solid #1e3a8a;
+  border-radius: 22px;
+  box-shadow: 0 5px 0 #1e3a8a;
   padding: 20px;
   margin-bottom: 20px;
   position: relative;
@@ -132,7 +135,7 @@ html body { background: #000000 !important; background-image: none !important; c
 .threads-title {
   font-size: 20px;
   font-weight: 900;
-  color: #fff;
+  color: #1e3a8a;
   margin-bottom: 6px;
   display: flex;
   align-items: center;
@@ -140,40 +143,41 @@ html body { background: #000000 !important; background-image: none !important; c
 }
 .threads-subtitle {
   font-size: 11px;
-  color: #a3a3a3;
+  color: #475569;
   font-weight: 700;
   margin-bottom: 16px;
 }
 
 .threads-reward-badge {
-  background: rgba(34, 197, 94, 0.15);
-  border: 1.5px solid #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  border: 2px solid #22c55e;
   border-radius: 16px;
   padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  box-shadow: 0 3px 0 #22c55e;
 }
 .threads-reward-lbl {
   font-size: 11px;
   font-weight: 800;
-  color: #a3a3a3;
+  color: #15803d;
 }
 .threads-reward-val {
   font-size: 18px;
   font-weight: 900;
-  color: #22c55e;
+  color: #16a34a;
 }
 
 .threads-instructions {
-  background: #181818;
-  border: 1.5px solid #2d2d2d;
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
   border-radius: 16px;
   padding: 14px;
   font-size: 12px;
   line-height: 1.5;
-  color: #e5e5e5;
+  color: #334155;
   font-weight: 700;
   white-space: pre-line;
   margin-bottom: 20px;
@@ -185,24 +189,24 @@ html body { background: #000000 !important; background-image: none !important; c
 .form-label {
   font-size: 12px;
   font-weight: 800;
-  color: #e5e5e5;
+  color: #1e293b;
   margin-bottom: 6px;
   display: block;
 }
 
 .threads-file-upload {
-  border: 2px dashed #2d2d2d;
+  border: 2.5px dashed #cbd5e1;
   border-radius: 16px;
   padding: 24px 16px;
   text-align: center;
   cursor: pointer;
-  background: #181818;
+  background: #f8fafc;
   transition: border-color 0.2s, background 0.2s;
   position: relative;
 }
 .threads-file-upload:hover {
-  border-color: #555;
-  background: #1c1c1c;
+  border-color: #64748b;
+  background: #f1f5f9;
 }
 .threads-file-upload input[type="file"] {
   position: absolute;
@@ -212,13 +216,13 @@ html body { background: #000000 !important; background-image: none !important; c
 }
 .threads-file-icon {
   font-size: 32px;
-  color: #737373;
+  color: #64748b;
   margin-bottom: 8px;
 }
 .threads-file-text {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  color: #a3a3a3;
+  color: #64748b;
 }
 
 .btn-threads-submit {
@@ -227,26 +231,26 @@ html body { background: #000000 !important; background-image: none !important; c
   justify-content: center;
   gap: 8px;
   width: 100%;
-  background: #ffffff;
-  color: #000000;
-  border: none;
+  background: linear-gradient(135deg, #db2777, #7c3aed);
+  color: #ffffff;
+  border: 2.5px solid #701a75;
   border-radius: 16px;
   padding: 14px;
   font-size: 14px;
   font-weight: 900;
   font-family: 'Nunito', sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(255,255,255,0.15);
+  box-shadow: 0 4px 0 #701a75;
   transition: transform 0.1s, box-shadow 0.1s;
 }
 .btn-threads-submit:active {
-  transform: scale(0.98);
+  transform: translateY(3px);
   box-shadow: none;
 }
 
 .threads-status-box {
-  background: #181818;
-  border: 2px solid #2d2d2d;
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
   border-radius: 20px;
   padding: 16px;
   text-align: center;
@@ -259,12 +263,12 @@ html body { background: #000000 !important; background-image: none !important; c
 .threads-status-title {
   font-size: 15px;
   font-weight: 900;
-  color: #fff;
+  color: #0f172a;
   margin-bottom: 4px;
 }
 .threads-status-desc {
   font-size: 11px;
-  color: #a3a3a3;
+  color: #475569;
   font-weight: 700;
   line-height: 1.4;
 }
@@ -273,7 +277,7 @@ html body { background: #000000 !important; background-image: none !important; c
   max-width: 100%;
   max-height: 250px;
   border-radius: 12px;
-  border: 2px solid #2d2d2d;
+  border: 2px solid #cbd5e1;
   margin-top: 12px;
   object-fit: contain;
 }
@@ -284,13 +288,14 @@ html body { background: #000000 !important; background-image: none !important; c
   gap: 6px;
   text-decoration: none;
   font-size: 12px;
-  font-weight: 800;
-  color: #a3a3a3;
+  font-weight: 900;
+  color: #ffffff;
   margin-bottom: 16px;
-  transition: color 0.2s;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  transition: opacity 0.2s;
 }
 .btn-back-home:hover {
-  color: #fff;
+  opacity: 0.9;
 }
 
 .flash-alert {
@@ -302,17 +307,17 @@ html body { background: #000000 !important; background-image: none !important; c
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 2px solid;
+  border: 2.5px solid;
 }
 .flash-alert--success {
-  background: rgba(34, 197, 94, 0.1);
-  color: #4ade80;
-  border-color: rgba(34, 197, 94, 0.2);
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #6ee7b7;
 }
 .flash-alert--err {
-  background: rgba(239, 68, 68, 0.1);
-  color: #f87171;
-  border-color: rgba(239, 68, 68, 0.2);
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fca5a5;
 }
 </style>
 

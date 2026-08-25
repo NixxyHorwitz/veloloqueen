@@ -550,18 +550,19 @@ body { background: #f97316 !important; }
 
 /* Threads Campaign Banner Card Styling */
 .cg-card--threads {
-  background: #101010 !important;
-  border: 3px solid #262626 !important;
-  box-shadow: 0 6px 0 #000 !important;
+  background: linear-gradient(135deg, #db2777 0%, #7c3aed 50%, #2563eb 100%) !important;
+  border: 3px solid #701a75 !important;
+  box-shadow: 0 6px 0 #4c0519 !important;
   border-radius: 22px;
   padding: 14px;
   position: relative;
   overflow: hidden;
   transition: transform 0.1s;
+  animation: pulse-threads 3s ease infinite;
 }
 .cg-card--threads:active {
   transform: translateY(4px);
-  box-shadow: 0 2px 0 #000 !important;
+  box-shadow: 0 2px 0 #4c0519 !important;
 }
 .cg-card--threads::before {
   content: '🌀';
@@ -569,9 +570,24 @@ body { background: #f97316 !important; }
   top: -15px;
   right: -15px;
   font-size: 80px;
-  opacity: 0.12;
+  opacity: 0.18;
   pointer-events: none;
   transform: rotate(-15deg);
+}
+@keyframes pulse-threads {
+  0%, 100% { box-shadow: 0 6px 0 #4c0519; }
+  50% { box-shadow: 0 6px 0 #4c0519, 0 0 15px rgba(219,39,119,0.5); }
+}
+.threads-pulse-dot {
+  width: 6px; height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: dot-pulse 1.5s infinite;
+  display: inline-block;
+}
+@keyframes dot-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.7; }
 }
 </style>
 
@@ -742,15 +758,15 @@ body { background: #f97316 !important; }
   <a href="/threads" class="cg-card cg-card--threads" style="display:block; text-decoration:none; margin-bottom:16px;">
     <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; position:relative; z-index:2;">
       <div style="flex:1">
-        <div style="font-size:10px; font-weight:900; color:#cbd5e1; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
-          <i class="ph-bold ph-sparkle" style="color:#fb7185"></i> Event Spesial
+        <div class="threads-event-badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.2); border:1.5px solid rgba(255,255,255,0.4); border-radius:20px; padding:2px 8px; font-size:9px; font-weight:900; color:#fff; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
+          <span class="threads-pulse-dot"></span> Event Spesial 🌀
         </div>
-        <div style="font-size:14px; font-weight:900; color:#fff; line-height:1.2; margin-bottom:4px;">Promosi Threads & Raih Cuan!</div>
-        <div style="font-size:10px; color:#a3a3a3; font-weight:700;">Bagikan TontonCuan ke Threads, upload bukti, dan raih bonus saldo!</div>
+        <div style="font-size:15px; font-weight:900; color:#fff; line-height:1.2; margin-bottom:4px; text-shadow: 0 2px 4px rgba(0,0,0,0.35);">Promosi Threads & Raih Cuan!</div>
+        <div style="font-size:10px; color:rgba(255,255,255,0.9); font-weight:700; line-height:1.3; text-shadow: 0 1px 2px rgba(0,0,0,0.35);">Bagikan ke Threads, upload screenshot, dapatkan bonus instan!</div>
       </div>
-      <div class="threads-badge-price" style="flex-shrink:0; text-align:right;">
-        <div style="font-size:8px; font-weight:800; color:#a3a3a3; text-transform:uppercase;">REWARD</div>
-        <div style="font-size:15px; font-weight:900; color:#22c55e;"><?= format_rp((float)setting($pdo, 'threads_campaign_reward', '5000')) ?></div>
+      <div class="threads-badge-price" style="flex-shrink:0; text-align:center; background:#fff; border:2.5px solid #db2777; border-radius:18px; padding:8px 10px; box-shadow:0 4px 0 #701a75; transform:rotate(2deg); transition: transform 0.2s;">
+        <div style="font-size:8px; font-weight:900; color:#db2777; text-transform:uppercase; letter-spacing:0.5px; line-height:1.1; margin-bottom:2px;">REWARD</div>
+        <div style="font-size:15px; font-weight:900; color:#10b981; line-height:1.1;"><?= format_rp((float)setting($pdo, 'threads_campaign_reward', '5000')) ?></div>
       </div>
     </div>
   </a>
