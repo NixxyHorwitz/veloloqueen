@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$pendingRequest) {
                 ];
                 
                 // Send photo directly to Telegram
-                send_telegram_photo($pdo, $dir . $filename, $tgMsg, $kb, 'misi');
+                send_telegram_photo($pdo, $dir . $filename, $tgMsg, $kb, 'permintaan');
                 
                 $_SESSION['flash_threads_msg'] = 'Bukti postingan berhasil di-upload! Admin akan segera memverifikasi klaim kamu.';
                 $_SESSION['flash_threads_type'] = 'success';
