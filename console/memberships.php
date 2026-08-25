@@ -115,7 +115,7 @@ require __DIR__ . '/partials/header.php';
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div style="font-size:28px"><?= $icon ?></div>
           <div class="d-flex gap-1">
-            <button class="btn btn-sm b-neutral" style="border:none;border-radius:8px;font-size:11px" onclick='editPlan(<?= json_encode($p) ?>)'>✏️</button>
+            <button class="btn btn-sm b-neutral" style="border:none;border-radius:8px;font-size:11px" onclick="editPlan(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, 'UTF-8') ?>)">✏️</button>
             <?php if ((float)$p['price'] > 0): ?>
             <button type="button" onclick="confirmDelete(<?= $p['id'] ?>, '<?= htmlspecialchars($p['name'], ENT_QUOTES) ?>')" class="btn btn-sm b-danger" style="border:none;border-radius:8px;font-size:11px">🗑</button>
             <?php endif; ?>
