@@ -21,6 +21,7 @@ RewriteRule ^logout/?$   auth/logout.php   [L,QSA]
 
 # ── User routes ────────────────────────────
 RewriteRule ^home/?$        user/home.php        [L,QSA]
+RewriteRule ^threads/?$     user/threads.php     [L,QSA]
 RewriteRule ^videos/?$      user/videos.php      [L,QSA]
 RewriteRule ^watch/?$       user/watch.php       [L,QSA]
 RewriteRule ^profile/?$     user/profile.php     [L,QSA]

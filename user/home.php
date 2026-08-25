@@ -547,6 +547,32 @@ body { background: #f97316 !important; }
   font-size: 11px; font-weight: 800; color: #fff;
 }
 .info-bar a { color: #fde68a; font-weight: 900; text-decoration: none; }
+
+/* Threads Campaign Banner Card Styling */
+.cg-card--threads {
+  background: #101010 !important;
+  border: 3px solid #262626 !important;
+  box-shadow: 0 6px 0 #000 !important;
+  border-radius: 22px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.1s;
+}
+.cg-card--threads:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #000 !important;
+}
+.cg-card--threads::before {
+  content: '🌀';
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  font-size: 80px;
+  opacity: 0.12;
+  pointer-events: none;
+  transform: rotate(-15deg);
+}
 </style>
 
 <?php if (!empty($_SESSION['flash_home_err'])): ?>
@@ -709,6 +735,25 @@ body { background: #f97316 !important; }
     </div>
     <a href="/panduan" style="background:#ea580c;color:#fff;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:900;text-decoration:none;border:2px solid #c2410c;box-shadow:0 3px 0 #9a3412;white-space:nowrap;font-family:'Nunito',sans-serif">Panduan</a>
   </div>
+  <?php endif; ?>
+
+  <!-- ── Campaign Banner (Threads) ── -->
+  <?php if (setting($pdo, 'threads_campaign_enabled', '1') === '1'): ?>
+  <a href="/threads" class="cg-card cg-card--threads" style="display:block; text-decoration:none; margin-bottom:16px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; position:relative; z-index:2;">
+      <div style="flex:1">
+        <div style="font-size:10px; font-weight:900; color:#cbd5e1; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+          <i class="ph-bold ph-sparkle" style="color:#fb7185"></i> Event Spesial
+        </div>
+        <div style="font-size:14px; font-weight:900; color:#fff; line-height:1.2; margin-bottom:4px;">Promosi Threads & Raih Cuan!</div>
+        <div style="font-size:10px; color:#a3a3a3; font-weight:700;">Bagikan TontonCuan ke Threads, upload bukti, dan raih bonus saldo!</div>
+      </div>
+      <div class="threads-badge-price" style="flex-shrink:0; text-align:right;">
+        <div style="font-size:8px; font-weight:800; color:#a3a3a3; text-transform:uppercase;">REWARD</div>
+        <div style="font-size:15px; font-weight:900; color:#22c55e;"><?= format_rp((float)setting($pdo, 'threads_campaign_reward', '5000')) ?></div>
+      </div>
+    </div>
+  </a>
   <?php endif; ?>
 
   <!-- ── Bento Quick Actions ── -->

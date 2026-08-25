@@ -45,6 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flash = 'Pengaturan maintenance disimpan!';
     }
 
+    if ($action === 'save_threads_campaign') {
+        setting_set($pdo, 'threads_campaign_enabled', isset($_POST['threads_campaign_enabled']) ? '1' : '0');
+        setting_set($pdo, 'threads_campaign_reward', clean_input($_POST['threads_campaign_reward'] ?? '5000'));
+        setting_set($pdo, 'threads_campaign_instructions', trim($_POST['threads_campaign_instructions'] ?? ''));
+        $flash = 'Pengaturan Kampanye Threads berhasil disimpan!';
+    }
+
 
 
     if ($action === 'save_telegram') {
@@ -177,6 +184,7 @@ require __DIR__ . '/partials/header.php';
 $active_tab = $_GET['tab'] ?? 'general';
 $tabs = [
     'general' => ['icon' => '🌐', 'label' => 'Umum'],
+    'campaign' => ['icon' => '📢', 'label' => 'Kampanye Threads'],
     'bank'    => ['icon' => '🏦', 'label' => 'Rekening'],
     'system'  => ['icon' => '🔧', 'label' => 'Sistem & TG'],
     'game'    => ['icon' => '🎮', 'label' => 'Game Config'],
@@ -278,6 +286,45 @@ $tabs = [
         </div>
       </div>
     </div></div>
+  </div>
+
+  <!-- TAB CAMPAIGN -->
+  <div class="stab-pane <?= $active_tab==='campaign'?'active':'' ?>" id="tab-campaign">
+    <div class="row g-3">
+      <div class="col-md-8">
+        <div class="c-card mb-3">
+          <div class="c-card-header"><span class="c-card-title">📢 Kampanye Promosi Threads</span></div>
+          <div class="c-card-body">
+            <form method="POST">
+              <?= csrf_field() ?>
+              <input type="hidden" name="action" value="save_threads_campaign">
+              
+              <div class="c-form-group mb-3">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" name="threads_campaign_enabled" id="threads_campaign_enabled" value="1" <?= $s('threads_campaign_enabled','1')==='1'?'checked':'' ?>>
+                  <label class="form-check-label text-secondary fw-bold" for="threads_campaign_enabled" style="font-size:13px">Aktifkan Kampanye Threads</label>
+                </div>
+                <small class="text-muted" style="font-size:11px">Jika dinonaktifkan, banner kampanye di halaman Beranda user tidak akan muncul.</small>
+              </div>
+
+              <div class="c-form-group mb-3">
+                <label class="c-label">Reward Kampanye (Rp)</label>
+                <input type="number" name="threads_campaign_reward" class="c-form-control" value="<?= htmlspecialchars($s('threads_campaign_reward','5000')) ?>" min="0" required>
+                <small class="text-muted" style="font-size:11px">Jumlah saldo yang akan diberikan kepada pengguna setelah promosi disetujui.</small>
+              </div>
+
+              <div class="c-form-group mb-3">
+                <label class="c-label">Petunjuk & Syarat Kampanye</label>
+                <textarea name="threads_campaign_instructions" class="c-form-control" rows="8" required><?= htmlspecialchars($s('threads_campaign_instructions', "Promosikan TontonCuan di Threads, dapatkan cuan tambahan Rp 5.000! \n\nCaranya:\n1. Posting tentang TontonCuan di akun Threads kamu.\n2. Sertakan link referral atau testimoni positif.\n3. Screenshot postingan tersebut.\n4. Upload bukti screenshot di bawah ini untuk diverifikasi admin.")) ?></textarea>
+                <small class="text-muted" style="font-size:11px">Petunjuk langkah demi langkah yang akan ditampilkan kepada pengguna di halaman klaim.</small>
+              </div>
+
+              <button type="submit" class="btn btn-sm text-white" style="background:var(--brand)">Simpan Pengaturan Kampanye</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- TAB BANK -->
