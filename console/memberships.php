@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $wd_hold         = isset($_POST['wd_hold']) ? 1 : 0;
         $allow_edit_bank = isset($_POST['allow_edit_bank']) ? 1 : 0;
         $is_genjutsu     = isset($_POST['is_genjutsu']) ? 1 : 0;
+        $is_genjutsu_hilang = isset($_POST['is_genjutsu_hilang']) ? 1 : 0;
         $price_genjutsu  = (float)preg_replace('/[^\d.]/', '', $_POST['price_genjutsu'] ?? '0');
         $sort            = (int)($_POST['sort_order'] ?? 0);
         $min_wd          = (float)preg_replace('/[^\d.]/', '', $_POST['min_wd'] ?? '50000');
@@ -35,12 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$name) { $flash = 'Nama paket wajib diisi.'; $flashType = 'error'; }
         else {
             if ($action === 'add') {
-                $pdo->prepare("INSERT INTO memberships (name,icon,price,original_price,watch_limit,duration_days,description,is_active,sort_order,min_wd,max_wd,wd_hold,allow_edit_bank,is_genjutsu,price_genjutsu) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
-                    ->execute([$name,$icon,$price,$orig_price,$limit,$days,$desc,$active,$sort,$min_wd,$max_wd,$wd_hold,$allow_edit_bank,$is_genjutsu,$price_genjutsu]);
+                $pdo->prepare("INSERT INTO memberships (name,icon,price,original_price,watch_limit,duration_days,description,is_active,sort_order,min_wd,max_wd,wd_hold,allow_edit_bank,is_genjutsu,is_genjutsu_hilang,price_genjutsu) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+                    ->execute([$name,$icon,$price,$orig_price,$limit,$days,$desc,$active,$sort,$min_wd,$max_wd,$wd_hold,$allow_edit_bank,$is_genjutsu,$is_genjutsu_hilang,$price_genjutsu]);
                 $flash = "Paket <strong>{$name}</strong> berhasil ditambahkan.";
             } else {
-                $pdo->prepare("UPDATE memberships SET name=?,icon=?,price=?,original_price=?,watch_limit=?,duration_days=?,description=?,is_active=?,sort_order=?,min_wd=?,max_wd=?,wd_hold=?,allow_edit_bank=?,is_genjutsu=?,price_genjutsu=? WHERE id=?")
-                    ->execute([$name,$icon,$price,$orig_price,$limit,$days,$desc,$active,$sort,$min_wd,$max_wd,$wd_hold,$allow_edit_bank,$is_genjutsu,$price_genjutsu,$id]);
+                $pdo->prepare("UPDATE memberships SET name=?,icon=?,price=?,original_price=?,watch_limit=?,duration_days=?,description=?,is_active=?,sort_order=?,min_wd=?,max_wd=?,wd_hold=?,allow_edit_bank=?,is_genjutsu=?,is_genjutsu_hilang=?,price_genjutsu=? WHERE id=?")
+                    ->execute([$name,$icon,$price,$orig_price,$limit,$days,$desc,$active,$sort,$min_wd,$max_wd,$wd_hold,$allow_edit_bank,$is_genjutsu,$is_genjutsu_hilang,$price_genjutsu,$id]);
                 $flash = "Paket <strong>{$name}</strong> berhasil diperbarui.";
             }
             $flashType = 'success';
@@ -283,15 +284,25 @@ require __DIR__ . '/partials/header.php';
 </div>
 
 <div class="ms-genjutsu-box">
-  <div class="ms-genjutsu-label">👁️ Genjutsu Pricing</div>
-  <div class="ms-field-row col2">
+  <div class="ms-genjutsu-label">👁️ Genjutsu Pricing & Rules</div>
+  <div class="ms-field-row col3">
     <div class="ms-field">
-      <label style="color:#ffc107">Aktifkan Genjutsu</label>
+      <label style="color:#ffc107">Aktifkan Genjutsu Price</label>
       <label class="ms-toggle" style="cursor:pointer">
         <input type="checkbox" name="is_genjutsu" <?= $v('is_genjutsu') ? 'checked' : '' ?>>
         <div class="ms-toggle-info">
           <strong>Genjutsu Mode</strong>
           <small>Harga berubah jika saldo beli user cukup</small>
+        </div>
+      </label>
+    </div>
+    <div class="ms-field">
+      <label style="color:#ffc107">Aktifkan Genjutsu Hilang</label>
+      <label class="ms-toggle" style="cursor:pointer">
+        <input type="checkbox" name="is_genjutsu_hilang" <?= $v('is_genjutsu_hilang') ? 'checked' : '' ?>>
+        <div class="ms-toggle-info">
+          <strong>Genjutsu Hilang</strong>
+          <small>Paket hilang jika saldo beli user cukup</small>
         </div>
       </label>
     </div>
@@ -528,7 +539,10 @@ require __DIR__ . '/partials/header.php';
               <div class="ms-price-orig"><?= format_rp((float)$p['original_price']) ?></div>
               <?php endif; ?>
               <?php if ($p['is_genjutsu']): ?>
-              <div class="ms-price-genjutsu">👁️ <?= format_rp((float)$p['price_genjutsu']) ?></div>
+              <div class="ms-price-genjutsu">👁️ Price: <?= format_rp((float)$p['price_genjutsu']) ?></div>
+              <?php endif; ?>
+              <?php if ($p['is_genjutsu_hilang']): ?>
+              <div class="ms-price-genjutsu" style="background:rgba(244,78,59,.1);color:#f44e3b;border-color:rgba(244,78,59,.25)">👁️ Hilang</div>
               <?php endif; ?>
             <?php endif; ?>
           </td>

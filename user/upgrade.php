@@ -13,7 +13,18 @@ function get_active_price(array $membership, array $user): float {
     return $price;
 }
 
-$memberships = $pdo->query("SELECT * FROM memberships WHERE is_active=1 ORDER BY sort_order ASC")->fetchAll();
+$all_memberships = $pdo->query("SELECT * FROM memberships WHERE is_active=1 ORDER BY sort_order ASC")->fetchAll();
+$memberships = [];
+foreach ($all_memberships as $ms) {
+    if (!empty($ms['is_genjutsu_hilang'])) {
+        $price = (float)$ms['price'];
+        $balance = (float)($user['balance_dep'] ?? 0);
+        if ($balance >= $price) {
+            continue;
+        }
+    }
+    $memberships[] = $ms;
+}
 $flash = $flashType = '';
 
 // Active membership info
@@ -74,7 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'check
     $ms = $pdo->prepare("SELECT * FROM memberships WHERE id=? AND is_active=1");
     $ms->execute([$mid]);
     $chosen_m = $ms->fetch();
-    if (!$chosen_m) { echo json_encode(['error' => 'Paket tidak valid.']); exit; }
+    if (!$chosen_m || (!empty($chosen_m['is_genjutsu_hilang']) && (float)($user['balance_dep'] ?? 0) >= (float)$chosen_m['price'])) {
+        echo json_encode(['error' => 'Paket tidak valid.']); exit;
+    }
     $price = get_active_price($chosen_m, $user);
     if (!$price) { echo json_encode(['error' => 'Paket tidak valid.']); exit; }
     
@@ -163,6 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $chosen = $ms->fetch();
 
     if (!$chosen) {
+        $flash = 'Duh, paketnya gak ketemu nih.'; $flashType = 'error';
+    } elseif (!empty($chosen['is_genjutsu_hilang']) && (float)($user['balance_dep'] ?? 0) >= (float)$chosen['price']) {
         $flash = 'Duh, paketnya gak ketemu nih.'; $flashType = 'error';
     } elseif ((float)$chosen['price'] == 0) {
         $flash = 'Paket Free gak usah diupgrade ya!'; $flashType = 'error';
