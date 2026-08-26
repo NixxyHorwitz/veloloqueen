@@ -74,7 +74,7 @@ if ($wd_require_level && $wd_min_level > 0) {
 }
 
 // Cek apakah ada WD pending
-$pending_wd = $pdo->prepare("SELECT id FROM withdrawals WHERE user_id=? AND status='pending' LIMIT 1");
+$pending_wd = $pdo->prepare("SELECT id FROM withdrawals WHERE user_id=? AND status IN ('pending', 'hold') LIMIT 1");
 $pending_wd->execute([$user['id']]);
 $has_pending_wd = (bool)$pending_wd->fetchColumn();
 
