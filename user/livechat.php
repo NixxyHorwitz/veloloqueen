@@ -539,6 +539,33 @@ body { margin: 0; padding: 0; overflow: hidden; background: #f0f9ff; }
     </div>
   </div>
 
+  <!-- Queue Overlay (Saat Kapasitas Sesi Penuh) -->
+  <div class="chat-start-overlay" id="chat-queue-overlay" style="display:none;">
+    <div class="chat-start-card" style="text-align:center;">
+      <div class="chat-start-icon" style="font-size:48px; margin-bottom:8px;">⏳</div>
+      <div class="chat-start-title" style="font-size:20px; font-weight:900; color:#0f172a;">Sesi Chat Sedang Penuh</div>
+      <div class="chat-start-sub" style="font-size:13px; color:#64748b; margin-bottom:16px;">Mohon tunggu sebentar, Anda berada dalam antrean customer support.</div>
+
+      <!-- Queue Box -->
+      <div style="background:#f0fdf4; border:2.5px dashed #86efac; border-radius:18px; padding:18px 14px; margin-bottom:18px;">
+        <div style="font-size:11px; font-weight:900; color:#15803d; text-transform:uppercase; letter-spacing:0.5px;">Nomor Antrean Anda</div>
+        <div style="font-size:38px; font-weight:900; color:#16a34a; margin:4px 0; text-shadow:0 2px 4px rgba(22,163,74,0.15);">#<span id="queue-pos-num">1</span></div>
+        <div style="font-size:12px; font-weight:800; color:#4b5563;">
+          <span id="queue-ahead-num">0</span> orang di depan Anda
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:12px; font-weight:800; color:#0284c7; margin-bottom:20px; background:#e0f2fe; padding:10px 14px; border-radius:12px; border:1.5px solid #bae6fd;">
+        <i class="ph-bold ph-spinner ph-spin" style="font-size:16px;"></i>
+        <span>Menghubungkan otomatis saat giliran Anda...</span>
+      </div>
+
+      <button id="btn-cancel-queue" onclick="cancelQueue()" style="width:100%; background:linear-gradient(135deg, #ef4444, #dc2626); border: 3px solid #fff; box-shadow: 0 6px 0 #b91c1c; color: #fff; font-size: 14px; font-weight: 900; padding: 12px; border-radius: 16px; cursor: pointer; transition: transform 0.1s; display:flex; align-items:center; justify-content:center; gap:8px;">
+        <i class="ph-bold ph-x-circle" style="font-size:18px;"></i> Batal Antre
+      </button>
+    </div>
+  </div>
+
   <!-- Chat UI -->
   <div class="chat-page" id="chat-ui" style="display:none;">
 
@@ -616,6 +643,8 @@ body { margin: 0; padding: 0; overflow: hidden; background: #f0f9ff; }
    LIVECHAT CLIENT
 ═══════════════════════════════════════ */
 let sessionKey   = null;
+let queueToken   = null;
+let queueTimer   = null;
 
 // Initial mode priority
 const LC_AI_ENABLED  = <?= $_ai_enabled ? 'true' : 'false' ?>;
@@ -680,10 +709,25 @@ async function startChat() {
   try {
     const fd = new FormData();
     fd.append('mode', startMode);
+    if (queueToken) fd.append('queue_token', queueToken);
+
     const res = await fetch('/chat_action?action=start', { method: 'POST', body: fd, credentials: 'include' });
     const data = await res.json();
     if (!data.ok) throw new Error(data.error || 'Gagal memulai sesi.');
 
+    // Jika antrean penuh / masuk queue
+    if (data.queued) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ph-bold ph-paper-plane-right" style="font-size:20px;"></i> Mulai Chat';
+
+      queueToken = data.queue_token;
+      showQueueUI(data.position, Math.max(0, data.position - 1));
+      startQueuePolling();
+      return;
+    }
+
+    // Berhasil masuk room chat
+    hideQueueUI();
     sessionKey    = data.session_key;
     currentMode   = data.mode;
     sessionStatus = data.status;
@@ -707,6 +751,86 @@ async function startChat() {
     btn.innerHTML = '<i class="ph-bold ph-paper-plane-right" style="font-size:20px;"></i> Mulai Chat';
     alert('❌ ' + e.message);
   }
+}
+
+// ── Queue UI & Polling ────────────────────────────────────
+function showQueueUI(pos, ahead) {
+  document.getElementById('chat-start-overlay').style.display = 'none';
+  document.getElementById('chat-ui').style.display = 'none';
+  const qOverlay = document.getElementById('chat-queue-overlay');
+  if (qOverlay) {
+    qOverlay.style.display = 'flex';
+    document.getElementById('queue-pos-num').textContent = pos || 1;
+    document.getElementById('queue-ahead-num').textContent = ahead || 0;
+  }
+}
+
+function hideQueueUI() {
+  const qOverlay = document.getElementById('chat-queue-overlay');
+  if (qOverlay) qOverlay.style.display = 'none';
+  if (queueTimer) { clearInterval(queueTimer); queueTimer = null; }
+}
+
+function startQueuePolling() {
+  if (queueTimer) clearInterval(queueTimer);
+  queueTimer = setInterval(pollQueueStatus, 3000);
+}
+
+async function pollQueueStatus() {
+  if (!queueToken) return;
+  try {
+    const res = await fetch(`/chat_action?action=check_queue&queue_token=${encodeURIComponent(queueToken)}`, { credentials: 'include' });
+    const data = await res.json();
+    if (!data.ok) return;
+
+    if (data.status === 'ready' && data.session_key) {
+      // Slot tersedia! Transisi langsung ke room chat
+      hideQueueUI();
+      sessionKey    = data.session_key;
+      currentMode   = data.mode;
+      sessionStatus = 'open';
+
+      document.getElementById('chat-start-overlay').style.display = 'none';
+      document.getElementById('chat-ui').style.display = 'flex';
+
+      const msgs = document.getElementById('chat-messages');
+      msgs.innerHTML = '';
+      (data.messages || []).forEach(m => appendBubble(m.sender, m.message, m.created_at, false, m.attachment, m.id));
+
+      updateModeUI(currentMode);
+      if (data.last_msg_id) lastMsgId = parseInt(data.last_msg_id);
+
+      scrollBottom();
+      startPolling();
+      document.getElementById('chat-input').focus();
+    } else if (data.status === 'waiting') {
+      const pos = data.position || 1;
+      document.getElementById('queue-pos-num').textContent = pos;
+      document.getElementById('queue-ahead-num').textContent = Math.max(0, pos - 1);
+    } else if (data.status === 'cancelled') {
+      hideQueueUI();
+      document.getElementById('chat-start-overlay').style.display = 'flex';
+      queueToken = null;
+      alert('Antrean telah berakhir atau dibatalkan.');
+    }
+  } catch (e) {
+    dbg('Queue poll error', e.message);
+  }
+}
+
+async function cancelQueue() {
+  if (queueTimer) { clearInterval(queueTimer); queueTimer = null; }
+  if (queueToken) {
+    const fd = new FormData();
+    fd.append('queue_token', queueToken);
+    fetch('/chat_action?action=cancel_queue', { method: 'POST', body: fd, credentials: 'include' }).catch(() => {});
+    queueToken = null;
+  }
+  hideQueueUI();
+  document.getElementById('chat-start-overlay').style.display = 'flex';
+  const btn = document.getElementById('btn-start-chat');
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ph-bold ph-paper-plane-right" style="font-size:20px;"></i> Mulai Chat';
 }
 
 // ── Append bubble ─────────────────────────────────────────

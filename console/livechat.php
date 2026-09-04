@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'lc_tg_token','lc_tg_chat_id','lc_tg_forum',
             'openai_api_key','openai_model','ai_system_prompt',
             'chat_welcome_msg','chat_ai_enabled','chat_admin_enabled','chat_admin_name','livechat_enabled','lc_site_url',
-            'lc_debug_panel','lc_attachment_enabled','lc_offline_msg',
+            'lc_debug_panel','lc_attachment_enabled','lc_offline_msg','lc_max_active_sessions',
         ];
         if (!isset($_POST['lc_attachment_enabled'])) $_POST['lc_attachment_enabled'] = '0';
         if (!isset($_POST['livechat_enabled'])) $_POST['livechat_enabled'] = '0';
@@ -205,11 +205,13 @@ foreach ([
     'lc_tg_token','lc_tg_chat_id','lc_tg_forum',
     'openai_api_key','openai_model','ai_system_prompt',
     'chat_welcome_msg','chat_ai_enabled','chat_admin_enabled','chat_admin_name','livechat_enabled','lc_site_url',
-    'lc_debug_panel','lc_attachment_enabled','lc_offline_msg',
+    'lc_debug_panel','lc_attachment_enabled','lc_offline_msg','lc_max_active_sessions',
 ] as $k) { $cfg[$k] = setting($pdo, $k, ''); }
 if (empty($cfg['chat_admin_name'])) $cfg['chat_admin_name'] = 'Admin';
 if ($cfg['livechat_enabled'] === '') $cfg['livechat_enabled'] = '1';
 if (!isset($cfg['lc_attachment_enabled']) || $cfg['lc_attachment_enabled'] === '') $cfg['lc_attachment_enabled'] = '1';
+$activeSessCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_sessions WHERE status='open'")->fetchColumn();
+$waitingQueueCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_queue WHERE status='waiting'")->fetchColumn();
 
 // ── Load sessions ─────────────────────────────────────────────
 $sessions = $pdo->query(
@@ -381,6 +383,41 @@ require_once __DIR__ . '/partials/header.php';
 
 <!-- ═══ TAB: SESSIONS ══════════════════════════════════════ -->
 <?php if ($activeTab === 'sessions' || $viewId): ?>
+<!-- Livechat Quick Stats -->
+<div class="row g-2 mb-3">
+  <div class="col-md-4 col-sm-6">
+    <div style="background:#13151f;border:1px solid #1f2235;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:24px;"><?= $cfg['livechat_enabled']==='1' ? '🟢' : '🔴' ?></div>
+      <div>
+        <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:700;">Status Livechat</div>
+        <div style="font-size:14px;font-weight:900;color:#fff;"><?= $cfg['livechat_enabled']==='1' ? 'BUKA (Online)' : 'TUTUP (Offline)' ?></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-sm-6">
+    <div style="background:#13151f;border:1px solid #1f2235;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:24px;">💬</div>
+      <div>
+        <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:700;">Sesi Aktif / Batas Maks</div>
+        <div style="font-size:14px;font-weight:900;color:#fff;">
+          <?= $activeSessCount ?> <span style="font-size:12px;color:#888;">/ <?= (int)($cfg['lc_max_active_sessions'] ?? 0) > 0 ? (int)$cfg['lc_max_active_sessions'] . ' Sesi' : 'Unlimited' ?></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-sm-12">
+    <div style="background:#13151f;border:1px solid #1f2235;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:24px;">⏳</div>
+      <div>
+        <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:700;">User Menunggu Antrean</div>
+        <div style="font-size:14px;font-weight:900;color:<?= $waitingQueueCount > 0 ? '#FBBC04' : '#4CAF82' ?>;">
+          <?= $waitingQueueCount ?> User
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row g-3">
   <!-- Session list -->
   <div class="<?= $viewId ? 'col-lg-4' : 'col-12' ?>">
@@ -730,6 +767,11 @@ require_once __DIR__ . '/partials/header.php';
               <input type="checkbox" name="livechat_enabled" value="1" <?= $cfg['livechat_enabled']==='1'?'checked':'' ?>>
               <strong style="color:#e0e0f0;">Livechat Aktif</strong>
             </label>
+          </div>
+          <div class="c-form-group">
+            <label class="c-label">Batas Maksimum Sesi Chat Aktif (Dalam 1 Waktu)</label>
+            <input type="number" name="lc_max_active_sessions" class="c-form-control" min="0" value="<?= htmlspecialchars((string)($cfg['lc_max_active_sessions'] ?? '0')) ?>" placeholder="0 (Tanpa batas / Unlimited)">
+            <small style="color:#444;font-size:11px;">Jika sesi aktif mencapai batas ini, pengguna baru yang masuk akan diminta mengantre (Queue) sampai ada sesi lain yang ditutup. Isi <strong>0</strong> untuk tanpa batas.</small>
           </div>
           <div class="c-form-group">
             <label class="c-label">Pesan Livechat Ditutup (Offline)</label>

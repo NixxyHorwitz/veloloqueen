@@ -105,22 +105,248 @@ function tg_escape(string $text): string {
     );
 }
 
-// ─── Helper: Cleanup Inactive Sessions ────────────────────────
-function cleanup_inactive_sessions(PDO $pdo): void {
+// ─── Helper: Cleanup Inactive Sessions (30 Min Timeout) ───────
+function cleanup_inactive_sessions(PDO $pdo): int {
+    $closedCount = 0;
     try {
-        $stale = $pdo->query("SELECT id, tg_thread_id FROM chat_sessions WHERE status='open' AND is_kept=0 AND last_message_at < DATE_SUB(NOW(), INTERVAL 3 HOUR)")->fetchAll();
-        if (!$stale) return;
-        $chatId = setting($pdo, 'lc_tg_chat_id', '');
-        foreach ($stale as $st) {
-            $pdo->prepare("UPDATE chat_sessions SET status='closed' WHERE id=?")->execute([$st['id']]);
-            if ($st['tg_thread_id'] && $chatId) {
-                tg_api($pdo, 'deleteForumTopic', [
-                    'chat_id'           => $chatId,
-                    'message_thread_id' => (int)$st['tg_thread_id'],
-                ]);
+        // Auto-close open sessions inactive > 30 minutes (kecuali yang di-keep)
+        $stale = $pdo->query(
+            "SELECT id, tg_thread_id, user_name FROM chat_sessions 
+             WHERE status='open' AND is_kept=0 AND last_message_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE)"
+        )->fetchAll();
+
+        if (!empty($stale)) {
+            $chatId = setting($pdo, 'lc_tg_chat_id', '');
+            $closeMsg = 'Sesi chat ditutup otomatis karena tidak ada aktivitas selama 30 menit.';
+            $updStmt = $pdo->prepare("UPDATE chat_sessions SET status='closed', close_reason=? WHERE id=?");
+            $msgStmt = $pdo->prepare("INSERT INTO chat_messages (session_id,sender,message) VALUES (?,'system',?)");
+
+            foreach ($stale as $st) {
+                $updStmt->execute([$closeMsg, $st['id']]);
+                $msgStmt->execute([$st['id'], $closeMsg]);
+                $closedCount++;
+
+                if ($st['tg_thread_id'] && $chatId) {
+                    tg_api($pdo, 'closeForumTopic', [
+                        'chat_id'           => $chatId,
+                        'message_thread_id' => (int)$st['tg_thread_id'],
+                    ]);
+                }
             }
         }
-    } catch (\Throwable $th) {}
+
+        // Cleanup dead queue tokens (user closed tab / no ping for > 60 seconds)
+        $pdo->exec("UPDATE chat_queue SET status='cancelled' WHERE status='waiting' AND last_ping_at < DATE_SUB(NOW(), INTERVAL 60 SECOND)");
+
+    } catch (\Throwable $th) {
+        error_log('[LiveChat] cleanup_inactive_sessions error: ' . $th->getMessage());
+    }
+    return $closedCount;
+}
+
+// ─── Helper: Create New Chat Session & Telegram Thread ─────────
+function create_chat_session_record(PDO $pdo, ?array $user, string $userName, ?string $userEmail, string $initMode): array {
+    $newKey = bin2hex(random_bytes(16));
+    $userId = $user ? (int)$user['id'] : null;
+
+    $pdo->prepare(
+        "INSERT INTO chat_sessions (session_key,user_id,user_name,user_email,mode) VALUES (?,?,?,?,?)"
+    )->execute([$newKey, $userId, $userName, $userEmail, $initMode]);
+    $sessId = (int)$pdo->lastInsertId();
+
+    // Welcome message
+    $welcome = setting($pdo, 'chat_welcome_msg', 'Halo! Ada yang bisa kami bantu?');
+    $pdo->prepare(
+        "INSERT INTO chat_messages (session_id,sender,message) VALUES (?,'system',?)"
+    )->execute([$sessId, $welcome]);
+    $welcomeMsgId = (int)$pdo->lastInsertId();
+
+    // Telegram: buat thread + inline keyboard
+    $chatId  = setting($pdo, 'lc_tg_chat_id', '');
+    $siteUrl = rtrim(setting($pdo, 'lc_site_url', ''), '/');
+    $tgThreadId = null;
+    $tgDebug    = null;
+
+    $consoleLink = $siteUrl ? "{$siteUrl}/console/livechat.php?view={$sessId}" : null;
+    
+    $inlineKbd = ['inline_keyboard' => []];
+    if ($consoleLink) {
+        $inlineKbd['inline_keyboard'][] = [['text' => "🖥️ Buka Console", 'url' => $consoleLink]];
+    }
+    if ($userId) {
+        $inlineKbd['inline_keyboard'][] = [
+            ['text' => "📜 Cek History Depo WD", 'callback_data' => "txnhist:{$userId}"],
+            ['text' => "💸 Refund All Holded WD", 'callback_data' => "refhold:{$userId}"]
+        ];
+        
+        $actualSiteUrl = $siteUrl;
+        if (!$actualSiteUrl && isset($_SERVER['HTTP_HOST'])) {
+            $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+            $actualSiteUrl = "{$scheme}://{$_SERVER['HTTP_HOST']}";
+        }
+        if ($actualSiteUrl) {
+            $inlineKbd['inline_keyboard'][] = [
+                ['text' => "✏️ Edit User & Saldo", 'callback_data' => "req_edit:{$userId}"]
+            ];
+        }
+    }
+    $inlineKbd['inline_keyboard'][] = [
+        ['text' => "📌 Keep", 'callback_data' => "keep_sess:{$sessId}"],
+        ['text' => "🔒 Tutup", 'callback_data' => "close_sess:{$sessId}"],
+        ['text' => "🗑️ Hapus Sesi", 'callback_data' => "del_thread:{$sessId}"]
+    ];
+    $inlineKbd['inline_keyboard'][] = [
+        ['text' => "🤖 Mode AI", 'callback_data' => "mode_ai:{$sessId}"],
+        ['text' => "👨‍💼 Mode Admin", 'callback_data' => "mode_admin:{$sessId}"]
+    ];
+    $inlineKbd['inline_keyboard'][] = [
+        ['text' => "🗑️ Hapus Pesan Ini", 'callback_data' => "del_msg:{$sessId}"]
+    ];
+
+    $lvl = get_free_tier_name($pdo);
+    $balance_wd = 0.0;
+    $balance_dep = 0.0;
+    if ($userId) {
+        $uStmt = $pdo->prepare("SELECT u.*, m.name as membership_name FROM users u LEFT JOIN memberships m ON m.id=u.membership_id WHERE u.id=?");
+        $uStmt->execute([$userId]);
+        $uInfo = $uStmt->fetch();
+        if ($uInfo) {
+            $lvl = $uInfo['membership_name'] ?: get_free_tier_name($pdo);
+            $balance_wd = (float)$uInfo['balance_wd'];
+            $balance_dep = (float)$uInfo['balance_dep'];
+        }
+    }
+
+    if ($chatId) {
+        $threadTitle = "{$userName} #{$sessId}";
+        $intro = "💬 Sesi Chat Baru\n" 
+               . "👤 User: {$userName}\n";
+        if ($userId) {
+            $intro .= "🏅 Level: {$lvl}\n"
+                    . "💰 Saldo Penarikan: Rp" . number_format($balance_wd, 0, ',', '.') . "\n"
+                    . "💳 Saldo Beli: Rp" . number_format($balance_dep, 0, ',', '.') . "\n";
+        } else {
+            $intro .= "🏅 Level: Guest\n";
+        }
+        $intro .= "🔑 Session: #{$sessId}\n"
+                . "🤖 Mode: " . ($initMode === 'admin' ? 'Admin' : 'AI');
+
+        $tgRes = tg_api($pdo, 'createForumTopic', [
+            'chat_id'    => $chatId,
+            'name'       => mb_substr($threadTitle, 0, 128),
+        ]);
+        $tgDebug = $tgRes;
+
+        if (!empty($tgRes['ok'])) {
+            $tgThreadId = $tgRes['result']['message_thread_id'] ?? null;
+            $pdo->prepare("UPDATE chat_sessions SET tg_thread_id=? WHERE id=?")
+                ->execute([$tgThreadId, $sessId]);
+            setting_set($pdo, 'lc_tg_forum', '1');
+            tg_api($pdo, 'sendMessage', [
+                'chat_id'           => $chatId,
+                'message_thread_id' => $tgThreadId,
+                'text'              => $intro,
+                'reply_markup'      => $inlineKbd,
+            ]);
+        } else {
+            setting_set($pdo, 'lc_tg_forum', '0');
+            $tgRes = tg_api($pdo, 'sendMessage', [
+                'chat_id'      => $chatId,
+                'text'         => $intro,
+                'reply_markup' => $inlineKbd,
+            ]);
+            $tgDebug = ['forum_failed' => $tgDebug, 'fallback' => $tgRes];
+        }
+    }
+
+    return [
+        'session_id'     => $sessId,
+        'session_key'    => $newKey,
+        'welcome_msg_id' => $welcomeMsgId,
+        'welcome'        => $welcome,
+        'tg_debug'       => $tgDebug,
+    ];
+}
+
+// ─── Helper: Check & Process Waiting Queue ─────────────────────
+function check_and_process_queue(PDO $pdo): void {
+    try {
+        $maxActive = (int)setting($pdo, 'lc_max_active_sessions', '0');
+        $openCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_sessions WHERE status='open'")->fetchColumn();
+
+        if ($maxActive > 0 && $openCount >= $maxActive) {
+            return; // Masih penuh
+        }
+
+        // Ambil 1 antrean terdepan yang masih waiting
+        $nextQueue = $pdo->query("SELECT * FROM chat_queue WHERE status='waiting' ORDER BY id ASC LIMIT 1")->fetch();
+        if (!$nextQueue) return;
+
+        $user = null;
+        if (!empty($nextQueue['user_id'])) {
+            $uStmt = $pdo->prepare("SELECT * FROM users WHERE id=?");
+            $uStmt->execute([$nextQueue['user_id']]);
+            $user = $uStmt->fetch() ?: null;
+        }
+
+        $sessData = create_chat_session_record(
+            $pdo,
+            $user,
+            $nextQueue['user_name'] ?: 'Guest',
+            $nextQueue['user_email'] ?: null,
+            $nextQueue['mode'] ?: 'ai'
+        );
+
+        $pdo->prepare("UPDATE chat_queue SET status='ready', assigned_session_key=? WHERE id=?")
+            ->execute([$sessData['session_key'], $nextQueue['id']]);
+
+    } catch (\Throwable $th) {
+        error_log('[LiveChat] check_and_process_queue error: ' . $th->getMessage());
+    }
+}
+
+// ─── Helper: Telegram /lcpanel Markup & Text Generator ─────────
+function lc_render_panel(PDO $pdo): array {
+    $isEnabled = setting($pdo, 'livechat_enabled', '1') === '1';
+    $maxActive = (int)setting($pdo, 'lc_max_active_sessions', '0');
+    $openCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_sessions WHERE status='open'")->fetchColumn();
+    $queueCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_queue WHERE status='waiting'")->fetchColumn();
+    $offlineMsg = setting($pdo, 'lc_offline_msg', 'Layanan live chat saat ini tidak tersedia. Silakan coba lagi nanti pada jam operasional.');
+
+    $statusIcon = $isEnabled ? '🟢 <b>BUKA (ONLINE)</b>' : '🔴 <b>DITUTUP (OFFLINE)</b>';
+    $limitText  = $maxActive > 0 ? "<b>{$maxActive} Sesi</b>" : "<b>Tanpa Batas (Unlimited)</b>";
+
+    $text = "🛠️ <b>PANEL KONTROL LIVECHAT</b>\n"
+          . "━━━━━━━━━━━━━━━━━━━━━━\n"
+          . "⚡ <b>Status:</b> {$statusIcon}\n"
+          . "🔢 <b>Batas Sesi Aktif:</b> {$limitText}\n"
+          . "💬 <b>Sesi Aktif Saat Ini:</b> <b>{$openCount} Sesi</b>\n"
+          . "⏳ <b>User dalam Antrean:</b> <b>{$queueCount} User</b>\n"
+          . "━━━━━━━━━━━━━━━━━━━━━━\n"
+          . "📝 <b>Pesan Offline:</b>\n"
+          . "<i>" . htmlspecialchars($offlineMsg) . "</i>\n"
+          . "━━━━━━━━━━━━━━━━━━━━━━\n"
+          . "<i>Gunakan tombol di bawah untuk mengelola livechat secara instan:</i>";
+
+    $toggleBtnText = $isEnabled ? "🔴 Tutup Livechat" : "🟢 Buka Livechat";
+
+    $keyboard = [
+        'inline_keyboard' => [
+            [
+                ['text' => $toggleBtnText, 'callback_data' => "lc_toggle_status"]
+            ],
+            [
+                ['text' => "✏️ Set Pesan Offline", 'callback_data' => "lc_ask_offline_msg"],
+                ['text' => "🔢 Set Limit Sesi", 'callback_data' => "lc_ask_limit"]
+            ],
+            [
+                ['text' => "🧹 Bersihkan Sesi (30m)", 'callback_data' => "lc_cleanup_now"],
+                ['text' => "🔄 Refresh Panel", 'callback_data' => "lc_panel_refresh"]
+            ]
+        ]
+    ];
+
+    return ['text' => $text, 'reply_markup' => $keyboard];
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -132,7 +358,7 @@ $user_check = auth_user($pdo);
 session_write_close(); // Unlock session immediately so long polling/uploads don't block other requests!
 
 if ($user_check && isset($user_check['can_chat']) && $user_check['can_chat'] == 0) {
-    if (in_array($action, ['start', 'send', 'switch_mode'])) {
+    if (in_array($action, ['start', 'send', 'switch_mode', 'check_queue'])) {
         json_err('Akses LiveChat Anda telah dibatasi oleh Administrator.');
     }
 }
@@ -141,6 +367,9 @@ switch ($action) {
 
     // ── Start / get session ─────────────────────────────────────
     case 'start':
+        cleanup_inactive_sessions($pdo);
+        check_and_process_queue($pdo);
+
         $user       = auth_user($pdo);
         $sessionKey = $_COOKIE['chat_session'] ?? '';
 
@@ -167,135 +396,70 @@ switch ($action) {
             setcookie('chat_session', '', time() - 3600, '/');
         }
 
-        // Buat sesi baru
-        $newKey    = bin2hex(random_bytes(16));
+        // Cek apakah Livechat sedang aktif
+        if (setting($pdo, 'livechat_enabled', '1') !== '1') {
+            json_err(setting($pdo, 'lc_offline_msg', 'Layanan live chat saat ini tidak tersedia. Silakan coba lagi nanti pada jam operasional.'));
+        }
+
         $userName  = $user ? $user['username'] : (trim($_POST['name'] ?? '') ?: 'Guest');
         $userEmail = $user ? $user['email'] : (trim($_POST['email'] ?? '') ?: null);
         $userId    = $user ? (int)$user['id'] : null;
         $initMode  = in_array($_POST['mode'] ?? '', ['ai','admin'], true) ? $_POST['mode'] : 'ai';
 
-        $pdo->prepare(
-            "INSERT INTO chat_sessions (session_key,user_id,user_name,user_email,mode) VALUES (?,?,?,?,?)"
-        )->execute([$newKey, $userId, $userName, $userEmail, $initMode]);
-        $sessId = (int)$pdo->lastInsertId();
+        // ── Cek Kuota Batas Sesi Aktif ──
+        $maxActive  = (int)setting($pdo, 'lc_max_active_sessions', '0');
+        $openCount  = (int)$pdo->query("SELECT COUNT(*) FROM chat_sessions WHERE status='open'")->fetchColumn();
 
-        // Welcome message
-        $welcome = setting($pdo, 'chat_welcome_msg', 'Halo! Ada yang bisa kami bantu?');
-        $pdo->prepare(
-            "INSERT INTO chat_messages (session_id,sender,message) VALUES (?,'system',?)"
-        )->execute([$sessId, $welcome]);
-        $welcomeMsgId = (int)$pdo->lastInsertId();
+        if ($maxActive > 0 && $openCount >= $maxActive) {
+            // Sesi penuh -> Masukkan user ke antrean (Queue)
+            $qToken = trim($_POST['queue_token'] ?? $_COOKIE['chat_queue_token'] ?? '');
+            $queueRow = null;
+
+            if ($qToken) {
+                $qStmt = $pdo->prepare("SELECT * FROM chat_queue WHERE queue_token=? AND status='waiting'");
+                $qStmt->execute([$qToken]);
+                $queueRow = $qStmt->fetch();
+            }
+
+            if (!$queueRow) {
+                $qToken = bin2hex(random_bytes(16));
+                $pdo->prepare(
+                    "INSERT INTO chat_queue (queue_token, user_id, user_name, user_email, mode, status, last_ping_at) 
+                     VALUES (?, ?, ?, ?, ?, 'waiting', NOW())"
+                )->execute([$qToken, $userId, $userName, $userEmail, $initMode]);
+                $qId = (int)$pdo->lastInsertId();
+            } else {
+                $qId = (int)$queueRow['id'];
+                $pdo->prepare("UPDATE chat_queue SET last_ping_at=NOW() WHERE id=?")->execute([$qId]);
+            }
+
+            setcookie('chat_queue_token', $qToken, time() + 86400, '/', '', false, true);
+
+            // Hitung posisi antrean
+            $posStmt = $pdo->prepare("SELECT COUNT(*) FROM chat_queue WHERE status='waiting' AND id <= ?");
+            $posStmt->execute([$qId]);
+            $position = (int)$posStmt->fetchColumn();
+
+            $totalQueue = (int)$pdo->query("SELECT COUNT(*) FROM chat_queue WHERE status='waiting'")->fetchColumn();
+
+            json_ok([
+                'queued'       => true,
+                'queue_token'  => $qToken,
+                'position'     => $position,
+                'total_queue'  => $totalQueue,
+                'max_active'   => $maxActive,
+                'active_count' => $openCount,
+            ]);
+        }
+
+        // Slot tersedia -> Langsung buat sesi baru
+        $sessData = create_chat_session_record($pdo, $user, $userName, $userEmail, $initMode);
+        $newKey   = $sessData['session_key'];
+        $welcome  = $sessData['welcome'];
+        $welcomeMsgId = $sessData['welcome_msg_id'];
 
         setcookie('chat_session', $newKey, time() + 86400 * 7, '/', '', false, true);
-
-        // ── Telegram: buat thread + inline keyboard ──
-        $chatId  = setting($pdo, 'lc_tg_chat_id', '');
-        $isForum = setting($pdo, 'lc_tg_forum', '1') === '1';
-        $siteUrl = rtrim(setting($pdo, 'lc_site_url', ''), '/');
-        $tgThreadId = null;
-        $tgDebug    = null;
-
-        // Inline keyboard untuk admin
-        $consoleLink = $siteUrl ? "{$siteUrl}/console/livechat.php?view={$sessId}" : null;
-        
-        $inlineKbd = ['inline_keyboard' => []];
-        if ($consoleLink) {
-            $inlineKbd['inline_keyboard'][] = [['text' => "🖥️ Buka Console", 'url' => $consoleLink]];
-        }
-        if ($userId) {
-            // First row of user-specific actions: History and Refund
-            $inlineKbd['inline_keyboard'][] = [
-                ['text' => "📜 Cek History Depo WD", 'callback_data' => "txnhist:{$userId}"],
-                ['text' => "💸 Refund All Holded WD", 'callback_data' => "refhold:{$userId}"]
-            ];
-            
-            // Fallback siteUrl if empty
-            $actualSiteUrl = $siteUrl;
-            if (!$actualSiteUrl && isset($_SERVER['HTTP_HOST'])) {
-                $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
-                $actualSiteUrl = "{$scheme}://{$_SERVER['HTTP_HOST']}";
-            }
-            
-            if ($actualSiteUrl) {
-                // We use callback_data because web_app is strictly forbidden in group chats by Telegram API.
-                // We will catch this callback and send the admin a Private Message (PM) containing the web_app button.
-                $inlineKbd['inline_keyboard'][] = [
-                    ['text' => "✏️ Edit User & Saldo", 'callback_data' => "req_edit:{$userId}"]
-                ];
-            }
-        }
-        $inlineKbd['inline_keyboard'][] = [
-            ['text' => "📌 Keep", 'callback_data' => "keep_sess:{$sessId}"],
-            ['text' => "🔒 Tutup", 'callback_data' => "close_sess:{$sessId}"],
-            ['text' => "🗑️ Hapus Sesi", 'callback_data' => "del_thread:{$sessId}"]
-        ];
-        $inlineKbd['inline_keyboard'][] = [
-            ['text' => "🤖 Mode AI", 'callback_data' => "mode_ai:{$sessId}"],
-            ['text' => "👨‍💼 Mode Admin", 'callback_data' => "mode_admin:{$sessId}"]
-        ];
-        $inlineKbd['inline_keyboard'][] = [
-            ['text' => "🗑️ Hapus Pesan Ini", 'callback_data' => "del_msg:{$sessId}"]
-        ];
-
-        $lvl = get_free_tier_name($pdo);
-        $balance_wd = 0.0;
-        $balance_dep = 0.0;
-        if ($userId) {
-            $uStmt = $pdo->prepare("SELECT u.*, m.name as membership_name FROM users u LEFT JOIN memberships m ON m.id=u.membership_id WHERE u.id=?");
-            $uStmt->execute([$userId]);
-            $uInfo = $uStmt->fetch();
-            if ($uInfo) {
-                $lvl = $uInfo['membership_name'] ?: get_free_tier_name($pdo);
-                $balance_wd = (float)$uInfo['balance_wd'];
-                $balance_dep = (float)$uInfo['balance_dep'];
-            }
-        }
-
-        if ($chatId) {
-            $threadTitle = "{$userName} #{$sessId}";
-            $intro = "💬 Sesi Chat Baru\n" 
-                   . "👤 User: {$userName}\n";
-            if ($userId) {
-                $intro .= "🏅 Level: {$lvl}\n"
-                        . "💰 Saldo Penarikan: Rp" . number_format($balance_wd, 0, ',', '.') . "\n"
-                        . "💳 Saldo Beli: Rp" . number_format($balance_dep, 0, ',', '.') . "\n";
-            } else {
-                $intro .= "🏅 Level: Guest\n";
-            }
-            $intro .= "🔑 Session: #{$sessId}\n"
-                    . "🤖 Mode: " . ($initMode === 'admin' ? 'Admin' : 'AI');
-
-            // Always try to create Forum Topic first
-            $tgRes = tg_api($pdo, 'createForumTopic', [
-                'chat_id'    => $chatId,
-                'name'       => mb_substr($threadTitle, 0, 128),
-            ]);
-            $tgDebug = $tgRes;
-
-            if (!empty($tgRes['ok'])) {
-                // Forum topic berhasil dibuat
-                $tgThreadId = $tgRes['result']['message_thread_id'] ?? null;
-                $pdo->prepare("UPDATE chat_sessions SET tg_thread_id=? WHERE id=?")
-                    ->execute([$tgThreadId, $sessId]);
-                // Update forum setting in DB
-                setting_set($pdo, 'lc_tg_forum', '1');
-                $tgSend = tg_api($pdo, 'sendMessage', [
-                    'chat_id'           => $chatId,
-                    'message_thread_id' => $tgThreadId,
-                    'text'              => $intro,
-                    'reply_markup'      => $inlineKbd,
-                ]);
-            } else {
-                // Bukan forum / gagal — kirim ke chat biasa
-                setting_set($pdo, 'lc_tg_forum', '0');
-                $tgRes = tg_api($pdo, 'sendMessage', [
-                    'chat_id'      => $chatId,
-                    'text'         => $intro,
-                    'reply_markup' => $inlineKbd,
-                ]);
-                $tgDebug = ['forum_failed' => $tgDebug, 'fallback' => $tgRes];
-            }
-        }
+        setcookie('chat_queue_token', '', time() - 3600, '/');
 
         json_ok([
             'session_key' => $newKey,
@@ -306,8 +470,82 @@ switch ($action) {
             ],
             'last_msg_id' => $welcomeMsgId,
             'welcome'     => $welcome,
-            'tg_debug'    => $tgDebug,
+            'tg_debug'    => $sessData['tg_debug'],
         ]);
+
+
+    // ── Check Queue Status ──────────────────────────────────────
+    case 'check_queue':
+        cleanup_inactive_sessions($pdo);
+        check_and_process_queue($pdo);
+
+        $qToken = trim($_GET['queue_token'] ?? $_POST['queue_token'] ?? $_COOKIE['chat_queue_token'] ?? '');
+        if (!$qToken) json_err('Token antrean tidak ditemukan.');
+
+        $qStmt = $pdo->prepare("SELECT * FROM chat_queue WHERE queue_token=?");
+        $qStmt->execute([$qToken]);
+        $qRow = $qStmt->fetch();
+
+        if (!$qRow) {
+            json_ok(['status' => 'cancelled']);
+        }
+
+        if ($qRow['status'] === 'ready' && $qRow['assigned_session_key']) {
+            $sess = get_chat_session($pdo, $qRow['assigned_session_key']);
+            if ($sess && $sess['status'] === 'open') {
+                $msgs = $pdo->prepare(
+                    "SELECT id,sender,message,attachment,created_at FROM chat_messages
+                     WHERE session_id=? ORDER BY id ASC LIMIT 100"
+                );
+                $msgs->execute([$sess['id']]);
+                $rows = $msgs->fetchAll();
+
+                setcookie('chat_session', $sess['session_key'], time() + 86400 * 7, '/', '', false, true);
+                setcookie('chat_queue_token', '', time() - 3600, '/');
+
+                json_ok([
+                    'status'      => 'ready',
+                    'session_key' => $sess['session_key'],
+                    'mode'        => $sess['mode'],
+                    'messages'    => $rows,
+                    'last_msg_id' => !empty($rows) ? (int)end($rows)['id'] : 0,
+                    'welcome'     => setting($pdo, 'chat_welcome_msg', 'Halo! Ada yang bisa dibantu?'),
+                ]);
+            }
+        }
+
+        if ($qRow['status'] === 'waiting') {
+            // Update last_ping_at agar tidak dianggap dead queue
+            $pdo->prepare("UPDATE chat_queue SET last_ping_at=NOW() WHERE id=?")->execute([$qRow['id']]);
+
+            $posStmt = $pdo->prepare("SELECT COUNT(*) FROM chat_queue WHERE status='waiting' AND id <= ?");
+            $posStmt->execute([$qRow['id']]);
+            $position = (int)$posStmt->fetchColumn();
+
+            $totalQueue  = (int)$pdo->query("SELECT COUNT(*) FROM chat_queue WHERE status='waiting'")->fetchColumn();
+            $maxActive   = (int)setting($pdo, 'lc_max_active_sessions', '0');
+            $activeCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_sessions WHERE status='open'")->fetchColumn();
+
+            json_ok([
+                'status'       => 'waiting',
+                'position'     => $position,
+                'total_queue'  => $totalQueue,
+                'max_active'   => $maxActive,
+                'active_count' => $activeCount,
+            ]);
+        }
+
+        json_ok(['status' => $qRow['status']]);
+
+
+    // ── Cancel Queue ────────────────────────────────────────────
+    case 'cancel_queue':
+        $qToken = trim($_POST['queue_token'] ?? $_COOKIE['chat_queue_token'] ?? '');
+        if ($qToken) {
+            $pdo->prepare("UPDATE chat_queue SET status='cancelled' WHERE queue_token=?")->execute([$qToken]);
+            setcookie('chat_queue_token', '', time() - 3600, '/');
+        }
+        json_ok(['cancelled' => true]);
 
 
     // ── Send message ────────────────────────────────────────────
@@ -787,6 +1025,106 @@ switch ($action) {
                 echo '{}'; exit;
             }
 
+            // ── LC Panel Callbacks ───────────────────────────────────────
+            if ($cbAction === 'lc_toggle_status') {
+                $curr = setting($pdo, 'livechat_enabled', '1') === '1';
+                $newVal = $curr ? '0' : '1';
+                setting_set($pdo, 'livechat_enabled', $newVal);
+                
+                $alertText = $newVal === '1' ? '🟢 Livechat berhasil DIBUKA!' : '🔴 Livechat berhasil DITUTUP!';
+                tg_api($pdo, 'answerCallbackQuery', [
+                    'callback_query_id' => $cbId,
+                    'text'              => $alertText,
+                    'show_alert'        => true,
+                ]);
+
+                $panel = lc_render_panel($pdo);
+                tg_api($pdo, 'editMessageText', [
+                    'chat_id'      => $cb['message']['chat']['id'],
+                    'message_id'   => $cb['message']['message_id'],
+                    'text'         => $panel['text'],
+                    'parse_mode'   => 'HTML',
+                    'reply_markup' => $panel['reply_markup'],
+                ]);
+                echo '{}'; exit;
+            }
+
+            if ($cbAction === 'lc_ask_offline_msg') {
+                $fromId = $cb['from']['id'] ?? '';
+                if ($fromId) {
+                    setting_set($pdo, 'tg_state_lc_' . $fromId, 'awaiting_offline_msg|' . ($cb['message']['message_id'] ?? 0));
+                }
+                tg_api($pdo, 'answerCallbackQuery', [
+                    'callback_query_id' => $cbId,
+                    'text'              => 'Silakan ketik pesan offline baru di chat...',
+                    'show_alert'        => false,
+                ]);
+                tg_api($pdo, 'sendMessage', [
+                    'chat_id'           => $cb['message']['chat']['id'],
+                    'message_thread_id' => $cb['message']['message_thread_id'] ?? null,
+                    'text'              => "📝 <b>Ketik Pesan Offline Baru</b>\n\nSilakan ketik isi pesan penutupan yang akan dilihat user saat Livechat dinonaktifkan, lalu kirimkan.\n\nKetik <code>/cancel</code> untuk membatalkan.",
+                    'parse_mode'        => 'HTML',
+                ]);
+                echo '{}'; exit;
+            }
+
+            if ($cbAction === 'lc_ask_limit') {
+                $fromId = $cb['from']['id'] ?? '';
+                if ($fromId) {
+                    setting_set($pdo, 'tg_state_lc_' . $fromId, 'awaiting_limit|' . ($cb['message']['message_id'] ?? 0));
+                }
+                tg_api($pdo, 'answerCallbackQuery', [
+                    'callback_query_id' => $cbId,
+                    'text'              => 'Silakan ketik angka batas sesi di chat...',
+                    'show_alert'        => false,
+                ]);
+                tg_api($pdo, 'sendMessage', [
+                    'chat_id'           => $cb['message']['chat']['id'],
+                    'message_thread_id' => $cb['message']['message_thread_id'] ?? null,
+                    'text'              => "🔢 <b>Set Batas Maksimum Sesi Chat Aktif</b>\n\nKetik jumlah maksimum sesi chat yang dapat aktif bersamaan (contoh: <code>5</code>, atau <code>0</code> untuk tanpa batas / unlimited), lalu kirimkan.\n\nKetik <code>/cancel</code> untuk membatalkan.",
+                    'parse_mode'        => 'HTML',
+                ]);
+                echo '{}'; exit;
+            }
+
+            if ($cbAction === 'lc_cleanup_now') {
+                $closed = cleanup_inactive_sessions($pdo);
+                check_and_process_queue($pdo);
+                tg_api($pdo, 'answerCallbackQuery', [
+                    'callback_query_id' => $cbId,
+                    'text'              => "🧹 Selesai! {$closed} sesi inactive ditutup.",
+                    'show_alert'        => true,
+                ]);
+                $panel = lc_render_panel($pdo);
+                tg_api($pdo, 'editMessageText', [
+                    'chat_id'      => $cb['message']['chat']['id'],
+                    'message_id'   => $cb['message']['message_id'],
+                    'text'         => $panel['text'],
+                    'parse_mode'   => 'HTML',
+                    'reply_markup' => $panel['reply_markup'],
+                ]);
+                echo '{}'; exit;
+            }
+
+            if ($cbAction === 'lc_panel_refresh') {
+                cleanup_inactive_sessions($pdo);
+                check_and_process_queue($pdo);
+                tg_api($pdo, 'answerCallbackQuery', [
+                    'callback_query_id' => $cbId,
+                    'text'              => '🔄 Panel berhasil diperbarui!',
+                    'show_alert'        => false,
+                ]);
+                $panel = lc_render_panel($pdo);
+                tg_api($pdo, 'editMessageText', [
+                    'chat_id'      => $cb['message']['chat']['id'],
+                    'message_id'   => $cb['message']['message_id'],
+                    'text'         => $panel['text'],
+                    'parse_mode'   => 'HTML',
+                    'reply_markup' => $panel['reply_markup'],
+                ]);
+                echo '{}'; exit;
+            }
+
             if ($cbSessId) {
                 $csStmt = $pdo->prepare("SELECT * FROM chat_sessions WHERE id=?");
                 $csStmt->execute([$cbSessId]);
@@ -805,6 +1143,7 @@ switch ($action) {
                                 ]);
                             }
                             $ackText = 'Sesi ditutup!';
+                            check_and_process_queue($pdo);
                         } else {
                             $ackText = 'Sesi sudah ditutup.';
                         }
@@ -843,6 +1182,7 @@ switch ($action) {
                             ]);
                         }
                         $ackText = 'Sesi dihapus!';
+                        check_and_process_queue($pdo);
                     } elseif ($cbAction === 'del_msg') {
                         tg_api($pdo, 'deleteMessage', [
                             'chat_id'    => $cb['message']['chat']['id'],
@@ -868,9 +1208,96 @@ switch ($action) {
         $threadId = $msg['message_thread_id'] ?? null;
         $text     = $msg['text'] ?? $msg['caption'] ?? '';
         $fromUser = $msg['from'] ?? [];
+        $fromId   = $fromUser['id'] ?? null;
 
         if (!empty($fromUser['is_bot'])) { echo '{}'; exit; }
         
+        // ── Command /lcpanel (Manage Livechat Panel via Telegram) ──
+        if (preg_match('/^[!\/]lcpanel(\s+.*)?$/i', trim($text))) {
+            cleanup_inactive_sessions($pdo);
+            check_and_process_queue($pdo);
+            $panel = lc_render_panel($pdo);
+            $tgParams = [
+                'chat_id'      => $msg['chat']['id'],
+                'text'         => $panel['text'],
+                'parse_mode'   => 'HTML',
+                'reply_markup' => $panel['reply_markup'],
+            ];
+            if ($threadId) {
+                $tgParams['message_thread_id'] = (int)$threadId;
+            }
+            tg_api($pdo, 'sendMessage', $tgParams);
+            echo '{}'; exit;
+        }
+
+        // ── Check Admin States for Livechat settings ──
+        if ($fromId) {
+            $lcState = setting($pdo, 'tg_state_lc_' . $fromId, '');
+            if ($lcState) {
+                [$stateType, $stateOrigMsgId] = array_pad(explode('|', $lcState, 2), 2, '');
+
+                if (in_array(strtolower(trim($text)), ['/cancel', '!cancel', 'cancel', 'batal'])) {
+                    $pdo->prepare("DELETE FROM settings WHERE `key`=?")->execute(['tg_state_lc_' . $fromId]);
+                    tg_api($pdo, 'sendMessage', [
+                        'chat_id'           => $msg['chat']['id'],
+                        'message_thread_id' => $threadId,
+                        'text'              => "❌ <b>Pengaturan dibatalkan.</b>",
+                        'parse_mode'        => 'HTML',
+                    ]);
+                    echo '{}'; exit;
+                }
+
+                if ($stateType === 'awaiting_offline_msg') {
+                    $newMsg = trim($text);
+                    setting_set($pdo, 'lc_offline_msg', $newMsg);
+                    $pdo->prepare("DELETE FROM settings WHERE `key`=?")->execute(['tg_state_lc_' . $fromId]);
+
+                    tg_api($pdo, 'sendMessage', [
+                        'chat_id'           => $msg['chat']['id'],
+                        'message_thread_id' => $threadId,
+                        'text'              => "✅ <b>Pesan offline berhasil diperbarui!</b>\n\n📝 Pesan Baru:\n<i>" . htmlspecialchars($newMsg) . "</i>",
+                        'parse_mode'        => 'HTML',
+                    ]);
+
+                    $panel = lc_render_panel($pdo);
+                    tg_api($pdo, 'sendMessage', [
+                        'chat_id'           => $msg['chat']['id'],
+                        'message_thread_id' => $threadId,
+                        'text'              => $panel['text'],
+                        'parse_mode'        => 'HTML',
+                        'reply_markup'      => $panel['reply_markup'],
+                    ]);
+                    echo '{}'; exit;
+                }
+
+                if ($stateType === 'awaiting_limit') {
+                    $newLimit = max(0, (int)trim($text));
+                    setting_set($pdo, 'lc_max_active_sessions', (string)$newLimit);
+                    $pdo->prepare("DELETE FROM settings WHERE `key`=?")->execute(['tg_state_lc_' . $fromId]);
+
+                    $limitDesc = $newLimit > 0 ? "<b>{$newLimit} Sesi Aktif</b>" : "<b>Tanpa Batas (Unlimited)</b>";
+                    tg_api($pdo, 'sendMessage', [
+                        'chat_id'           => $msg['chat']['id'],
+                        'message_thread_id' => $threadId,
+                        'text'              => "✅ <b>Batas sesi aktif berhasil diubah menjadi: {$limitDesc}</b>",
+                        'parse_mode'        => 'HTML',
+                    ]);
+
+                    check_and_process_queue($pdo);
+
+                    $panel = lc_render_panel($pdo);
+                    tg_api($pdo, 'sendMessage', [
+                        'chat_id'           => $msg['chat']['id'],
+                        'message_thread_id' => $threadId,
+                        'text'              => $panel['text'],
+                        'parse_mode'        => 'HTML',
+                        'reply_markup'      => $panel['reply_markup'],
+                    ]);
+                    echo '{}'; exit;
+                }
+            }
+        }
+
         // Intercept /panel command in private chat for Mini App (Admin only)
         if (($msg['chat']['type'] ?? '') === 'private' && strpos(trim($text), '/panel') === 0) {
             $siteUrl = rtrim(setting($pdo, 'lc_site_url', ''), '/');
