@@ -336,12 +336,129 @@ function lc_render_panel(PDO $pdo): array {
                 ['text' => $toggleBtnText, 'callback_data' => "lc_toggle_status"]
             ],
             [
+                ['text' => "👥 Cek Sesi Aktif ({$openCount})", 'callback_data' => "lc_view_active"],
+                ['text' => "⏳ Cek Antrean ({$queueCount})", 'callback_data' => "lc_view_queue"]
+            ],
+            [
                 ['text' => "✏️ Set Pesan Offline", 'callback_data' => "lc_ask_offline_msg"],
                 ['text' => "🔢 Set Limit Sesi", 'callback_data' => "lc_ask_limit"]
             ],
             [
                 ['text' => "🧹 Bersihkan Sesi (30m)", 'callback_data' => "lc_cleanup_now"],
                 ['text' => "🔄 Refresh Panel", 'callback_data' => "lc_panel_refresh"]
+            ]
+        ]
+    ];
+
+    return ['text' => $text, 'reply_markup' => $keyboard];
+}
+
+// ─── Helper: Render Active Sessions View ───────────────────────
+function lc_render_active_sessions(PDO $pdo): array {
+    $maxActive = (int)setting($pdo, 'lc_max_active_sessions', '0');
+    $limitText = $maxActive > 0 ? "{$maxActive} Sesi" : "Unlimited";
+    
+    $sessions = $pdo->query(
+        "SELECT s.*, 
+            (SELECT COUNT(*) FROM chat_messages m WHERE m.session_id=s.id) as msg_count,
+            (SELECT message FROM chat_messages m WHERE m.session_id=s.id ORDER BY m.id DESC LIMIT 1) as last_msg
+         FROM chat_sessions s 
+         WHERE s.status='open' 
+         ORDER BY s.last_message_at DESC 
+         LIMIT 10"
+    )->fetchAll();
+
+    $count = count($sessions);
+
+    $text = "👥 <b>DAFTAR SESI CHAT AKTIF (ONLINE)</b>\n"
+          . "━━━━━━━━━━━━━━━━━━━━━━\n"
+          . "📊 <b>Total Sesi Aktif:</b> <b>{$count} / {$limitText}</b>\n"
+          . "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+
+    if (empty($sessions)) {
+        $text .= "<i>(Belum ada sesi chat yang aktif saat ini)</i>\n\n";
+    } else {
+        $i = 1;
+        foreach ($sessions as $s) {
+            $modeIcon = $s['mode'] === 'admin' ? '👨‍💼 Admin' : '🤖 AI';
+            $keepIcon = !empty($s['is_kept']) ? ' 📌[Keep]' : '';
+            $timeAgo = date('H:i', strtotime($s['last_message_at']));
+            $lastSnippet = !empty($s['last_msg']) ? mb_substr(strip_tags($s['last_msg']), 0, 35) : '(belum ada pesan)';
+
+            $text .= "<b>{$i}. {$s['user_name']}</b> (#{$s['id']}){$keepIcon}\n"
+                   . "   └ Mode: {$modeIcon} · 💬 {$s['msg_count']} pesan\n"
+                   . "   └ Terakhir: <code>{$timeAgo} WIB</code>\n"
+                   . "   └ <i>\"" . htmlspecialchars($lastSnippet) . "\"</i>\n\n";
+            $i++;
+        }
+    }
+
+    $text .= "━━━━━━━━━━━━━━━━━━━━━━\n"
+           . "<i>Klik tombol di bawah untuk refresh atau kembali:</i>";
+
+    $keyboard = [
+        'inline_keyboard' => [
+            [
+                ['text' => "🔄 Refresh Sesi Aktif", 'callback_data' => "lc_view_active"]
+            ],
+            [
+                ['text' => "⏳ Lihat Antrean", 'callback_data' => "lc_view_queue"],
+                ['text' => "🔙 Kembali ke Menu", 'callback_data' => "lc_panel_refresh"]
+            ]
+        ]
+    ];
+
+    return ['text' => $text, 'reply_markup' => $keyboard];
+}
+
+// ─── Helper: Render Waiting Queue View ─────────────────────────
+function lc_render_queue(PDO $pdo): array {
+    $queues = $pdo->query(
+        "SELECT q.*, u.username as registered_username 
+         FROM chat_queue q 
+         LEFT JOIN users u ON u.id=q.user_id 
+         WHERE q.status='waiting' 
+         ORDER BY q.id ASC 
+         LIMIT 10"
+    )->fetchAll();
+
+    $count = count($queues);
+
+    $text = "⏳ <b>DAFTAR ANTREAN LIVECHAT</b>\n"
+          . "━━━━━━━━━━━━━━━━━━━━━━\n"
+          . "📊 <b>Total User Menunggu:</b> <b>{$count} User</b>\n"
+          . "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+
+    if (empty($queues)) {
+        $text .= "<i>(Tidak ada pengguna yang sedang mengantre saat ini)</i>\n\n";
+    } else {
+        $i = 1;
+        $now = time();
+        foreach ($queues as $q) {
+            $uName = $q['registered_username'] ?: $q['user_name'] ?: 'Guest';
+            $modeIcon = $q['mode'] === 'admin' ? '👨‍💼 Admin' : '🤖 AI';
+            $joinTime = date('H:i:s', strtotime($q['created_at']));
+            $pingDiff = max(0, $now - strtotime($q['last_ping_at']));
+
+            $text .= "<b>#{$i}. 👤 {$uName}</b>\n"
+                   . "   └ Mode: {$modeIcon}\n"
+                   . "   └ Masuk Antre: <code>{$joinTime} WIB</code>\n"
+                   . "   └ Ping Terakhir: {$pingDiff}s lalu\n\n";
+            $i++;
+        }
+    }
+
+    $text .= "━━━━━━━━━━━━━━━━━━━━━━\n"
+           . "<i>Antrean akan otomatis diproses saat slot sesi tersedia.</i>";
+
+    $keyboard = [
+        'inline_keyboard' => [
+            [
+                ['text' => "🔄 Refresh Antrean", 'callback_data' => "lc_view_queue"]
+            ],
+            [
+                ['text' => "👥 Lihat Sesi Aktif", 'callback_data' => "lc_view_active"],
+                ['text' => "🔙 Kembali ke Menu", 'callback_data' => "lc_panel_refresh"]
             ]
         ]
     ];
@@ -1096,6 +1213,44 @@ switch ($action) {
                     'show_alert'        => true,
                 ]);
                 $panel = lc_render_panel($pdo);
+                tg_api($pdo, 'editMessageText', [
+                    'chat_id'      => $cb['message']['chat']['id'],
+                    'message_id'   => $cb['message']['message_id'],
+                    'text'         => $panel['text'],
+                    'parse_mode'   => 'HTML',
+                    'reply_markup' => $panel['reply_markup'],
+                ]);
+                echo '{}'; exit;
+            }
+
+            if ($cbAction === 'lc_view_active') {
+                cleanup_inactive_sessions($pdo);
+                check_and_process_queue($pdo);
+                tg_api($pdo, 'answerCallbackQuery', [
+                    'callback_query_id' => $cbId,
+                    'text'              => 'Memuat daftar sesi aktif...',
+                    'show_alert'        => false,
+                ]);
+                $panel = lc_render_active_sessions($pdo);
+                tg_api($pdo, 'editMessageText', [
+                    'chat_id'      => $cb['message']['chat']['id'],
+                    'message_id'   => $cb['message']['message_id'],
+                    'text'         => $panel['text'],
+                    'parse_mode'   => 'HTML',
+                    'reply_markup' => $panel['reply_markup'],
+                ]);
+                echo '{}'; exit;
+            }
+
+            if ($cbAction === 'lc_view_queue') {
+                cleanup_inactive_sessions($pdo);
+                check_and_process_queue($pdo);
+                tg_api($pdo, 'answerCallbackQuery', [
+                    'callback_query_id' => $cbId,
+                    'text'              => 'Memuat daftar antrean...',
+                    'show_alert'        => false,
+                ]);
+                $panel = lc_render_queue($pdo);
                 tg_api($pdo, 'editMessageText', [
                     'chat_id'      => $cb['message']['chat']['id'],
                     'message_id'   => $cb['message']['message_id'],
