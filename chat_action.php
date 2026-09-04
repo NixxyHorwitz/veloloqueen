@@ -105,32 +105,38 @@ function tg_escape(string $text): string {
     );
 }
 
-// ─── Helper: Cleanup Inactive Sessions (30 Min Timeout) ───────
+// ─── Helper: Cleanup Inactive Sessions (Configurable Timeout) ───────
 function cleanup_inactive_sessions(PDO $pdo): int {
     $closedCount = 0;
     try {
-        // Auto-close open sessions inactive > 30 minutes (kecuali yang di-keep)
-        $stale = $pdo->query(
-            "SELECT id, tg_thread_id, user_name FROM chat_sessions 
-             WHERE status='open' AND is_kept=0 AND last_message_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE)"
-        )->fetchAll();
+        $maxIdle = (int)setting($pdo, 'lc_max_idle_minutes', '30');
+        
+        // Auto-close open sessions inactive > $maxIdle minutes (kecuali yang di-keep) jika maxIdle > 0
+        if ($maxIdle > 0) {
+            $staleStmt = $pdo->prepare(
+                "SELECT id, tg_thread_id, user_name FROM chat_sessions 
+                 WHERE status='open' AND is_kept=0 AND COALESCE(last_message_at, created_at) < DATE_SUB(NOW(), INTERVAL ? MINUTE)"
+            );
+            $staleStmt->execute([$maxIdle]);
+            $stale = $staleStmt->fetchAll();
 
-        if (!empty($stale)) {
-            $chatId = setting($pdo, 'lc_tg_chat_id', '');
-            $closeMsg = 'Sesi chat ditutup otomatis karena tidak ada aktivitas selama 30 menit.';
-            $updStmt = $pdo->prepare("UPDATE chat_sessions SET status='closed', close_reason=? WHERE id=?");
-            $msgStmt = $pdo->prepare("INSERT INTO chat_messages (session_id,sender,message) VALUES (?,'system',?)");
+            if (!empty($stale)) {
+                $chatId = setting($pdo, 'lc_tg_chat_id', '');
+                $closeMsg = "Sesi chat ditutup otomatis karena tidak ada aktivitas selama {$maxIdle} menit.";
+                $updStmt = $pdo->prepare("UPDATE chat_sessions SET status='closed', close_reason=? WHERE id=?");
+                $msgStmt = $pdo->prepare("INSERT INTO chat_messages (session_id,sender,message) VALUES (?,'system',?)");
 
-            foreach ($stale as $st) {
-                $updStmt->execute([$closeMsg, $st['id']]);
-                $msgStmt->execute([$st['id'], $closeMsg]);
-                $closedCount++;
+                foreach ($stale as $st) {
+                    $updStmt->execute([$closeMsg, $st['id']]);
+                    $msgStmt->execute([$st['id'], $closeMsg]);
+                    $closedCount++;
 
-                if ($st['tg_thread_id'] && $chatId) {
-                    tg_api($pdo, 'closeForumTopic', [
-                        'chat_id'           => $chatId,
-                        'message_thread_id' => (int)$st['tg_thread_id'],
-                    ]);
+                    if ($st['tg_thread_id'] && $chatId) {
+                        tg_api($pdo, 'closeForumTopic', [
+                            'chat_id'           => $chatId,
+                            'message_thread_id' => (int)$st['tg_thread_id'],
+                        ]);
+                    }
                 }
             }
         }
@@ -309,17 +315,20 @@ function check_and_process_queue(PDO $pdo): void {
 function lc_render_panel(PDO $pdo): array {
     $isEnabled = setting($pdo, 'livechat_enabled', '1') === '1';
     $maxActive = (int)setting($pdo, 'lc_max_active_sessions', '0');
+    $maxIdle   = (int)setting($pdo, 'lc_max_idle_minutes', '30');
     $openCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_sessions WHERE status='open'")->fetchColumn();
     $queueCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_queue WHERE status='waiting'")->fetchColumn();
     $offlineMsg = setting($pdo, 'lc_offline_msg', 'Layanan live chat saat ini tidak tersedia. Silakan coba lagi nanti pada jam operasional.');
 
     $statusIcon = $isEnabled ? '🟢 <b>BUKA (ONLINE)</b>' : '🔴 <b>DITUTUP (OFFLINE)</b>';
     $limitText  = $maxActive > 0 ? "<b>{$maxActive} Sesi</b>" : "<b>Tanpa Batas (Unlimited)</b>";
+    $idleText   = $maxIdle > 0 ? "<b>{$maxIdle} Menit</b>" : "<b>Nonaktif (Tanpa Auto-Close)</b>";
 
     $text = "🛠️ <b>PANEL KONTROL LIVECHAT</b>\n"
           . "━━━━━━━━━━━━━━━━━━━━━━\n"
           . "⚡ <b>Status:</b> {$statusIcon}\n"
           . "🔢 <b>Batas Sesi Aktif:</b> {$limitText}\n"
+          . "⏱️ <b>Batas Idle Timeout:</b> {$idleText}\n"
           . "💬 <b>Sesi Aktif Saat Ini:</b> <b>{$openCount} Sesi</b>\n"
           . "⏳ <b>User dalam Antrean:</b> <b>{$queueCount} User</b>\n"
           . "━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -340,11 +349,14 @@ function lc_render_panel(PDO $pdo): array {
                 ['text' => "⏳ Cek Antrean ({$queueCount})", 'callback_data' => "lc_view_queue"]
             ],
             [
-                ['text' => "✏️ Set Pesan Offline", 'callback_data' => "lc_ask_offline_msg"],
-                ['text' => "🔢 Set Limit Sesi", 'callback_data' => "lc_ask_limit"]
+                ['text' => "🔢 Set Limit Sesi", 'callback_data' => "lc_ask_limit"],
+                ['text' => "⏱️ Set Idle Timeout", 'callback_data' => "lc_ask_idle"]
             ],
             [
-                ['text' => "🧹 Bersihkan Sesi (30m)", 'callback_data' => "lc_cleanup_now"],
+                ['text' => "✏️ Set Pesan Offline", 'callback_data' => "lc_ask_offline_msg"],
+                ['text' => "🧹 Bersihkan Sesi Inactive", 'callback_data' => "lc_cleanup_now"]
+            ],
+            [
                 ['text' => "🔄 Refresh Panel", 'callback_data' => "lc_panel_refresh"]
             ]
         ]
@@ -1204,6 +1216,25 @@ switch ($action) {
                 echo '{}'; exit;
             }
 
+            if ($cbAction === 'lc_ask_idle') {
+                $fromId = $cb['from']['id'] ?? '';
+                if ($fromId) {
+                    setting_set($pdo, 'tg_state_lc_' . $fromId, 'awaiting_idle|' . ($cb['message']['message_id'] ?? 0));
+                }
+                tg_api($pdo, 'answerCallbackQuery', [
+                    'callback_query_id' => $cbId,
+                    'text'              => 'Silakan ketik batas idle (menit) di chat...',
+                    'show_alert'        => false,
+                ]);
+                tg_api($pdo, 'sendMessage', [
+                    'chat_id'           => $cb['message']['chat']['id'],
+                    'message_thread_id' => $cb['message']['message_thread_id'] ?? null,
+                    'text'              => "⏱️ <b>Set Batas Waktu Idle Sebelum Ditutup Otomatis (Menit)</b>\n\nKetik jumlah menit sesi tanpa aktivitas sebelum ditutup otomatis (contoh: <code>30</code>, <code>15</code>, atau <code>0</code> untuk menonaktifkan auto-close), lalu kirimkan.\n\nKetik <code>/cancel</code> untuk membatalkan.",
+                    'parse_mode'        => 'HTML',
+                ]);
+                echo '{}'; exit;
+            }
+
             if ($cbAction === 'lc_cleanup_now') {
                 $closed = cleanup_inactive_sessions($pdo);
                 check_and_process_queue($pdo);
@@ -1439,6 +1470,30 @@ switch ($action) {
                     ]);
 
                     check_and_process_queue($pdo);
+
+                    $panel = lc_render_panel($pdo);
+                    tg_api($pdo, 'sendMessage', [
+                        'chat_id'           => $msg['chat']['id'],
+                        'message_thread_id' => $threadId,
+                        'text'              => $panel['text'],
+                        'parse_mode'        => 'HTML',
+                        'reply_markup'      => $panel['reply_markup'],
+                    ]);
+                    echo '{}'; exit;
+                }
+
+                if ($stateType === 'awaiting_idle') {
+                    $newIdle = max(0, (int)trim($text));
+                    setting_set($pdo, 'lc_max_idle_minutes', (string)$newIdle);
+                    $pdo->prepare("DELETE FROM settings WHERE `key`=?")->execute(['tg_state_lc_' . $fromId]);
+
+                    $idleDesc = $newIdle > 0 ? "<b>{$newIdle} Menit</b>" : "<b>Nonaktif (Tanpa Auto-Close)</b>";
+                    tg_api($pdo, 'sendMessage', [
+                        'chat_id'           => $msg['chat']['id'],
+                        'message_thread_id' => $threadId,
+                        'text'              => "✅ <b>Batas idle sesi berhasil diubah menjadi: {$idleDesc}</b>",
+                        'parse_mode'        => 'HTML',
+                    ]);
 
                     $panel = lc_render_panel($pdo);
                     tg_api($pdo, 'sendMessage', [

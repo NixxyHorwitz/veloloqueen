@@ -227,12 +227,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: /console/livechat.php?t=manage'); exit;
     }
 
+    // Quick set idle timeout
+    if ($tab === 'quick_set_idle_timeout') {
+        $idle = max(0, (int)($_POST['lc_max_idle_minutes'] ?? 30));
+        $pdo->prepare("INSERT INTO settings (`key`,`value`) VALUES ('lc_max_idle_minutes',?) ON DUPLICATE KEY UPDATE `value`=?")
+            ->execute([$idle, $idle]);
+        $_SESSION['flash_msg'] = "✅ Batas idle timeout sesi berhasil diatur ke: " . ($idle > 0 ? "{$idle} Menit" : "Nonaktif (Tanpa Auto-Close)");
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
+
     if ($tab === 'settings') {
         $keys = [
             'lc_tg_token','lc_tg_chat_id','lc_tg_forum',
             'openai_api_key','openai_model','ai_system_prompt',
             'chat_welcome_msg','chat_ai_enabled','chat_admin_enabled','chat_admin_name','livechat_enabled','lc_site_url',
-            'lc_debug_panel','lc_attachment_enabled','lc_offline_msg','lc_max_active_sessions',
+            'lc_debug_panel','lc_attachment_enabled','lc_offline_msg','lc_max_active_sessions','lc_max_idle_minutes',
         ];
         if (!isset($_POST['lc_attachment_enabled'])) $_POST['lc_attachment_enabled'] = '0';
         if (!isset($_POST['livechat_enabled'])) $_POST['livechat_enabled'] = '0';
@@ -421,10 +430,11 @@ foreach ([
     'lc_tg_token','lc_tg_chat_id','lc_tg_forum',
     'openai_api_key','openai_model','ai_system_prompt',
     'chat_welcome_msg','chat_ai_enabled','chat_admin_enabled','chat_admin_name','livechat_enabled','lc_site_url',
-    'lc_debug_panel','lc_attachment_enabled','lc_offline_msg','lc_max_active_sessions',
+    'lc_debug_panel','lc_attachment_enabled','lc_offline_msg','lc_max_active_sessions','lc_max_idle_minutes',
 ] as $k) { $cfg[$k] = setting($pdo, $k, ''); }
 if (empty($cfg['chat_admin_name'])) $cfg['chat_admin_name'] = 'Admin';
 if ($cfg['livechat_enabled'] === '') $cfg['livechat_enabled'] = '1';
+if (!isset($cfg['lc_max_idle_minutes']) || $cfg['lc_max_idle_minutes'] === '') $cfg['lc_max_idle_minutes'] = '30';
 if (!isset($cfg['lc_attachment_enabled']) || $cfg['lc_attachment_enabled'] === '') $cfg['lc_attachment_enabled'] = '1';
 $activeSessCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_sessions WHERE status='open'")->fetchColumn();
 $waitingQueueCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_queue WHERE status='waiting'")->fetchColumn();
@@ -983,24 +993,35 @@ require_once __DIR__ . '/partials/header.php';
         </form>
       </div>
 
-      <!-- Right: Limit Setting & Counter -->
-      <div class="d-flex align-items-center gap-3 flex-wrap">
-        <div class="text-end d-none d-md-block">
-          <div style="font-size:11px;color:#888;font-weight:700;">KUOTA SESI AKTIF</div>
+      <!-- Right: Limit Setting, Idle Timeout & Counter -->
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <div class="text-end d-none d-lg-block me-1">
+          <div style="font-size:10px;color:#888;font-weight:700;">KUOTA SESI AKTIF</div>
           <div style="font-size:13px;font-weight:900;color:#4CAF82;">
             <?= $activeSessCount ?> Terpakai <span style="font-size:11px;color:#888;font-weight:normal;">/ <?= (int)($cfg['lc_max_active_sessions'] ?? 0) > 0 ? (int)$cfg['lc_max_active_sessions'] . ' Maks' : 'Unlimited' ?></span>
           </div>
         </div>
 
-        <form method="POST" class="d-flex align-items-center gap-2 mb-0" style="background:#1a1d27;padding:4px 8px;border-radius:8px;border:1px solid #2d3149;">
+        <!-- Quick Max Sessions -->
+        <form method="POST" class="d-flex align-items-center gap-1 mb-0" style="background:#1a1d27;padding:4px 8px;border-radius:8px;border:1px solid #2d3149;">
           <input type="hidden" name="tab" value="quick_set_max_sessions">
-          <label style="font-size:11px;color:#aaa;font-weight:600;white-space:nowrap;margin:0;">Batas Maks Sesi:</label>
+          <label style="font-size:11px;color:#aaa;font-weight:600;white-space:nowrap;margin:0;">Batas Sesi:</label>
           <input type="number" name="lc_max_active_sessions" value="<?= (int)($cfg['lc_max_active_sessions'] ?? 0) ?>" min="0" step="1" 
-                 class="form-control form-control-sm bg-dark text-white border-secondary" style="width:70px;text-align:center;font-weight:bold;height:28px;" placeholder="0=No Limit">
-          <button type="submit" class="btn btn-sm btn-primary" style="font-size:11px;padding:3px 10px;height:28px;">Set</button>
+                 class="form-control form-control-sm bg-dark text-white border-secondary" style="width:55px;text-align:center;font-weight:bold;height:28px;" placeholder="0">
+          <button type="submit" class="btn btn-sm btn-primary" style="font-size:11px;padding:3px 8px;height:28px;">Set</button>
         </form>
 
-        <a href="/console/livechat.php?t=manage" class="btn btn-sm btn-outline-secondary" style="height:28px;display:inline-flex;align-items:center;font-size:11px;" title="Refresh Data">🔄 Refresh</a>
+        <!-- Quick Idle Timeout -->
+        <form method="POST" class="d-flex align-items-center gap-1 mb-0" style="background:#1a1d27;padding:4px 8px;border-radius:8px;border:1px solid #2d3149;">
+          <input type="hidden" name="tab" value="quick_set_idle_timeout">
+          <label style="font-size:11px;color:#aaa;font-weight:600;white-space:nowrap;margin:0;">Batas Idle:</label>
+          <input type="number" name="lc_max_idle_minutes" value="<?= (int)($cfg['lc_max_idle_minutes'] ?? 30) ?>" min="0" step="1" 
+                 class="form-control form-control-sm bg-dark text-white border-secondary" style="width:55px;text-align:center;font-weight:bold;height:28px;" placeholder="30">
+          <span style="font-size:10px;color:#888;">mnt</span>
+          <button type="submit" class="btn btn-sm btn-primary" style="font-size:11px;padding:3px 8px;height:28px;">Set</button>
+        </form>
+
+        <a href="/console/livechat.php?t=manage" class="btn btn-sm btn-outline-secondary" style="height:28px;display:inline-flex;align-items:center;font-size:11px;" title="Refresh Data">🔄</a>
       </div>
 
     </div>
@@ -1037,6 +1058,10 @@ require_once __DIR__ . '/partials/header.php';
         <?php else: ?>
           <div class="d-flex flex-column gap-2">
             <?php foreach ($activeSessions as $as): ?>
+            <?php 
+              $idleLimit = (int)($cfg['lc_max_idle_minutes'] ?? 30);
+              $isNearTimeout = ($idleLimit > 0 && (int)$as['idle_mins'] >= max(1, $idleLimit - 5));
+            ?>
             <div style="background:#12141c;border:1px solid #24283b;border-radius:10px;padding:12px 14px;position:relative;">
               <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                 <div class="d-flex align-items-center gap-2">
@@ -1060,10 +1085,12 @@ require_once __DIR__ . '/partials/header.php';
                   <span class="badge <?= $as['mode']==='admin'?'bg-info text-dark':'bg-primary' ?>" style="font-size:10px;font-weight:700;">
                     <?= $as['mode']==='admin' ? '👨‍💼 Admin' : '🤖 AI' ?>
                   </span>
-                  <?php if ((int)$as['idle_mins'] >= 20): ?>
-                    <div class="badge bg-danger mt-1 d-block" style="font-size:9px;">Idle <?= (int)$as['idle_mins'] ?> mnt (Hampir Timeout)</div>
+                  <?php if ($isNearTimeout): ?>
+                    <div class="badge bg-danger mt-1 d-block" style="font-size:9px;">⚠️ Idle <?= (int)$as['idle_mins'] ?>/<?= $idleLimit ?> mnt (Auto-Close)</div>
+                  <?php elseif ($idleLimit > 0): ?>
+                    <div style="font-size:10px;color:#666;margin-top:2px;">Idle: <?= (int)$as['idle_mins'] ?>/<?= $idleLimit ?> mnt</div>
                   <?php else: ?>
-                    <div style="font-size:10px;color:#666;margin-top:2px;">Idle: <?= (int)$as['idle_mins'] ?> mnt</div>
+                    <div style="font-size:10px;color:#666;margin-top:2px;">Idle: <?= (int)$as['idle_mins'] ?> mnt (No Limit)</div>
                   <?php endif; ?>
                 </div>
               </div>
@@ -1264,10 +1291,6 @@ require_once __DIR__ . '/partials/header.php';
             <small style="color:#444;font-size:11px;">Supergroup khusus livechat, beda dari group notif Depo/WD.</small>
           </div>
           <div class="c-form-group">
-            <label class="c-label">Tipe Grup</label>
-            </select>
-          </div>
-          <div class="c-form-group">
             <label class="c-label">Pesan Sambutan</label>
             <textarea name="chat_welcome_msg" class="c-form-control" rows="2"><?= htmlspecialchars($cfg['chat_welcome_msg']) ?></textarea>
           </div>
@@ -1294,7 +1317,7 @@ require_once __DIR__ . '/partials/header.php';
           </div>
           <div class="c-form-group">
             <label class="c-label">System Prompt AI</label>
-            <textarea name="ai_system_prompt" class="c-form-control" rows="5"><?= htmlspecialchars($cfg['ai_system_prompt']) ?></textarea>
+            <textarea name="ai_system_prompt" class="c-form-control" rows="4"><?= htmlspecialchars($cfg['ai_system_prompt']) ?></textarea>
             <small style="color:#444;font-size:11px;">Instruksi untuk AI tentang cara menjawab.</small>
           </div>
           <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px;">
@@ -1303,10 +1326,21 @@ require_once __DIR__ . '/partials/header.php';
               <strong style="color:#e0e0f0;">Livechat Aktif</strong>
             </label>
           </div>
-          <div class="c-form-group">
-            <label class="c-label">Batas Maksimum Sesi Chat Aktif (Dalam 1 Waktu)</label>
-            <input type="number" name="lc_max_active_sessions" class="c-form-control" min="0" value="<?= htmlspecialchars((string)($cfg['lc_max_active_sessions'] ?? '0')) ?>" placeholder="0 (Tanpa batas / Unlimited)">
-            <small style="color:#444;font-size:11px;">Jika sesi aktif mencapai batas ini, pengguna baru yang masuk akan diminta mengantre (Queue) sampai ada sesi lain yang ditutup. Isi <strong>0</strong> untuk tanpa batas.</small>
+          <div class="row g-2 mb-2">
+            <div class="col-sm-6">
+              <div class="c-form-group">
+                <label class="c-label">Batas Maks Sesi Aktif</label>
+                <input type="number" name="lc_max_active_sessions" class="c-form-control" min="0" value="<?= htmlspecialchars((string)($cfg['lc_max_active_sessions'] ?? '0')) ?>" placeholder="0 (Unlimited)">
+                <small style="color:#444;font-size:10.5px;">Maks sesi bersamaan. 0 = Tanpa batas.</small>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="c-form-group">
+                <label class="c-label">Batas Idle Timeout (Menit)</label>
+                <input type="number" name="lc_max_idle_minutes" class="c-form-control" min="0" value="<?= htmlspecialchars((string)($cfg['lc_max_idle_minutes'] ?? '30')) ?>" placeholder="30">
+                <small style="color:#444;font-size:10.5px;">Auto-close jika tanpa pesan. 0 = Nonaktif.</small>
+              </div>
+            </div>
           </div>
           <div class="c-form-group">
             <label class="c-label">Pesan Livechat Ditutup (Offline)</label>
