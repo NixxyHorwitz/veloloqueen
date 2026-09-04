@@ -6,10 +6,226 @@ staff_require('livechat');
 $pageTitle  = 'Live Chat';
 $activePage = 'livechat';
 
+// ── Helper: Admit single queue entry to active session ──────
+function lc_admit_queue_entry(PDO $pdo, int $queueId): bool {
+    $qStmt = $pdo->prepare("SELECT * FROM chat_queue WHERE id=? AND status='waiting'");
+    $qStmt->execute([$queueId]);
+    $q = $qStmt->fetch();
+    if (!$q) return false;
+
+    $user = null;
+    if (!empty($q['user_id'])) {
+        $uStmt = $pdo->prepare("SELECT * FROM users WHERE id=?");
+        $uStmt->execute([$q['user_id']]);
+        $user = $uStmt->fetch() ?: null;
+    }
+
+    $userName  = $q['user_name'] ?: ($user ? $user['username'] : 'Guest');
+    $userEmail = $q['user_email'] ?: ($user ? $user['email'] : null);
+    $userId    = $user ? (int)$user['id'] : (!empty($q['user_id']) ? (int)$q['user_id'] : null);
+    $initMode  = in_array($q['mode'] ?? '', ['ai','admin'], true) ? $q['mode'] : 'ai';
+    $newKey    = bin2hex(random_bytes(16));
+
+    $pdo->prepare("INSERT INTO chat_sessions (session_key,user_id,user_name,user_email,mode,status,created_at,last_message_at) VALUES (?,?,?,?,?,'open',NOW(),NOW())")
+        ->execute([$newKey, $userId, $userName, $userEmail, $initMode]);
+    $sessId = (int)$pdo->lastInsertId();
+
+    $welcome = setting($pdo, 'chat_welcome_msg', 'Halo! Ada yang bisa kami bantu?');
+    $pdo->prepare("INSERT INTO chat_messages (session_id,sender,message) VALUES (?,'system',?)")
+        ->execute([$sessId, $welcome]);
+
+    // TG Forum topic creation if enabled
+    $token   = setting($pdo, 'lc_tg_token', '');
+    $chatId  = setting($pdo, 'lc_tg_chat_id', '');
+    $siteUrl = rtrim(setting($pdo, 'lc_site_url', ''), '/');
+    if ($chatId && $token) {
+        $threadTitle = "{$userName} #{$sessId}";
+        $intro = "💬 Sesi Chat Baru (Di-admit oleh Admin)\n"
+               . "👤 User: {$userName}\n"
+               . "🔑 Session: #{$sessId}\n"
+               . "🤖 Mode: " . ($initMode === 'admin' ? 'Admin' : 'AI');
+
+        $consoleLink = $siteUrl ? "{$siteUrl}/console/livechat.php?view={$sessId}" : null;
+        $inlineKbd = ['inline_keyboard' => []];
+        if ($consoleLink) {
+            $inlineKbd['inline_keyboard'][] = [['text' => "🖥️ Buka Console", 'url' => $consoleLink]];
+        }
+        $inlineKbd['inline_keyboard'][] = [
+            ['text' => "📌 Keep", 'callback_data' => "keep_sess:{$sessId}"],
+            ['text' => "🔒 Tutup", 'callback_data' => "close_sess:{$sessId}"],
+            ['text' => "🗑️ Hapus Sesi", 'callback_data' => "del_thread:{$sessId}"]
+        ];
+
+        $ch = curl_init("https://api.telegram.org/bot{$token}/createForumTopic");
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode(['chat_id' => $chatId, 'name' => mb_substr($threadTitle, 0, 128)]),
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_TIMEOUT => 6
+        ]);
+        $res = json_decode(curl_exec($ch) ?: '{}', true);
+        curl_close($ch);
+
+        if (!empty($res['ok'])) {
+            $tgThreadId = $res['result']['message_thread_id'] ?? null;
+            $pdo->prepare("UPDATE chat_sessions SET tg_thread_id=? WHERE id=?")->execute([$tgThreadId, $sessId]);
+            $ch = curl_init("https://api.telegram.org/bot{$token}/sendMessage");
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => json_encode([
+                    'chat_id' => $chatId, 'message_thread_id' => $tgThreadId,
+                    'text' => $intro, 'reply_markup' => $inlineKbd
+                ]),
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_TIMEOUT => 6
+            ]);
+            curl_exec($ch); curl_close($ch);
+        }
+    }
+
+    $pdo->prepare("UPDATE chat_queue SET status='ready', assigned_session_key=? WHERE id=?")
+        ->execute([$newKey, $queueId]);
+    return true;
+}
+
 // ── Handle form saves ────────────────────────────────────────
 $saved = false; $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tab = $_POST['tab'] ?? 'settings';
+
+    // Admit single queue
+    if ($tab === 'admit_queue') {
+        $qid = (int)($_POST['queue_id'] ?? 0);
+        if ($qid && lc_admit_queue_entry($pdo, $qid)) {
+            $_SESSION['flash_msg'] = '✅ User antrean berhasil dimasukkan ke sesi aktif.';
+        } else {
+            $_SESSION['flash_err'] = '❌ Gagal memasukkan antrean (mungkin sudah tidak aktif).';
+        }
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
+
+    // Admit all queue
+    if ($tab === 'admit_all_queue') {
+        $waiting = $pdo->query("SELECT id FROM chat_queue WHERE status='waiting' ORDER BY id ASC")->fetchAll();
+        $cnt = 0;
+        foreach ($waiting as $w) {
+            if (lc_admit_queue_entry($pdo, (int)$w['id'])) $cnt++;
+        }
+        $_SESSION['flash_msg'] = "✅ Sebanyak {$cnt} user antrean berhasil dimasukkan ke sesi aktif.";
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
+
+    // Remove single queue
+    if ($tab === 'remove_queue') {
+        $qid = (int)($_POST['queue_id'] ?? 0);
+        if ($qid) {
+            $pdo->prepare("UPDATE chat_queue SET status='cancelled' WHERE id=?")->execute([$qid]);
+            $_SESSION['flash_msg'] = "✅ Antrean #{$qid} berhasil dihapus/dibatalkan.";
+        }
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
+
+    // Clear all queue
+    if ($tab === 'clear_all_queue') {
+        $pdo->exec("UPDATE chat_queue SET status='cancelled' WHERE status='waiting'");
+        $_SESSION['flash_msg'] = '✅ Seluruh antrean yang menunggu berhasil dibersihkan.';
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
+
+    // Delete single active session
+    if ($tab === 'delete_active_session') {
+        $sid = (int)($_POST['session_id'] ?? 0);
+        if ($sid) {
+            $chatId = setting($pdo, 'lc_tg_chat_id', '');
+            $token  = setting($pdo, 'lc_tg_token', '');
+            $sRow   = $pdo->prepare("SELECT tg_thread_id FROM chat_sessions WHERE id=?");
+            $sRow->execute([$sid]);
+            $tInfo  = $sRow->fetch();
+            if ($token && $chatId && !empty($tInfo['tg_thread_id'])) {
+                $ch = curl_init("https://api.telegram.org/bot{$token}/deleteForumTopic");
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
+                    CURLOPT_POSTFIELDS => json_encode(['chat_id' => $chatId, 'message_thread_id' => (int)$tInfo['tg_thread_id']]),
+                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_TIMEOUT => 5
+                ]);
+                curl_exec($ch); curl_close($ch);
+            }
+            $pdo->prepare("DELETE FROM chat_messages WHERE session_id=?")->execute([$sid]);
+            $pdo->prepare("DELETE FROM chat_sessions WHERE id=?")->execute([$sid]);
+            $_SESSION['flash_msg'] = "✅ Sesi chat #{$sid} berhasil dihapus permanen.";
+        }
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
+
+    // Close all active sessions
+    if ($tab === 'close_all_active') {
+        $chatId = setting($pdo, 'lc_tg_chat_id', '');
+        $token  = setting($pdo, 'lc_tg_token', '');
+        $opens  = $pdo->query("SELECT id, tg_thread_id FROM chat_sessions WHERE status='open'")->fetchAll();
+        $closeMsg = 'Sesi ditutup massal oleh Admin.';
+        foreach ($opens as $op) {
+            $pdo->prepare("UPDATE chat_sessions SET status='closed' WHERE id=?")->execute([$op['id']]);
+            $pdo->prepare("INSERT INTO chat_messages (session_id,sender,message) VALUES (?, 'system', ?)")->execute([$op['id'], $closeMsg]);
+            if ($token && $chatId && !empty($op['tg_thread_id'])) {
+                $ch = curl_init("https://api.telegram.org/bot{$token}/closeForumTopic");
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
+                    CURLOPT_POSTFIELDS => json_encode(['chat_id' => $chatId, 'message_thread_id' => (int)$op['tg_thread_id']]),
+                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_TIMEOUT => 4
+                ]);
+                curl_exec($ch); curl_close($ch);
+            }
+        }
+        $_SESSION['flash_msg'] = '✅ Semua sesi aktif berhasil ditutup.';
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
+
+    // Switch session mode
+    if ($tab === 'switch_mode') {
+        $sid = (int)($_POST['session_id'] ?? 0);
+        $newMode = in_array($_POST['mode'] ?? '', ['ai','admin']) ? $_POST['mode'] : 'admin';
+        if ($sid) {
+            $pdo->prepare("UPDATE chat_sessions SET mode=? WHERE id=?")->execute([$newMode, $sid]);
+            $modeLabel = $newMode === 'admin' ? 'Admin' : 'AI Assistant';
+            $pdo->prepare("INSERT INTO chat_messages (session_id,sender,message) VALUES (?, 'system', ?)")
+                ->execute([$sid, "Mode chat dialihkan ke: {$modeLabel}"]);
+            $_SESSION['flash_msg'] = "✅ Mode sesi #{$sid} diubah ke {$modeLabel}.";
+        }
+        header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/console/livechat.php?t=manage')); exit;
+    }
+
+    // Close session & admit next queue
+    if ($tab === 'close_and_admit_next') {
+        $sid = (int)($_POST['session_id'] ?? 0);
+        if ($sid) {
+            $pdo->prepare("UPDATE chat_sessions SET status='closed' WHERE id=?")->execute([$sid]);
+            $pdo->prepare("INSERT INTO chat_messages (session_id,sender,message) VALUES (?, 'system', 'Sesi ditutup oleh Admin.')")->execute([$sid]);
+        }
+        $nextQ = $pdo->query("SELECT id FROM chat_queue WHERE status='waiting' ORDER BY id ASC LIMIT 1")->fetch();
+        if ($nextQ && lc_admit_queue_entry($pdo, (int)$nextQ['id'])) {
+            $_SESSION['flash_msg'] = "✅ Sesi #{$sid} ditutup dan antrean berikutnya berhasil dimasukkan ke sesi aktif.";
+        } else {
+            $_SESSION['flash_msg'] = "✅ Sesi #{$sid} ditutup (tidak ada antrean yang menunggu).";
+        }
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
+
+    // Quick toggle livechat
+    if ($tab === 'quick_toggle_livechat') {
+        $curr = setting($pdo, 'livechat_enabled', '1');
+        $newVal = $curr === '1' ? '0' : '1';
+        $pdo->prepare("INSERT INTO settings (`key`,`value`) VALUES ('livechat_enabled',?) ON DUPLICATE KEY UPDATE `value`=?")
+            ->execute([$newVal, $newVal]);
+        $_SESSION['flash_msg'] = $newVal === '1' ? '🟢 Livechat berhasil DIBUKA (Online).' : '🔴 Livechat berhasil DITUTUP (Offline).';
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
+
+    // Quick set max sessions
+    if ($tab === 'quick_set_max_sessions') {
+        $max = max(0, (int)($_POST['lc_max_active_sessions'] ?? 0));
+        $pdo->prepare("INSERT INTO settings (`key`,`value`) VALUES ('lc_max_active_sessions',?) ON DUPLICATE KEY UPDATE `value`=?")
+            ->execute([$max, $max]);
+        $_SESSION['flash_msg'] = "✅ Batas sesi aktif berhasil diatur ke: " . ($max > 0 ? "{$max} Sesi" : "Unlimited");
+        header('Location: /console/livechat.php?t=manage'); exit;
+    }
 
     if ($tab === 'settings') {
         $keys = [
@@ -213,6 +429,32 @@ if (!isset($cfg['lc_attachment_enabled']) || $cfg['lc_attachment_enabled'] === '
 $activeSessCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_sessions WHERE status='open'")->fetchColumn();
 $waitingQueueCount = (int)$pdo->query("SELECT COUNT(*) FROM chat_queue WHERE status='waiting'")->fetchColumn();
 
+// ── Load active sessions specifically for manage tab ──────────
+$activeSessions = $pdo->query(
+    "SELECT s.*, 
+        (SELECT COUNT(*) FROM chat_messages m WHERE m.session_id=s.id) as msg_count,
+        (SELECT message FROM chat_messages m WHERE m.session_id=s.id ORDER BY m.id DESC LIMIT 1) as last_msg,
+        (SELECT created_at FROM chat_messages m WHERE m.session_id=s.id ORDER BY m.id DESC LIMIT 1) as last_msg_time,
+        TIMESTAMPDIFF(MINUTE, COALESCE(s.last_message_at, s.created_at), NOW()) as idle_mins
+     FROM chat_sessions s 
+     WHERE s.status='open' 
+     ORDER BY s.last_message_at DESC"
+)->fetchAll();
+
+// ── Load waiting queue list specifically for manage tab ───────
+$waitingQueueList = $pdo->query(
+    "SELECT q.*, 
+        TIMESTAMPDIFF(SECOND, q.last_ping_at, NOW()) as ping_ago_sec,
+        TIMESTAMPDIFF(MINUTE, q.created_at, NOW()) as wait_mins
+     FROM chat_queue q 
+     WHERE q.status='waiting' 
+     ORDER BY q.id ASC"
+)->fetchAll();
+
+$flashMsg = $_SESSION['flash_msg'] ?? null;
+$flashErr = $_SESSION['flash_err'] ?? null;
+unset($_SESSION['flash_msg'], $_SESSION['flash_err']);
+
 // ── Load sessions ─────────────────────────────────────────────
 $sessions = $pdo->query(
     "SELECT s.*, 
@@ -363,6 +605,16 @@ require_once __DIR__ . '/partials/header.php';
   ✅ Pengaturan berhasil disimpan.
 </div>
 <?php endif; ?>
+<?php if ($flashMsg): ?>
+<div class="alert alert-success mb-3" style="background:rgba(76,175,130,.15);border:1px solid rgba(76,175,130,.3);color:#4CAF82;padding:10px 16px;border-radius:8px;font-size:13px;">
+  <?= htmlspecialchars($flashMsg) ?>
+</div>
+<?php endif; ?>
+<?php if ($flashErr): ?>
+<div class="alert alert-danger mb-3" style="background:rgba(244,78,59,.15);border:1px solid rgba(244,78,59,.3);color:#F44E3B;padding:10px 16px;border-radius:8px;font-size:13px;">
+  <?= htmlspecialchars($flashErr) ?>
+</div>
+<?php endif; ?>
 <?php if (!empty($_GET['replied'])): ?>
 <div class="alert alert-success mb-3" style="background:rgba(76,175,130,.15);border:1px solid rgba(76,175,130,.3);color:#4CAF82;padding:10px 16px;border-radius:8px;font-size:13px;">
   ✅ Balasan berhasil dikirim.
@@ -370,7 +622,16 @@ require_once __DIR__ . '/partials/header.php';
 <?php endif; ?>
 
 <div class="lc-tabs">
-  <a href="/console/livechat.php" class="lc-tab <?= !$viewId && ($_GET['t']??'sessions')==='sessions' ? 'active':'' ?>">💬 Sesi Chat</a>
+  <a href="/console/livechat.php" class="lc-tab <?= !$viewId && ($_GET['t']??'sessions')==='sessions' ? 'active':'' ?>">💬 Semua Sesi</a>
+  <a href="/console/livechat.php?t=manage" class="lc-tab <?= ($_GET['t']??'')==='manage' ? 'active':'' ?>">
+    ⚡ Manage Antrean & Sesi Aktif 
+    <?php if ($waitingQueueCount > 0): ?>
+      <span class="badge bg-warning text-dark ms-1" style="font-size:10px;"><?= $waitingQueueCount ?> Antre</span>
+    <?php endif; ?>
+    <?php if ($activeSessCount > 0): ?>
+      <span class="badge bg-success ms-1" style="font-size:10px;"><?= $activeSessCount ?> Aktif</span>
+    <?php endif; ?>
+  </a>
   <a href="/console/livechat.php?t=settings" class="lc-tab <?= ($_GET['t']??'')==='settings' ? 'active':'' ?>">⚙️ Pengaturan</a>
   <a href="/console/livechat.php?t=webhook" class="lc-tab <?= ($_GET['t']??'')==='webhook' ? 'active':'' ?>">🔗 Webhook Info</a>
 </div>
@@ -694,6 +955,280 @@ require_once __DIR__ . '/partials/header.php';
   consolePollTimer = setInterval(consolePoll, 3000);
   </script>
   <?php endif; ?>
+</div>
+<?php endif; ?>
+
+<!-- ═══ TAB: MANAGE SESSIONS & QUEUE ════════════════════════ -->
+<?php if ($activeTab === 'manage'): ?>
+
+<!-- Top Quick Control Bar -->
+<div class="c-card mb-3" style="background:#131520;border:1px solid #1f2235;">
+  <div class="c-card-body p-3">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      
+      <!-- Left: Status Toggle -->
+      <div class="d-flex align-items-center gap-3">
+        <div style="font-size:26px;line-height:1;"><?= $cfg['livechat_enabled']==='1' ? '🟢' : '🔴' ?></div>
+        <div>
+          <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:700;">Status Layanan LiveChat</div>
+          <div style="font-size:14px;font-weight:900;color:#fff;">
+            <?= $cfg['livechat_enabled']==='1' ? 'BUKA (Online)' : 'TUTUP (Offline)' ?>
+          </div>
+        </div>
+        <form method="POST" class="ms-2 mb-0">
+          <input type="hidden" name="tab" value="quick_toggle_livechat">
+          <button type="submit" class="btn btn-sm <?= $cfg['livechat_enabled']==='1' ? 'btn-outline-danger' : 'btn-outline-success' ?>" style="font-weight:700;font-size:12px;border-radius:6px;padding:4px 12px;">
+            <?= $cfg['livechat_enabled']==='1' ? '🔴 Tutup LiveChat' : '🟢 Buka LiveChat' ?>
+          </button>
+        </form>
+      </div>
+
+      <!-- Right: Limit Setting & Counter -->
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <div class="text-end d-none d-md-block">
+          <div style="font-size:11px;color:#888;font-weight:700;">KUOTA SESI AKTIF</div>
+          <div style="font-size:13px;font-weight:900;color:#4CAF82;">
+            <?= $activeSessCount ?> Terpakai <span style="font-size:11px;color:#888;font-weight:normal;">/ <?= (int)($cfg['lc_max_active_sessions'] ?? 0) > 0 ? (int)$cfg['lc_max_active_sessions'] . ' Maks' : 'Unlimited' ?></span>
+          </div>
+        </div>
+
+        <form method="POST" class="d-flex align-items-center gap-2 mb-0" style="background:#1a1d27;padding:4px 8px;border-radius:8px;border:1px solid #2d3149;">
+          <input type="hidden" name="tab" value="quick_set_max_sessions">
+          <label style="font-size:11px;color:#aaa;font-weight:600;white-space:nowrap;margin:0;">Batas Maks Sesi:</label>
+          <input type="number" name="lc_max_active_sessions" value="<?= (int)($cfg['lc_max_active_sessions'] ?? 0) ?>" min="0" step="1" 
+                 class="form-control form-control-sm bg-dark text-white border-secondary" style="width:70px;text-align:center;font-weight:bold;height:28px;" placeholder="0=No Limit">
+          <button type="submit" class="btn btn-sm btn-primary" style="font-size:11px;padding:3px 10px;height:28px;">Set</button>
+        </form>
+
+        <a href="/console/livechat.php?t=manage" class="btn btn-sm btn-outline-secondary" style="height:28px;display:inline-flex;align-items:center;font-size:11px;" title="Refresh Data">🔄 Refresh</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  
+  <!-- 🟢 KOLOM KIRI: SESI CHAT AKTIF -->
+  <div class="col-lg-6">
+    <div class="c-card h-100" style="border-top:3px solid #4CAF82;">
+      <div class="c-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <span class="c-card-title text-success">🟢 Sesi Chat Aktif (<?= count($activeSessions) ?>)</span>
+          <div style="font-size:11px;color:#888;">User yang sedang terhubung dan berkomunikasi langsung.</div>
+        </div>
+        <?php if (!empty($activeSessions)): ?>
+        <form method="POST" onsubmit="return confirm('TUTUP SEMUA SESI AKTIF? Semua sesi chat yang sedang berjalan akan ditutup.');" class="mb-0">
+          <input type="hidden" name="tab" value="close_all_active">
+          <button type="submit" class="btn btn-sm btn-outline-danger" style="font-size:11px;padding:3px 10px;border-radius:6px;font-weight:700;">
+            🔒 Tutup Semua Sesi
+          </button>
+        </form>
+        <?php endif; ?>
+      </div>
+
+      <div class="c-card-body p-3">
+        <?php if (empty($activeSessions)): ?>
+          <div class="text-center py-5" style="color:#666;">
+            <div style="font-size:36px;margin-bottom:8px;">💬</div>
+            <div style="font-weight:600;font-size:13px;color:#aaa;">Tidak ada sesi chat yang sedang aktif</div>
+            <div style="font-size:11px;margin-top:4px;">User baru atau user dari antrean akan muncul di sini saat mulai chat.</div>
+          </div>
+        <?php else: ?>
+          <div class="d-flex flex-column gap-2">
+            <?php foreach ($activeSessions as $as): ?>
+            <div style="background:#12141c;border:1px solid #24283b;border-radius:10px;padding:12px 14px;position:relative;">
+              <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="sess-avatar" style="width:32px;height:32px;font-size:12px;"><?= strtoupper(substr($as['user_name'],0,1)) ?></div>
+                  <div>
+                    <div style="font-size:13px;font-weight:bold;color:#fff;">
+                      <?= htmlspecialchars($as['user_name']) ?>
+                      <?php if ($as['user_id']): ?>
+                        <a href="/console/users.php?q=<?= urlencode($as['user_name']) ?>" class="badge bg-secondary text-decoration-none ms-1" style="font-size:10px;" target="_blank">#UID: <?= $as['user_id'] ?></a>
+                      <?php else: ?>
+                        <span class="badge bg-dark border text-muted ms-1" style="font-size:10px;">Guest</span>
+                      <?php endif; ?>
+                    </div>
+                    <?php if ($as['user_email']): ?>
+                      <div style="font-size:11px;color:#777;"><?= htmlspecialchars($as['user_email']) ?></div>
+                    <?php endif; ?>
+                  </div>
+                </div>
+
+                <div class="text-end">
+                  <span class="badge <?= $as['mode']==='admin'?'bg-info text-dark':'bg-primary' ?>" style="font-size:10px;font-weight:700;">
+                    <?= $as['mode']==='admin' ? '👨‍💼 Admin' : '🤖 AI' ?>
+                  </span>
+                  <?php if ((int)$as['idle_mins'] >= 20): ?>
+                    <div class="badge bg-danger mt-1 d-block" style="font-size:9px;">Idle <?= (int)$as['idle_mins'] ?> mnt (Hampir Timeout)</div>
+                  <?php else: ?>
+                    <div style="font-size:10px;color:#666;margin-top:2px;">Idle: <?= (int)$as['idle_mins'] ?> mnt</div>
+                  <?php endif; ?>
+                </div>
+              </div>
+
+              <!-- Last Message -->
+              <div style="background:#181b26;border-radius:6px;padding:6px 10px;font-size:11.5px;color:#aaa;margin-bottom:10px;border-left:3px solid var(--brand);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                <strong style="color:#ddd;">Pesan:</strong> <?= htmlspecialchars($as['last_msg'] ?: '(Belum ada pesan baru)') ?>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-1 pt-1" style="border-top:1px dashed #24283b;">
+                <div class="d-flex gap-1">
+                  <a href="/console/livechat.php?view=<?= $as['id'] ?>" class="btn btn-sm btn-primary" style="font-size:11px;padding:3px 10px;border-radius:5px;font-weight:600;">
+                    👁️ Buka Chat
+                  </a>
+                  <form method="POST" class="d-inline mb-0">
+                    <input type="hidden" name="tab" value="switch_mode">
+                    <input type="hidden" name="session_id" value="<?= $as['id'] ?>">
+                    <input type="hidden" name="mode" value="<?= $as['mode']==='admin' ? 'ai' : 'admin' ?>">
+                    <button type="submit" class="btn btn-sm btn-outline-light" style="font-size:11px;padding:3px 8px;border-radius:5px;" title="Ganti mode obrolan AI / Admin">
+                      <?= $as['mode']==='admin' ? '🤖 Switch AI' : '👨‍💼 Switch Admin' ?>
+                    </button>
+                  </form>
+                </div>
+
+                <div class="d-flex gap-1">
+                  <?php if (!empty($waitingQueueList)): ?>
+                  <form method="POST" class="d-inline mb-0" onsubmit="return confirm('Tutup sesi ini dan langsung masukkan 1 antrean terdepan ke sesi aktif?');">
+                    <input type="hidden" name="tab" value="close_and_admit_next">
+                    <input type="hidden" name="session_id" value="<?= $as['id'] ?>">
+                    <button type="submit" class="btn btn-sm btn-outline-warning" style="font-size:11px;padding:3px 8px;border-radius:5px;" title="Tutup sesi ini & masukkan antrean berikutnya">
+                      ⏭️ Tutup & Next
+                    </button>
+                  </form>
+                  <?php endif; ?>
+
+                  <form method="POST" class="d-inline mb-0" onsubmit="return promptCloseSession(this);">
+                    <input type="hidden" name="tab" value="close_session">
+                    <input type="hidden" name="session_id" value="<?= $as['id'] ?>">
+                    <input type="hidden" name="close_reason" value="">
+                    <button type="submit" class="btn btn-sm btn-outline-warning" style="font-size:11px;padding:3px 8px;border-radius:5px;" title="Tutup sesi chat ini">
+                      🔒 Tutup
+                    </button>
+                  </form>
+
+                  <form method="POST" class="d-inline mb-0" onsubmit="return confirm('HAPUS PERMANEN sesi #<?= $as['id'] ?> (<?= htmlspecialchars($as['user_name']) ?>)? Sesi dan topik Telegram akan dihapus total.');">
+                    <input type="hidden" name="tab" value="delete_active_session">
+                    <input type="hidden" name="session_id" value="<?= $as['id'] ?>">
+                    <button type="submit" class="btn btn-sm btn-danger" style="font-size:11px;padding:3px 8px;border-radius:5px;" title="Hapus sesi secara permanen">
+                      🗑️ Hapus
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+            </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⏳ KOLOM KANAN: SESI ANTREAN -->
+  <div class="col-lg-6">
+    <div class="c-card h-100" style="border-top:3px solid #FBBC04;">
+      <div class="c-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <span class="c-card-title text-warning">⏳ Antrean Menunggu (<?= count($waitingQueueList) ?>)</span>
+          <div style="font-size:11px;color:#888;">User yang mengantre menunggu kuota sesi aktif tersedia.</div>
+        </div>
+        <?php if (!empty($waitingQueueList)): ?>
+        <div class="d-flex gap-1">
+          <form method="POST" onsubmit="return confirm('MASUKKAN SEMUA ANTREAN KE SESI AKTIF SEKARANG?');" class="mb-0">
+            <input type="hidden" name="tab" value="admit_all_queue">
+            <button type="submit" class="btn btn-sm btn-success" style="font-size:11px;padding:3px 10px;border-radius:6px;font-weight:700;">
+              ▶️ Admit Semua
+            </button>
+          </form>
+          <form method="POST" onsubmit="return confirm('BERSIHKAN SEMUA ANTREAN? Semua user dalam antrean akan dibatalkan.');" class="mb-0">
+            <input type="hidden" name="tab" value="clear_all_queue">
+            <button type="submit" class="btn btn-sm btn-outline-danger" style="font-size:11px;padding:3px 8px;border-radius:6px;">
+              🧹 Bersihkan
+            </button>
+          </form>
+        </div>
+        <?php endif; ?>
+      </div>
+
+      <div class="c-card-body p-3">
+        <?php if (empty($waitingQueueList)): ?>
+          <div class="text-center py-5" style="color:#666;">
+            <div style="font-size:36px;margin-bottom:8px;">⏳</div>
+            <div style="font-weight:600;font-size:13px;color:#aaa;">Tidak ada user dalam antrean saat ini</div>
+            <div style="font-size:11px;margin-top:4px;">Jika sesi aktif penuh sesuai batas maks, user baru akan mengantre di sini.</div>
+          </div>
+        <?php else: ?>
+          <div class="d-flex flex-column gap-2">
+            <?php foreach ($waitingQueueList as $idx => $wq): ?>
+            <div style="background:#12141c;border:1px solid #24283b;border-radius:10px;padding:12px 14px;">
+              <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <div style="background:#FBBC04;color:#000;font-weight:900;font-size:12px;border-radius:6px;padding:4px 8px;">
+                    #<?= $idx + 1 ?>
+                  </div>
+                  <div>
+                    <div style="font-size:13px;font-weight:bold;color:#fff;">
+                      <?= htmlspecialchars($wq['user_name']) ?>
+                      <?php if ($wq['user_id']): ?>
+                        <span class="badge bg-secondary ms-1" style="font-size:10px;">#UID: <?= $wq['user_id'] ?></span>
+                      <?php else: ?>
+                        <span class="badge bg-dark border text-muted ms-1" style="font-size:10px;">Guest</span>
+                      <?php endif; ?>
+                    </div>
+                    <?php if ($wq['user_email']): ?>
+                      <div style="font-size:11px;color:#777;"><?= htmlspecialchars($wq['user_email']) ?></div>
+                    <?php endif; ?>
+                  </div>
+                </div>
+
+                <div class="text-end">
+                  <span class="badge bg-dark border" style="font-size:10px;color:#aaa;">
+                    Req: <?= $wq['mode']==='admin' ? '👨‍💼 Admin' : '🤖 AI' ?>
+                  </span>
+                  <?php if ((int)$wq['ping_ago_sec'] <= 25): ?>
+                    <div style="font-size:10px;color:#4CAF82;margin-top:2px;">🟢 Online (Ping <?= (int)$wq['ping_ago_sec'] ?>s)</div>
+                  <?php else: ?>
+                    <div style="font-size:10px;color:#ff9800;margin-top:2px;">🟡 Idle (Ping <?= (int)$wq['ping_ago_sec'] ?>s)</div>
+                  <?php endif; ?>
+                </div>
+              </div>
+
+              <!-- Queue Info -->
+              <div class="d-flex justify-content-between align-items-center mb-2 px-2 py-1" style="background:#181b26;border-radius:6px;font-size:11px;color:#888;">
+                <span>Menunggu sejak: <strong><?= date('H:i:s', strtotime($wq['created_at'])) ?></strong> (<?= (int)$wq['wait_mins'] ?> mnt)</span>
+                <span>Token: <code style="color:#a8f0dc;"><?= substr($wq['queue_token'],0,8) ?>...</code></span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-1" style="border-top:1px dashed #24283b;">
+                <form method="POST" class="mb-0">
+                  <input type="hidden" name="tab" value="admit_queue">
+                  <input type="hidden" name="queue_id" value="<?= $wq['id'] ?>">
+                  <button type="submit" class="btn btn-sm btn-success" style="font-size:11.5px;padding:4px 14px;border-radius:6px;font-weight:700;">
+                    ▶️ Masukkan ke Sesi Aktif (Admit)
+                  </button>
+                </form>
+
+                <form method="POST" class="mb-0" onsubmit="return confirm('Keluarkan <?= htmlspecialchars($wq['user_name']) ?> dari antrean?');">
+                  <input type="hidden" name="tab" value="remove_queue">
+                  <input type="hidden" name="queue_id" value="<?= $wq['id'] ?>">
+                  <button type="submit" class="btn btn-sm btn-outline-danger" style="font-size:11px;padding:3px 10px;border-radius:6px;">
+                    🗑️ Hapus dari Antrean
+                  </button>
+                </form>
+              </div>
+
+            </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+
 </div>
 <?php endif; ?>
 
